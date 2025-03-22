@@ -33,3 +33,26 @@ export class ForbiddenRequestError extends ErrorResponse {
     super(message, statusCode)
   }
 }
+
+export class EntityError extends ErrorResponse {
+  errors: ErrorsType
+  constructor({
+    message = 'Validate error',
+    statusCode = status.BAD_REQUEST,
+    errors
+  }: {
+    message?: string
+    statusCode?: number
+    errors: ErrorsType
+  }) {
+    super(message, statusCode)
+    this.errors = errors
+  }
+}
+
+type ErrorsType = Record<
+  string,
+  {
+    msg: string
+  }
+>

@@ -2,15 +2,12 @@ import { DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize }
 import { Regex } from '~/constants/regex'
 import { UserStatus } from '~/constants/userStatus'
 
-export class User extends Model<
-  InferAttributes<User>, //
-  InferCreationAttributes<User>
-> {
+export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id?: number
   declare email: string
   declare username: string
   declare password: string
-  declare full_name: string
+  declare fullName: string
   declare avatar?: string
   declare status?: UserStatus
 
@@ -50,7 +47,7 @@ export class User extends Model<
             }
           }
         },
-        full_name: {
+        fullName: {
           type: DataTypes.STRING,
           allowNull: false,
           validate: {

@@ -1,8 +1,9 @@
 import { RequestHandler, Request, Response, NextFunction, ErrorRequestHandler } from 'express'
 import status from 'http-status'
 import { ValidationError } from 'sequelize'
-import { ErrorResponse, NotFoundRequestError } from '~/core/error.response'
+import { EntityError, ErrorResponse, NotFoundRequestError } from '~/core/error.response'
 import { convertValidateErr } from './validate'
+import { getInfoData } from '.'
 
 // Transform to async await for controller
 export const wrapRequestHandler = <P = any>(handler: RequestHandler<P>) => {
@@ -18,11 +19,21 @@ export const errorHandler: ErrorRequestHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  // if validate error
+  if (err instanceof EntityError) {
+    const statusCode = err.statusCode
+    res.status(statusCode).json({
+      message: 'Middleware error',
+      statusCode: status.BAD_REQUEST,
+      err: err.errors
+    })
+    return
+  }
+
+  // if validate error in db
   if (err instanceof ValidationError) {
     const errorFields = convertValidateErr(err)
     res.status(status.BAD_REQUEST).json({
-      message: 'Validate Error',
+      message: 'Validate Error DB',
       statusCode: status.BAD_REQUEST,
       err: errorFields
     })
