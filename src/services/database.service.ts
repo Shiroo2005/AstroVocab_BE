@@ -5,6 +5,7 @@ import { parseInt } from 'lodash'
 import { LogCustomize } from '~/utils/log'
 import { User } from '~/entities/user.entity'
 import { Role } from '~/entities/role.entitity'
+import { Token } from '~/entities/token.entity'
 
 config()
 
@@ -33,6 +34,12 @@ class DatabaseService {
     }
   }
 
+  async createRelationShip() {
+    // USER 1-N TOKEN
+    User.hasMany(Token, { foreignKey: 'userId', as: 'tokens' })
+    Token.belongsTo(User, { foreignKey: 'userId', as: 'Users' })
+  }
+
   async syncDB() {
     try {
       // init user
@@ -41,6 +48,10 @@ class DatabaseService {
       // init role
       Role.initModel(this.sequelize)
 
+      // init token
+      Token.initModel(this.sequelize)
+
+      this.createRelationShip()
       // update column
       await this.sequelize.sync({ alter: true })
       LogCustomize.logSuccess('Database synchronized (alter mode) 🔄')

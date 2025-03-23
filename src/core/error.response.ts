@@ -8,10 +8,7 @@ export class ErrorResponse extends Error {
 }
 
 export class BadRequestError extends ErrorResponse {
-  constructor({
-    message = status[400],
-    statusCode = status.BAD_REQUEST
-  }: { message?: string; statusCode?: number } = {}) {
+  constructor(message: string = status[400], statusCode: number = status.BAD_REQUEST) {
     super(message, statusCode)
   }
 }

@@ -1,6 +1,7 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from 'sequelize'
 import { Regex } from '~/constants/regex'
 import { UserStatus } from '~/constants/userStatus'
+import { Token } from './token.entity'
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id?: number

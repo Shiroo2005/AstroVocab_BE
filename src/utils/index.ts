@@ -6,6 +6,10 @@ export const getInfoData = ({ fields = [], object = {} }: { fields: Array<string
   return _.pick(object, fields)
 }
 
+export const unGetData = ({ fields = [], object = {} }: { fields: Array<string>; object: object }) => {
+  return _.omit(object, fields)
+}
+
 export const getSelectData = (select = []) => {
   return Object.fromEntries(select.map((el) => [el, 1]))
 }

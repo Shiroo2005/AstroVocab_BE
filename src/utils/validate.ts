@@ -23,8 +23,6 @@ export const validate = (validation: RunnableValidationChains<ValidationChain>) 
     const errorObjects = result.mapped()
     const entityError = new EntityError({ errors: {} })
     for (const key in errorObjects) {
-      console.log(errorObjects[key])
-
       entityError.errors[key] = errorObjects[key]
     }
 
