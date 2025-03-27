@@ -8,10 +8,7 @@ export class ErrorResponse extends Error {
 }
 
 export class BadRequestError extends ErrorResponse {
-  constructor({
-    message = status[400],
-    statusCode = status.BAD_REQUEST
-  }: { message?: string; statusCode?: number } = {}) {
+  constructor(message: string = status[400], statusCode: number = status.BAD_REQUEST) {
     super(message, statusCode)
   }
 }
@@ -33,3 +30,26 @@ export class ForbiddenRequestError extends ErrorResponse {
     super(message, statusCode)
   }
 }
+
+export class EntityError extends ErrorResponse {
+  errors: ErrorsType
+  constructor({
+    message = 'Validate error',
+    statusCode = status.BAD_REQUEST,
+    errors
+  }: {
+    message?: string
+    statusCode?: number
+    errors: ErrorsType
+  }) {
+    super(message, statusCode)
+    this.errors = errors
+  }
+}
+
+type ErrorsType = Record<
+  string,
+  {
+    msg: string
+  }
+>
