@@ -8,11 +8,16 @@ import { databaseService } from './services/database.service'
 import router from './routes'
 import swaggerUi from 'swagger-ui-express'
 import { swaggerSpec } from './swagger'
+import { corsConfig } from './config/cors.config'
 const app = express()
 const port = 8081
 config()
 
 //MIDDLE_WARES
+
+// cors
+app.use(corsConfig)
+
 // log by morgan
 app.use(morganMiddleware)
 
