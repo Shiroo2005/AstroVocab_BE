@@ -16,11 +16,11 @@ const authRouter = express.Router()
 
 /*
   Description: Get new tokens
-  Method: GET
+  Method: POST
   Path: /refresh-token
   Body: {refreshToken: string}
 */
-authRouter.get('/refresh-token', refreshTokenValidation, wrapRequestHandler(refreshTokenController))
+authRouter.post('/refresh-token', refreshTokenValidation, wrapRequestHandler(refreshTokenController))
 
 /*
   Description: Get info account
