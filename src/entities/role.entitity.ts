@@ -1,5 +1,4 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from 'sequelize'
-import { Regex } from '~/constants/regex'
 
 export class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
   declare id?: number
@@ -19,8 +18,8 @@ export class Role extends Model<InferAttributes<Role>, InferCreationAttributes<R
           allowNull: false,
           validate: {
             is: {
-              args: Regex.ONLY_LETTER_AND_NUMBER_AND_MUST_BE_1_LETTER,
-              msg: 'Name phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ cái!'
+              args: /^(?=.*[a-zA-Z])[a-zA-Z0-9 ]{6,}$/,
+              msg: 'Name must contain at least 6 chars, 1 letter and only letter, number'
             },
             notNull: {
               msg: 'Name not be null!'

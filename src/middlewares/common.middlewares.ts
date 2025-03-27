@@ -61,27 +61,30 @@ export const isLength = ({ fieldName, min = 6, max = 30 }: { fieldName: string; 
 })
 
 export const accessTokenValidation = validate(
-  checkSchema({
-    authorization: {
-      custom: {
-        options: async (value: string, { req }) => {
-          const accessToken = value.split(' ')[1]
-          if (accessToken.length == 0) throw new AuthRequestError('Access token invalid!')
+  checkSchema(
+    {
+      authorization: {
+        custom: {
+          options: async (value: string, { req }) => {
+            const accessToken = value.split(' ')[1]
+            if (accessToken.length == 0) throw new AuthRequestError('Access token invalid!')
 
-          try {
-            const decodedAuthorization = await verifyToken({ token: accessToken })
-            ;(req as Request).decodedAuthorization = decodedAuthorization
+            try {
+              const decodedAuthorization = await verifyToken({ token: accessToken })
+              ;(req as Request).decodedAuthorization = decodedAuthorization
 
-            console.log(decodedAuthorization)
-          } catch (error) {
-            if (error === 'jwt expired') throw new AuthRequestError('Access token expired!')
-            throw error
+              console.log(decodedAuthorization)
+            } catch (error) {
+              if (error === 'jwt expired') throw new AuthRequestError('Access token expired!')
+              throw error
+            }
+            return true
           }
-          return true
         }
       }
-    }
-  })
+    },
+    ['headers']
+  )
 )
 
 export const refreshTokenValidation = validate(
@@ -90,6 +93,7 @@ export const refreshTokenValidation = validate(
       refreshToken: {
         custom: {
           options: async (value: string, { req }) => {
+            // check refresh token valid
             try {
               const decodedRefreshToken = await verifyToken({ token: value })
               ;(req as Request).decodedRefreshToken = decodedRefreshToken
@@ -98,13 +102,21 @@ export const refreshTokenValidation = validate(
               throw error
             }
 
-            const foundToken = await Token.findAll({
+            // can refresh token use ?
+            const foundToken: Token[] = await Token.findAll({
               where: {
                 refreshToken: value
               }
             })
 
-            if (!foundToken) throw new BadRequestError('Please login again!')
+            // access and refresh token must be 1 userId
+            const decodedAuthorization = (req as Request).decodedAuthorization
+            const decodedRefreshToken = (req as Request).decodedRefreshToken
+            if (decodedAuthorization && decodedAuthorization.userId != decodedRefreshToken?.userId)
+              throw new BadRequestError('Access and refresh token must belong to the same user!')
+
+            if (!foundToken || (foundToken as Token[]).length == 0) throw new BadRequestError('Please login again!')
+
             return true
           }
         }

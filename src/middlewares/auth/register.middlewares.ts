@@ -22,7 +22,9 @@ export const registerValidation = validate(
         custom: {
           options: async (value, { req }) => {
             const foundUser = await findOneUser({
-              [Op.or]: [{ email: req.body?.email }, { username: req.body?.username }]
+              condition: {
+                [Op.or]: [{ email: req.body?.email }, { username: req.body?.username }]
+              }
             })
             if (foundUser) {
               throw new BadRequestError('Email or username already taken!')

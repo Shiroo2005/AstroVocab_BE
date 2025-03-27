@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import { config } from 'dotenv'
 import jwt, { SignOptions } from 'jsonwebtoken'
 import { env } from 'process'
+import { TokenType } from '~/constants/tokenType'
 import { UserStatus } from '~/constants/userStatus'
 import { TokenPayload } from '~/dto/common.dto'
 config()
@@ -30,7 +31,7 @@ export const signToken = ({ payload, optional }: { payload: string | Buffer | ob
 
 export const signAccessToken = async ({ userId, status }: { userId: number; status: UserStatus }) => {
   return await signToken({
-    payload: { userId, status },
+    payload: { userId, status, tokenType: TokenType.accessToken },
     optional: { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME as string }
   })
 }
@@ -46,12 +47,12 @@ export const signRefreshToken = async ({
 }) => {
   if (exp) {
     return await signToken({
-      payload: { payload: { userId, status, exp } }
+      payload: { userId, status, exp, tokenType: TokenType.accessToken }
     })
   }
 
   return await signToken({
-    payload: { payload: { userId, status } },
+    payload: { userId, status },
     optional: { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME as string }
   })
 }

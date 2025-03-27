@@ -1,7 +1,5 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from 'sequelize'
-import { Regex } from '~/constants/regex'
 import { UserStatus } from '~/constants/userStatus'
-import { Token } from './token.entity'
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id?: number
@@ -24,10 +22,9 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
           type: DataTypes.STRING,
           allowNull: false,
           validate: {
-            isEmailCheck(value: string) {
-              if (!Regex.EMAIL.test(value)) {
-                throw new Error('Email không hợp lệ')
-              }
+            is: {
+              args: /^[\w.-]+@([\w-]+\.)+[\w-]{2,20}$/,
+              msg: 'Email invalid format!'
             }
           }
         },
@@ -43,8 +40,8 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
           allowNull: false,
           validate: {
             is: {
-              args: Regex.PASSWORD,
-              msg: 'Mật khẩu phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ hoa!'
+              args: /^(?=.*[A-Z]).{6,}$/, // Min: 6 chars, 1 upper_case
+              msg: 'Password must be contain at least 6 chars, 1 upperCase!'
             }
           }
         },
@@ -53,8 +50,8 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
           allowNull: false,
           validate: {
             is: {
-              args: Regex.NAME,
-              msg: 'Full name phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ cái!'
+              args: /^(?=(?:.*\p{L}){3})[\p{L}0-9 \-']+$/u,
+              msg: 'Full name must contain at least 3 letters and only letters, number, some symbols!'
             }
           }
         },

@@ -2,11 +2,13 @@ import _, { parseInt } from 'lodash'
 
 export const isValidNumber = (num: string) => !Number.isNaN(parseInt(num))
 
+export const toNumber = (num: string) => _.toNumber(num)
+
 export const getInfoData = ({ fields = [], object = {} }: { fields: Array<string>; object: object }) => {
   return _.pick(object, fields)
 }
 
-export const unGetData = ({ fields = [], object = {} }: { fields: Array<string>; object: object }) => {
+export const unGetData = ({ fields = [], object = {} }: { fields?: Array<string>; object?: object }) => {
   return _.omit(object, fields)
 }
 

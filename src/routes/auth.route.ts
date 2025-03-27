@@ -1,19 +1,60 @@
 import express from 'express'
-import { loginController, logoutController, registerController } from '~/controllers/auth.controller'
+import {
+  accountController,
+  loginController,
+  logoutController,
+  refreshTokenController,
+  registerController
+} from '~/controllers/auth.controller'
 import { loginValidation } from '~/middlewares/auth/login.middlewares'
 import { registerValidation } from '~/middlewares/auth/register.middlewares'
-import { refreshTokenValidation } from '~/middlewares/common.middlewares'
+import { accessTokenValidation, refreshTokenValidation } from '~/middlewares/common.middlewares'
 import { wrapRequestHandler } from '~/utils/handler'
 const authRouter = express.Router()
 
 // GET
 
+/*
+  Description: Get new tokens
+  Method: GET
+  Path: /refresh-token
+  Body: {refreshToken: string}
+*/
+authRouter.get('/refresh-token', refreshTokenValidation, wrapRequestHandler(refreshTokenController))
+
+/*
+  Description: Get info account
+  Method: GET
+  Path: /account
+  Header: Authorization
+*/
+authRouter.get('/account', accessTokenValidation, wrapRequestHandler(accountController))
+
 // POST
+/*
+  Description: Register new user
+  Method: POST
+  Path: /register
+  Body: {email: string, username: string, password: string, fullName: string}
+*/
 authRouter.post('/register', registerValidation, wrapRequestHandler(registerController))
 
+/*
+  Description: Login user
+  Method: POST
+  Path: /login
+  Body: {username: string, password: string}
+*/
 authRouter.post('/login', loginValidation, wrapRequestHandler(loginController))
 
-authRouter.post('/logout', refreshTokenValidation, wrapRequestHandler(logoutController))
+/*
+  Description: Logout user
+  Method: POST
+  Path: /logout
+  Body: {refreshToken}
+  Header: Authorization
+*/
+authRouter.post('/logout', accessTokenValidation, refreshTokenValidation, wrapRequestHandler(logoutController))
 
 // PUT
 
