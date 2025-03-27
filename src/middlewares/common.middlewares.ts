@@ -95,6 +95,8 @@ export const refreshTokenValidation = validate(
           options: async (value: string, { req }) => {
             // check refresh token valid
             try {
+              console.log(value)
+
               const decodedRefreshToken = await verifyToken({ token: value })
               ;(req as Request).decodedRefreshToken = decodedRefreshToken
             } catch (error) {

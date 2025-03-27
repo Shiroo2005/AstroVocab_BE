@@ -1,5 +1,21 @@
+version: '3.8'
 
 services:
+  # app:
+  #   build: .
+  #   container_name: node_app
+  #   ports:
+  #     - '3000:3000'
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - .:/app
+  #   environment:
+  #     DB_HOST: db
+  #     DB_USER: ${DB_USERNAME}
+  #     DB_PASSWORD: ${DB_PASSWORD}
+  #     DB_NAME: ${DB_NAME}
+
   db:
     image: mysql:8.0
     container_name: mysql_db
