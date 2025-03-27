@@ -5,6 +5,7 @@ import { env } from 'process'
 import { TokenType } from '~/constants/tokenType'
 import { UserStatus } from '~/constants/userStatus'
 import { TokenPayload } from '~/dto/common.dto'
+import { v4 as uuidv4 } from 'uuid'
 config()
 
 const secretKey = env.JWT_SECRET_KEY as string
@@ -20,7 +21,7 @@ export const compareBcrypt = (data: string, hashData: string) => {
 export const signToken = ({ payload, optional }: { payload: string | Buffer | object; optional?: SignOptions }) => {
   optional = { ...optional, algorithm: 'HS256' }
   return new Promise<string>((resolve, reject) => {
-    jwt.sign(payload, secretKey, optional, (err, token) => {
+    jwt.sign(payload, secretKey, { ...optional, jwtid: uuidv4() }, (err, token) => {
       if (err) {
         reject(err)
       }
@@ -47,12 +48,12 @@ export const signRefreshToken = async ({
 }) => {
   if (exp) {
     return await signToken({
-      payload: { userId, status, exp, tokenType: TokenType.accessToken }
+      payload: { userId, status, exp, tokenType: TokenType.refreshToken }
     })
   }
 
   return await signToken({
-    payload: { userId, status },
+    payload: { userId, status, tokenType: TokenType.refreshToken },
     optional: { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME as string }
   })
 }
