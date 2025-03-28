@@ -30,9 +30,17 @@ export const signToken = ({ payload, optional }: { payload: string | Buffer | ob
   })
 }
 
-export const signAccessToken = async ({ userId, status }: { userId: number; status: UserStatus }) => {
+export const signAccessToken = async ({
+  userId,
+  status,
+  roleId
+}: {
+  userId: number
+  status: UserStatus
+  roleId: number
+}) => {
   return await signToken({
-    payload: { userId, status, tokenType: TokenType.accessToken },
+    payload: { userId, status, roleId, tokenType: TokenType.accessToken },
     optional: { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME as string }
   })
 }
@@ -40,15 +48,17 @@ export const signAccessToken = async ({ userId, status }: { userId: number; stat
 export const signRefreshToken = async ({
   userId,
   status,
-  exp
+  exp,
+  roleId
 }: {
   userId: number
   status: UserStatus
   exp?: number
+  roleId: number
 }) => {
   if (exp) {
     return await signToken({
-      payload: { userId, status, exp, tokenType: TokenType.refreshToken }
+      payload: { userId, status, roleId, exp, tokenType: TokenType.refreshToken }
     })
   }
 

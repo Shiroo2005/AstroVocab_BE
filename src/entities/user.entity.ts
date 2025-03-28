@@ -1,5 +1,6 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from 'sequelize'
 import { UserStatus } from '~/constants/userStatus'
+import { Role } from './role.entity'
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id?: number
@@ -9,6 +10,8 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare fullName: string
   declare avatar?: string
   declare status?: UserStatus
+  declare roleId: number
+  declare role?: Role
 
   static initModel(sequelize: Sequelize) {
     User.init(
@@ -64,6 +67,14 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
           type: DataTypes.INTEGER,
           allowNull: false,
           defaultValue: UserStatus.NOT_VERIFIED
+        },
+        roleId: {
+          type: DataTypes.INTEGER,
+          references: {
+            model: Role,
+            key: 'id'
+          },
+          allowNull: false
         }
       },
       {

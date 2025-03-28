@@ -1,19 +1,22 @@
+import { RoleName } from '~/constants/access'
 import { UserStatus } from '~/constants/userStatus'
 import { TokenPayload } from '~/dto/common.dto'
 import { LogoutBodyReq } from '~/dto/req/auth/logoutBody.req'
 import { RegisterBodyReq } from '~/dto/req/auth/registerBody.req'
+import { Role } from '~/entities/role.entity'
 import { Token } from '~/entities/token.entity'
 import { User } from '~/entities/user.entity'
+import { findOneRole } from '~/repositories/role.repository'
 import { findOneUser } from '~/repositories/user.repository'
-import { toNumber, unGetData } from '~/utils'
+import { unGetData } from '~/utils'
 import { hashData, signAccessToken, signRefreshToken } from '~/utils/jwt'
 
 class UserService {
-  login = async ({ userId, status }: { userId: number; status: UserStatus }) => {
+  login = async ({ userId, status, roleId }: { userId: number; status: UserStatus; roleId: number }) => {
     // create access, refresh token
     const [accessToken, refreshToken] = await Promise.all([
-      signAccessToken({ userId, status }),
-      signRefreshToken({ userId, status })
+      signAccessToken({ userId, status, roleId }),
+      signRefreshToken({ userId, status, roleId })
     ])
 
     // save refreshToken
@@ -26,7 +29,15 @@ class UserService {
   }
 
   register = async ({ email, username, fullName, password }: RegisterBodyReq) => {
-    const createdUser = await User.create({ email, username, password: hashData(password), fullName: fullName })
+    const userRole = await findOneRole({ condition: { name: RoleName.USER } })
+
+    const createdUser = await User.create({
+      email,
+      username,
+      password: hashData(password),
+      fullName: fullName,
+      roleId: (userRole as Role).id as number
+    })
 
     return unGetData({ fields: ['password'], object: createdUser.dataValues })
   }
@@ -42,11 +53,11 @@ class UserService {
     return {}
   }
 
-  newToken = async ({ userId, exp, status }: TokenPayload) => {
+  newToken = async ({ userId, exp, status, roleId }: TokenPayload) => {
     // recreate token
     const [accessToken, refreshToken] = await Promise.all([
-      signAccessToken({ userId: userId, status }),
-      signRefreshToken({ userId: userId, status, exp })
+      signAccessToken({ userId: userId, status, roleId }),
+      signRefreshToken({ userId: userId, status, exp, roleId })
     ])
 
     // save refreshToken
@@ -58,6 +69,7 @@ class UserService {
   getAccount = async ({ userId }: TokenPayload) => {
     const foundUser = await findOneUser({ condition: { id: userId }, unGetFields: ['password'] })
 
+    if (!foundUser) return {}
     return foundUser
   }
 }

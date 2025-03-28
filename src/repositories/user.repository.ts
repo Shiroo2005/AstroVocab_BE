@@ -19,7 +19,7 @@ export const findOneUser = async ({
     }
   })
 
-  if (!foundUser) return {}
+  if (!foundUser) return null
 
   return unGetData({ fields: unGetFields, object: foundUser?.dataValues })
 }
