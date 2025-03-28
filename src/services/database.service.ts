@@ -4,8 +4,9 @@ import { env } from 'process'
 import { parseInt } from 'lodash'
 import { LogCustomize } from '~/utils/log'
 import { User } from '~/entities/user.entity'
-import { Role } from '~/entities/role.entitity'
 import { Token } from '~/entities/token.entity'
+import { Role } from '~/entities/role.entity'
+import { seedRoles } from '~/core/seeds'
 
 config()
 
@@ -42,19 +43,23 @@ class DatabaseService {
 
   async syncDB() {
     try {
-      // init user
-      User.initModel(this.sequelize)
-
       // init role
       Role.initModel(this.sequelize)
+
+      // init user
+      User.initModel(this.sequelize)
 
       // init token
       Token.initModel(this.sequelize)
 
       this.createRelationShip()
       // update column
+
       await this.sequelize.sync({ alter: true })
       LogCustomize.logSuccess('Database synchronized (alter mode) 🔄')
+
+      // seed data
+      seedRoles()
     } catch (error) {
       console.log((error as Error).message)
     }

@@ -35,7 +35,7 @@ export const isPassword = {
       minSymbols: 0,
       minUppercase: 1
     },
-    errorMessage: 'Password must be at least 8 characters'
+    errorMessage: 'Password must be at least 6 characters, 1 upper case'
   }
 }
 

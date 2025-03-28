@@ -18,8 +18,8 @@ export class Role extends Model<InferAttributes<Role>, InferCreationAttributes<R
           allowNull: false,
           validate: {
             is: {
-              args: /^(?=.*[a-zA-Z])[a-zA-Z0-9 ]{6,}$/,
-              msg: 'Name must contain at least 6 chars, 1 letter and only letter, number'
+              args: /^(?=.*[a-zA-Z])[a-zA-Z0-9 ]{3,}$/,
+              msg: 'Name must contain at least 3 chars, 1 letter and only letter, number'
             },
             notNull: {
               msg: 'Name not be null!'

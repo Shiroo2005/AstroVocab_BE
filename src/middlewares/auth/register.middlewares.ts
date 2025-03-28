@@ -26,6 +26,7 @@ export const registerValidation = validate(
                 [Op.or]: [{ email: req.body?.email }, { username: req.body?.username }]
               }
             })
+
             if (foundUser) {
               throw new BadRequestError('Email or username already taken!')
             }
