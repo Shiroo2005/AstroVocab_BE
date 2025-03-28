@@ -30,6 +30,7 @@ authRouter.get('/account', accessTokenValidation, wrapRequestHandler(accountCont
  * @body : {refreshToken: string}
  */
 authRouter.post('/refresh-token', refreshTokenValidation, wrapRequestHandler(refreshTokenController))
+
 /**
  * @description : Register new user
  * @method : POST
@@ -37,6 +38,7 @@ authRouter.post('/refresh-token', refreshTokenValidation, wrapRequestHandler(ref
  * @body : {email: string, username: string, password: string, fullName: string}
  */
 authRouter.post('/register', registerValidation, wrapRequestHandler(registerController))
+
 /**
  * @description : Login user
  * @method : POST
@@ -44,6 +46,7 @@ authRouter.post('/register', registerValidation, wrapRequestHandler(registerCont
  * @body : {username: string, password: string}
  */
 authRouter.post('/login', loginValidation, wrapRequestHandler(loginController))
+
 /**
  * @description : Logout user
  * @method : POST
@@ -51,7 +54,6 @@ authRouter.post('/login', loginValidation, wrapRequestHandler(loginController))
  * @body : {refreshToken}
  * @header : Authorization
  */
-
 authRouter.post('/logout', accessTokenValidation, refreshTokenValidation, wrapRequestHandler(logoutController))
 
 // PUT

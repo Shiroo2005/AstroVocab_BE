@@ -7,6 +7,8 @@ import { User } from '~/entities/user.entity'
 import { Token } from '~/entities/token.entity'
 import { Role } from '~/entities/role.entity'
 import { seedData } from '~/core/seeds'
+import { Permission } from '~/entities/permission.entity'
+import { RolePermission } from '~/entities/rolePermission.entity'
 
 config()
 
@@ -21,7 +23,7 @@ const options = {
 }
 
 class DatabaseService {
-  sequelize: Sequelize
+  public sequelize: Sequelize
   constructor() {
     this.sequelize = new Sequelize(options)
   }
@@ -37,8 +39,12 @@ class DatabaseService {
 
   async createRelationShip() {
     // USER 1-N TOKEN
-    User.hasMany(Token, { foreignKey: 'userId', as: 'tokens' })
-    Token.belongsTo(User, { foreignKey: 'userId', as: 'Users' })
+    User.hasMany(Token, { foreignKey: 'userId', as: 'Tokens' })
+    Token.belongsTo(User, { foreignKey: 'userId', as: 'User' })
+
+    // USER N-1 Role
+    User.belongsTo(Role, { foreignKey: 'roleId', as: 'Role' })
+    Role.hasMany(User, { foreignKey: 'roleId', as: 'Users' })
   }
 
   async syncDB() {
@@ -51,6 +57,12 @@ class DatabaseService {
 
       // init token
       Token.initModel(this.sequelize)
+
+      // init permission
+      Permission.initModel(this.sequelize)
+
+      // init Role_Permission
+      RolePermission.initModel(this.sequelize)
 
       this.createRelationShip()
       // update column

@@ -12,10 +12,10 @@ export const unGetData = ({ fields = [], object = {} }: { fields?: Array<string>
   return _.omit(object, fields)
 }
 
-export const getSelectData = (select = []) => {
-  return Object.fromEntries(select.map((el) => [el, 1]))
-}
+// export const getSelectData = (select = []) => {
+//   return Object.fromEntries(select.map((el) => [el, 1]))
+// }
 
-export const unGetSelectData = (select = []) => {
-  return Object.fromEntries(select.map((el) => [el, 0]))
-}
+// export const unGetSelectData = (select = []) => {
+//   return Object.fromEntries(select.map((el) => [el, 0]))
+// }

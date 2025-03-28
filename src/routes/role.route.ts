@@ -11,6 +11,7 @@ const roleRouter = express.Router()
 
 // authenticate....
 roleRouter.use(accessTokenValidation)
+
 /**
  * @description : Get all roles
  * @method : GET
@@ -34,7 +35,7 @@ roleRouter.get(
   '/:id',
   wrapRequestHandler(checkPermission('readAny', Resource.ROLE)),
   wrapRequestHandler(roleController.createRole),
-  checkIdParamMiddleware,
+  checkIdParamMiddleware(),
   wrapRequestHandler(roleController.getRole)
 )
 
@@ -51,7 +52,9 @@ roleRouter.post(
   wrapRequestHandler(checkPermission('createAny', Resource.ROLE)),
   wrapRequestHandler(roleController.createRole)
 )
+
 // PUT
+
 /**
  * @description : Update role by id
  * @method : PUT
@@ -63,7 +66,7 @@ roleRouter.put(
   '/:id',
   wrapRequestHandler(checkPermission('updateAny', Resource.ROLE)),
   wrapRequestHandler(roleController.createRole),
-  checkIdParamMiddleware,
+  checkIdParamMiddleware(),
   wrapRequestHandler(roleController.putRole)
 )
 
@@ -72,7 +75,7 @@ roleRouter.delete(
   '/:id',
   wrapRequestHandler(checkPermission('deleteAny', Resource.ROLE)),
   wrapRequestHandler(roleController.createRole),
-  checkIdParamMiddleware,
+  checkIdParamMiddleware(),
   wrapRequestHandler(roleController.deleteRoleById)
 )
 

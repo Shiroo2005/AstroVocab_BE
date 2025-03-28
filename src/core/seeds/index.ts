@@ -36,6 +36,6 @@ async function seedUsers() {
 }
 
 export function seedData() {
-  seedRoles()
-  seedUsers()
+  // seedRoles()
+  // seedUsers()
 }
