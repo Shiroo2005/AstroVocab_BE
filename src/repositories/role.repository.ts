@@ -7,7 +7,7 @@ export const findOneRole = async ({ condition, unGetFields }: { condition: Where
     where: condition
   })
 
-  if (!foundRole) return {}
+  if (!foundRole) return null
 
   return unGetData({ fields: unGetFields, object: foundRole?.dataValues })
 }

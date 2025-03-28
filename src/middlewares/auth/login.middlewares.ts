@@ -17,9 +17,11 @@ export const loginValidation = validate(
         ...isRequired('Username'),
         custom: {
           options: async (value, { req }) => {
-            const foundUser = await findOneUser({
-              [Op.or]: [{ [Op.and]: [{ email: value }] }, { [Op.and]: [{ username: value }] }]
-            })
+            const foundUser = (await findOneUser({
+              condition: {
+                [Op.or]: [{ [Op.and]: [{ email: value }] }, { [Op.and]: [{ username: value }] }]
+              }
+            })) as User
 
             if (!foundUser || !compareBcrypt(req.body?.password, foundUser.password)) {
               throw new BadRequestError('Email or username incorrect!')

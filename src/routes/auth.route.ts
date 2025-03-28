@@ -6,9 +6,10 @@ import {
   refreshTokenController,
   registerController
 } from '~/controllers/auth.controller'
+import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { loginValidation } from '~/middlewares/auth/login.middlewares'
+import { refreshTokenValidation } from '~/middlewares/auth/refreshToken.middleware'
 import { registerValidation } from '~/middlewares/auth/register.middlewares'
-import { accessTokenValidation, refreshTokenValidation } from '~/middlewares/common.middlewares'
 import { wrapRequestHandler } from '~/utils/handler'
 const authRouter = express.Router()
 
@@ -20,7 +21,12 @@ const authRouter = express.Router()
   Path: /refresh-token
   Body: {refreshToken: string}
 */
-authRouter.post('/refresh-token', refreshTokenValidation, wrapRequestHandler(refreshTokenController))
+authRouter.post(
+  '/refresh-token',
+  accessTokenValidation,
+  refreshTokenValidation,
+  wrapRequestHandler(refreshTokenController)
+)
 
 /*
   Description: Get info account

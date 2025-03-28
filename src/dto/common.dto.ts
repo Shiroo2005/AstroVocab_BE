@@ -7,4 +7,5 @@ export interface TokenPayload extends JwtPayload {
   tokenType: TokenType
   status: UserStatus
   exp: number
+  roleId: number
 }

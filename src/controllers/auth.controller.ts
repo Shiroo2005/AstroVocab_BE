@@ -21,7 +21,11 @@ export const loginController = async (req: Request<ParamsDictionary, any, LoginB
 
   return new SuccessResponse({
     message: 'Login successful!',
-    metaData: await userService.login({ userId: user.id as number, status: user.status as UserStatus })
+    metaData: await userService.login({
+      userId: user.id as number,
+      status: user.status as UserStatus,
+      roleId: user.roleId
+    })
   }).send(res)
 }
 

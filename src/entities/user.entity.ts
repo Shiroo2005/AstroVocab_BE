@@ -11,6 +11,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare avatar?: string
   declare status?: UserStatus
   declare roleId: number
+  declare role?: Role
 
   static initModel(sequelize: Sequelize) {
     User.init(

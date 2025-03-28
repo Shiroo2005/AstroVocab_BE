@@ -8,6 +8,8 @@ paths:
   /roles:
     post:
       summary: Tạo vai trò mới
+      security:
+        - bearerAuth: []
       tags:
         - Roles
       requestBody:
@@ -32,6 +34,8 @@ paths:
   /roles/all:
     get:
       summary: Lấy danh sách tất cả vai trò (có phân trang)
+      security:
+        - bearerAuth: []
       tags:
         - Roles
       parameters:
@@ -93,6 +97,8 @@ paths:
   /roles/{id}:
     get:
       summary: Lấy thông tin vai trò
+      security:
+        - bearerAuth: []
       tags:
         - Roles
       parameters:
@@ -123,6 +129,8 @@ paths:
 
     put:
       summary: Cập nhật thông tin vai trò
+      security:
+        - bearerAuth: []
       tags:
         - Roles
       parameters:
@@ -162,6 +170,8 @@ paths:
 
     delete:
       summary: Xóa vai trò theo ID
+      security:
+        - bearerAuth: []
       tags:
         - Roles
       parameters:
@@ -229,3 +239,9 @@ components:
         description:
           type: string
           example: 'Vai trò quản trị'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
