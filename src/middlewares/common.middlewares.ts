@@ -1,14 +1,7 @@
 import { Request, Response } from 'express'
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
-import { checkSchema } from 'express-validator'
-import { AuthRequestError, BadRequestError } from '~/core/error.response'
-import { Role } from '~/entities/role.entity'
-import { Token } from '~/entities/token.entity'
-import { User } from '~/entities/user.entity'
-import { findOneRole } from '~/repositories/role.repository'
+import { BadRequestError } from '~/core/error.response'
 import { isValidNumber } from '~/utils'
-import { verifyToken } from '~/utils/jwt'
-import { validate } from '~/utils/validate'
 
 export const checkIdParamMiddleware = (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
   if (req.params?.id && !isValidNumber(req.params?.id)) {

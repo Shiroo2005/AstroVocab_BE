@@ -6,7 +6,7 @@ import { LogCustomize } from '~/utils/log'
 import { User } from '~/entities/user.entity'
 import { Token } from '~/entities/token.entity'
 import { Role } from '~/entities/role.entity'
-import { seedRoles } from '~/core/seeds'
+import { seedData } from '~/core/seeds'
 
 config()
 
@@ -59,7 +59,7 @@ class DatabaseService {
       LogCustomize.logSuccess('Database synchronized (alter mode) 🔄')
 
       // seed data
-      seedRoles()
+      seedData()
     } catch (error) {
       console.log((error as Error).message)
     }

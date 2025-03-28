@@ -6,8 +6,6 @@ import helmet from 'helmet'
 import compression from 'compression'
 import { databaseService } from './services/database.service'
 import router from './routes'
-import swaggerUi from 'swagger-ui-express'
-import { swaggerSpec } from './swagger'
 import { corsConfig } from './config/cors.config'
 const app = express()
 const port = 8081
@@ -41,7 +39,7 @@ app.use(router)
 //////////////////////////////
 
 //init swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 //DEFAULT HANDLER
 //not found handler

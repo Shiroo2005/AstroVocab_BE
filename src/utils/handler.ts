@@ -3,7 +3,6 @@ import status from 'http-status'
 import { ValidationError } from 'sequelize'
 import { EntityError, ErrorResponse, NotFoundRequestError } from '~/core/error.response'
 import { convertValidateErr } from './validate'
-import { getInfoData } from '.'
 
 // Transform to async await for controller
 export const wrapRequestHandler = <P = any>(handler: RequestHandler<P>) => {
