@@ -34,7 +34,6 @@ roleRouter.get(
 roleRouter.get(
   '/:id',
   wrapRequestHandler(checkPermission('readAny', Resource.ROLE)),
-  wrapRequestHandler(roleController.createRole),
   checkIdParamMiddleware(),
   wrapRequestHandler(roleController.getRole)
 )

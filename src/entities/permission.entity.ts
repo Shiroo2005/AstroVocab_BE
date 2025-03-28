@@ -1,10 +1,12 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from 'sequelize'
+import { Action, Possession, Resource } from '~/constants/access'
 
 export class Permission extends Model<InferAttributes<Permission>, InferCreationAttributes<Permission>> {
   declare id?: number
-  declare resource: string
-  declare action: string
+  declare resource: Resource
+  declare action: Action
   declare attributes: string
+  declare possession: Possession // any, own,
 
   static initModel(sequelize: Sequelize) {
     Permission.init(
@@ -27,6 +29,12 @@ export class Permission extends Model<InferAttributes<Permission>, InferCreation
           }
         },
         attributes: {
+          type: DataTypes.STRING,
+          validate: {
+            len: [2, 50]
+          }
+        },
+        possession: {
           type: DataTypes.STRING,
           validate: {
             len: [2, 50]

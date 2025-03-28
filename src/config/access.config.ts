@@ -1,15 +1,18 @@
 import { AccessControl } from 'accesscontrol'
-import { Resource, RoleName } from '~/constants/access'
+import { Role } from '~/entities/role.entity'
+import { permissionService } from '~/services/permission.service'
 
 const ac = new AccessControl()
 
-ac.grant(RoleName.USER)
+export const grantList = async (role: Role) => {
+  const permissions = await permissionService.findPermissionByRole(role.id as number)
 
-ac.grant(RoleName.ADMIN)
-  .extend([RoleName.USER])
-  .createAny(Resource.ROLE)
-  .readAny(Resource.ROLE)
-  .updateAny(Resource.ROLE)
-  .deleteAny(Resource.ROLE)
+  permissions.forEach((permission) => {
+    ac.grant({
+      role: role.name,
+      ...permission
+    })
+  })
 
-export default ac
+  return ac
+}

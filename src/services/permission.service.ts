@@ -1,9 +1,7 @@
 import { CreatePermissionBodyReq } from '~/dto/req/permission/createPermissionBody.req'
 import { Permission } from '~/entities/permission.entity'
-import { Role } from '~/entities/role.entity'
 import { RolePermission } from '~/entities/rolePermission.entity'
 import { create, find } from '~/repositories/permission.repository'
-import { getInfoData } from '~/utils'
 
 class PermissionService {
   createPermission = async (permissions: CreatePermissionBodyReq) => {
@@ -23,9 +21,7 @@ class PermissionService {
     return createdPermission
   }
 
-  findPermission = async (roleId: number) => {
-    console.log('Hasccscskk', roleId)
-
+  findPermissionByRole = async (roleId: number) => {
     const foundRolePermission = await RolePermission.findAll({
       where: {
         roleId
@@ -47,7 +43,7 @@ class PermissionService {
     if (!foundPermissions || foundPermissions.length == 0) {
       return []
     }
-    return foundPermissions
+    return foundPermissions as Permission[]
   }
 }
 
