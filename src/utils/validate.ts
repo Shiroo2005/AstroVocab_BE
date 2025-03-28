@@ -21,9 +21,9 @@ export const validate = (validation: RunnableValidationChains<ValidationChain>) 
     const result = validationResult(req)
 
     const errorObjects = result.mapped()
-    const entityError = new EntityError({ errors: {} })
+    const entityError = new EntityError({ errors: [] })
     for (const key in errorObjects) {
-      entityError.errors[key] = errorObjects[key]
+      entityError.errors.push(errorObjects[key])
     }
 
     if (!result.isEmpty()) {

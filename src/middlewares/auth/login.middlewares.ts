@@ -24,7 +24,7 @@ export const loginValidation = validate(
             })) as User
 
             if (!foundUser || !compareBcrypt(req.body?.password, foundUser.password)) {
-              throw new BadRequestError('Email or username incorrect!')
+              throw new BadRequestError('Username or password incorrect!')
             }
 
             ;(req as Request).user = foundUser as User
