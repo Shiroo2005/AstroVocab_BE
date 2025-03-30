@@ -34,11 +34,7 @@ class RoleController {
     }).send(res)
   }
 
-  deleteRoleById = async (
-    req: Request<ParamsDictionary, any, UpdateRoleBodyReq>,
-    res: Response,
-    next: NextFunction
-  ) => {
+  deleteRoleById = async (req: Request<ParamsDictionary, any, UpdateRoleBodyReq>, res: Response) => {
     return new SuccessResponse({
       message: 'Delete role by id successful!',
       metaData: await roleService.deleteRoleById({ id: req.params?.id })

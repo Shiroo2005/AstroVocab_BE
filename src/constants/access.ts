@@ -8,14 +8,13 @@ export enum RoleName {
   ADMIN = 'admin'
 }
 
-export enum Possession {
-  ANY = 'any',
-  OWN = 'own'
-}
-
 export enum Action {
-  CREATE = 'create',
-  UPDATE = 'update',
-  READ = 'read',
-  DELETE = 'delete'
+  CREATE_ANY = 'create:any',
+  UPDATE_ANY = 'update:any',
+  READ_ANY = 'read:any',
+  DELETE_ANY = 'delete:any',
+  CREATE_OWN = 'create:own',
+  UPDATE_OWN = 'update:own',
+  READ_OWN = 'read:own',
+  DELETE_OWN = 'delete:own'
 }

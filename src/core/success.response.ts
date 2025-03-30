@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import status from 'http-status'
+import { status } from 'http-status'
 
 export class SuccessResponse {
   message: string

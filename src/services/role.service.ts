@@ -1,9 +1,22 @@
 import { CreateRoleBodyReq } from '~/dto/req/roles/createRoleBody.req'
 import { Role } from '~/entities/role.entity'
+import { RolePermission } from '~/entities/rolePermission.entity'
+import { permissionService } from './permission.service'
 
 class RoleService {
-  createRole = async ({ name, description }: CreateRoleBodyReq) => {
+  createRole = async ({ name, description, permissionIds }: CreateRoleBodyReq) => {
     const createdRole = await Role.create({ name, description }, { returning: true })
+
+    // create ROLE_PERMISSION
+    if (permissionIds && permissionIds.length > 0) {
+      console.log('cacassacsac')
+
+      const transforPermissions = permissionIds.map((permissionId) => ({
+        roleId: createdRole.id as number,
+        permissionId: permissionId
+      }))
+      await RolePermission.bulkCreate(transforPermissions)
+    }
     return createdRole
   }
 
@@ -43,10 +56,25 @@ class RoleService {
       attributes: ['id', 'name', 'description']
     })
     if (!foundRole) return {}
-    return foundRole
+    const permissions = await permissionService.findPermissionByRole(Number(id))
+
+    return {
+      foundRole,
+      permissions
+    }
   }
 
-  putRoleById = async ({ id, name, description }: { id: string; name: string; description?: string }) => {
+  putRoleById = async ({
+    id,
+    name,
+    description,
+    permissionIds
+  }: {
+    id: string
+    name: string
+    description?: string
+    permissionIds?: number[]
+  }) => {
     const updatedRole = await Role.update(
       {
         name,
@@ -59,10 +87,30 @@ class RoleService {
         returning: true
       }
     )
+
+    // update rolePermission
+    if (permissionIds && permissionIds.length > 0) {
+      const rolePermissions = permissionIds?.map((permissionId) => {
+        return {
+          roleId: Number(id),
+          permissionId: permissionId as number
+        }
+      })
+
+      await RolePermission.bulkCreate(rolePermissions, { ignoreDuplicates: true })
+    }
     return updatedRole
   }
 
   deleteRoleById = async ({ id }: { id: string }) => {
+    // delete rolePermission
+    await RolePermission.destroy({
+      where: {
+        roleId: id
+      }
+    })
+
+    // delete role
     return await Role.update({ isDeleted: true }, { where: { id } })
   }
 }

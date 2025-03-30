@@ -1,5 +1,5 @@
 import { RequestHandler, Request, Response, NextFunction, ErrorRequestHandler } from 'express'
-import status from 'http-status'
+import { status } from 'http-status'
 import { ValidationError } from 'sequelize'
 import { EntityError, ErrorResponse, NotFoundRequestError } from '~/core/error.response'
 import { convertValidateErr } from './validate'

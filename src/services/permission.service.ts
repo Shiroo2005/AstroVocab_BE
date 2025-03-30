@@ -1,22 +1,14 @@
 import { CreatePermissionBodyReq } from '~/dto/req/permission/createPermissionBody.req'
 import { Permission } from '~/entities/permission.entity'
 import { RolePermission } from '~/entities/rolePermission.entity'
-import { create, find } from '~/repositories/permission.repository'
+import { permissionRepository } from '~/repositories/permission.repository'
 
 class PermissionService {
-  createPermission = async (permissions: CreatePermissionBodyReq) => {
-    // create permission
-    const createdPermission = await create(permissions.permissions)
+  createPermission = async (permission: CreatePermissionBodyReq) => {
+    console.log(permission)
 
-    // permisison_role
-    await RolePermission.bulkCreate(
-      createdPermission.map((permission) => {
-        return {
-          permissionId: permission.id as number,
-          roleId: permissions.roleId
-        }
-      })
-    )
+    // create permission
+    const createdPermission = await permissionRepository.create(permission.permission)
 
     return createdPermission
   }
@@ -34,7 +26,7 @@ class PermissionService {
 
     const permissionIds = foundRolePermission.map((rp) => rp.permissionId)
 
-    const foundPermissions = await find({
+    const foundPermissions = await permissionRepository.find({
       condition: {
         id: permissionIds
       }
@@ -43,6 +35,7 @@ class PermissionService {
     if (!foundPermissions || foundPermissions.length == 0) {
       return []
     }
+
     return foundPermissions as Permission[]
   }
 }

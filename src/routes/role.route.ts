@@ -44,7 +44,7 @@ roleRouter.get(
  * @method : POST
  * @path : /
  * @header : Authorization
- * @body : {name: string, description: string}
+ * @body : {name: string, description?: string, permissionIds?: number[]}
  */
 roleRouter.post(
   '/',
@@ -59,7 +59,7 @@ roleRouter.post(
  * @method : PUT
  * @path : /:id
  * @header : Authorization
- * @body : {name: string, description: string}
+ * @body : {name: string, description?: string, permisisonIds: number}
  */
 roleRouter.put(
   '/:id',

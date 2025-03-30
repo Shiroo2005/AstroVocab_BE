@@ -1,12 +1,11 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from 'sequelize'
-import { Action, Possession, Resource } from '~/constants/access'
+import { Action, Resource } from '~/constants/access'
+import { getResourceValues } from '~/utils'
 
 export class Permission extends Model<InferAttributes<Permission>, InferCreationAttributes<Permission>> {
   declare id?: number
   declare resource: Resource
   declare action: Action
-  declare attributes: string
-  declare possession: Possession // any, own,
 
   static initModel(sequelize: Sequelize) {
     Permission.init(
@@ -17,25 +16,13 @@ export class Permission extends Model<InferAttributes<Permission>, InferCreation
           primaryKey: true
         },
         resource: {
-          type: DataTypes.STRING,
+          type: DataTypes.ENUM(...getResourceValues(Resource)),
           validate: {
             len: [2, 50]
           }
         },
         action: {
-          type: DataTypes.STRING,
-          validate: {
-            len: [2, 50]
-          }
-        },
-        attributes: {
-          type: DataTypes.STRING,
-          validate: {
-            len: [2, 50]
-          }
-        },
-        possession: {
-          type: DataTypes.STRING,
+          type: DataTypes.ENUM(...getResourceValues(Action)),
           validate: {
             len: [2, 50]
           }

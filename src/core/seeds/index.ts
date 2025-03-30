@@ -1,18 +1,21 @@
-import { Action, Possession, Resource, RoleName } from '~/constants/access'
+import { Action, Resource, RoleName } from '~/constants/access'
 import { Permission } from '~/entities/permission.entity'
 import { Role } from '~/entities/role.entity'
 import { User } from '~/entities/user.entity'
-import { create } from '~/repositories/permission.repository'
 import { permissionService } from '~/services/permission.service'
+import { roleService } from '~/services/role.service'
 import { hashData } from '~/utils/jwt'
 
 async function seedRoles() {
   const count = await Role.count() // Kiểm tra xem có dữ liệu chưa
   if (count === 0) {
-    await Role.bulkCreate([
-      { name: RoleName.ADMIN, description: 'Administrator role' },
-      { name: RoleName.USER, description: 'Default user role' }
-    ])
+    const createRoleBody = [
+      { name: RoleName.ADMIN, description: 'Administrator role', permissionIds: [1, 2, 3, 4] },
+      { name: RoleName.USER, description: 'Default user role', permissionIds: [1, 2] }
+    ]
+    for (const data of createRoleBody) {
+      await roleService.createRole(data)
+    }
     console.log('✅ Seeded Roles successfully!')
   } else {
     console.log('ℹ️ Roles already exist, skipping seed...')
@@ -42,57 +45,37 @@ async function seedPermissions() {
   const count = await Permission.count()
   if (count == 0) {
     // admin
-    await permissionService.createPermission({
-      roleId: 1,
-      permissions: [
-        Permission.build({
-          resource: Resource.ROLE,
-          action: Action.READ,
-          attributes: '*',
-          possession: Possession.ANY
-        }),
-        Permission.build({
-          resource: Resource.ROLE,
-          action: Action.CREATE,
-          attributes: '*',
-          possession: Possession.ANY
-        }),
+    const permissions = [
+      {
+        resource: Resource.ROLE,
+        action: Action.READ_ANY
+      },
+      {
+        resource: Resource.ROLE,
+        action: Action.CREATE_ANY
+      },
+      {
+        resource: Resource.ROLE,
+        action: Action.UPDATE_ANY
+      },
+      {
+        resource: Resource.ROLE,
+        action: Action.DELETE_ANY
+      }
+    ]
+    for (const permission of permissions) {
+      const data = Permission.build(permission).dataValues as Permission
+      await permissionService.createPermission({ permission: data })
+    }
 
-        Permission.build({
-          resource: Resource.ROLE,
-          action: Action.UPDATE,
-          attributes: '*',
-          possession: Possession.ANY
-        }),
-
-        Permission.build({
-          resource: Resource.ROLE,
-          action: Action.DELETE,
-          attributes: '*',
-          possession: Possession.ANY
-        })
-      ]
-    })
-    // user
-    await permissionService.createPermission({
-      roleId: 2,
-      permissions: [
-        Permission.build({
-          resource: Resource.ROLE,
-          action: Action.READ,
-          attributes: '*',
-          possession: Possession.ANY
-        })
-      ]
-    })
     console.log('✅ Seeded Permissions successfully!')
   } else {
     console.log('ℹ️ Permissions already exist, skipping seed...')
   }
 }
 
-export function seedData() {
-  seedRoles()
-  seedUsers()
-  seedPermissions()
+export async function seedData() {
+  await seedPermissions()
+  await seedRoles()
+  await seedUsers()
 }

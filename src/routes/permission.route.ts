@@ -1,7 +1,7 @@
 import express from 'express'
 import { createPermissionController, findPermissonController } from '~/controllers/permission.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
-import { checkIdParamMiddleware, checkQueryRequiredMiddleware } from '~/middlewares/common.middlewares'
+import { checkQueryRequiredMiddleware } from '~/middlewares/common.middlewares'
 import { createPermissionValidation } from '~/middlewares/permission/createPermission.middleware'
 import { wrapRequestHandler } from '~/utils/handler'
 export const permissionRouter = express.Router()
@@ -25,8 +25,6 @@ permissionRouter.get(
   checkQueryRequiredMiddleware(['roleId']),
   wrapRequestHandler(findPermissonController)
 )
-
-permissionRouter.use(accessTokenValidation)
 
 /**
  * @description : Create permissions

@@ -12,6 +12,10 @@ export const unGetData = ({ fields = [], object = {} }: { fields?: Array<string>
   return _.omit(object, fields)
 }
 
+export const getResourceValues = <T extends object>(enumType: T) => {
+  return Object.values(enumType)
+}
+
 // export const getSelectData = (select = []) => {
 //   return Object.fromEntries(select.map((el) => [el, 1]))
 // }
