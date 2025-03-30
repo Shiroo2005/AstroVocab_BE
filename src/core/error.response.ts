@@ -1,4 +1,5 @@
 import status from 'http-status'
+
 export class ErrorResponse extends Error {
   public statusCode: number
   constructor(message: string, statusCode: number) {

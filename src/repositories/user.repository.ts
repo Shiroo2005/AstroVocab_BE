@@ -3,23 +3,27 @@ import { UserStatus } from '~/constants/userStatus'
 import { User } from '~/entities/user.entity'
 import { unGetData } from '~/utils'
 
-export const findOneUser = async ({
-  condition,
-  status,
-  unGetFields
-}: {
-  condition: WhereOptions
-  status?: string
-  unGetFields?: string[]
-}) => {
-  const foundUser = await User.findOne({
-    where: {
-      ...condition,
-      status: status ? status : { [Op.in]: [UserStatus.ACTIVE, UserStatus.NOT_VERIFIED] }
-    }
-  })
+class UserRepository {
+  findOneUser = async ({
+    condition,
+    status,
+    unGetFields
+  }: {
+    condition: WhereOptions
+    status?: string
+    unGetFields?: string[]
+  }) => {
+    const foundUser = await User.findOne({
+      where: {
+        ...condition,
+        status: status ? status : { [Op.in]: [UserStatus.ACTIVE, UserStatus.NOT_VERIFIED] }
+      }
+    })
 
-  if (!foundUser) return null
+    if (!foundUser) return null
 
-  return unGetData({ fields: unGetFields, object: foundUser?.dataValues })
+    return unGetData({ fields: unGetFields, object: foundUser?.dataValues })
+  }
 }
+
+export const userRepository = new UserRepository()
