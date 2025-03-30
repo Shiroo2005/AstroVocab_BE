@@ -1,9 +1,9 @@
 import { checkSchema } from 'express-validator'
 import { isEmail, isLength, isPassword, isRequired, isUsername } from '../common.middlewares'
-import { findOneUser } from '~/repositories/user.repository'
 import { Op } from 'sequelize'
 import { BadRequestError } from '~/core/error.response'
 import { validate } from '~/utils/validate'
+import { userRepository } from '~/repositories/user.repository'
 
 // Validate Register
 export const registerValidation = validate(
@@ -21,7 +21,7 @@ export const registerValidation = validate(
         ...isEmail,
         custom: {
           options: async (value, { req }) => {
-            const foundUser = await findOneUser({
+            const foundUser = await userRepository.findOneUser({
               condition: {
                 [Op.or]: [{ email: req.body?.email }, { username: req.body?.username }]
               }

@@ -6,8 +6,8 @@ import { RegisterBodyReq } from '~/dto/req/auth/registerBody.req'
 import { Role } from '~/entities/role.entity'
 import { Token } from '~/entities/token.entity'
 import { User } from '~/entities/user.entity'
-import { findOneRole } from '~/repositories/role.repository'
-import { findOneUser } from '~/repositories/user.repository'
+import { roleRepository } from '~/repositories/role.repository'
+import { userRepository } from '~/repositories/user.repository'
 import { unGetData } from '~/utils'
 import { hashData, signAccessToken, signRefreshToken } from '~/utils/jwt'
 
@@ -29,7 +29,7 @@ class UserService {
   }
 
   register = async ({ email, username, fullName, password }: RegisterBodyReq) => {
-    const userRole = await findOneRole({ condition: { name: RoleName.USER } })
+    const userRole = await roleRepository.findOneRole({ condition: { name: RoleName.USER } })
 
     const createdUser = await User.create({
       email,
@@ -67,7 +67,7 @@ class UserService {
   }
 
   getAccount = async ({ userId }: TokenPayload) => {
-    const foundUser = await findOneUser({ condition: { id: userId }, unGetFields: ['password'] })
+    const foundUser = await userRepository.findOneUser({ condition: { id: userId }, unGetFields: ['password'] })
 
     if (!foundUser) return {}
     return foundUser

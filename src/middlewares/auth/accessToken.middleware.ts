@@ -3,7 +3,7 @@ import { checkSchema } from 'express-validator'
 import { AuthRequestError } from '~/core/error.response'
 import { Role } from '~/entities/role.entity'
 import { User } from '~/entities/user.entity'
-import { findOneRole } from '~/repositories/role.repository'
+import { roleRepository } from '~/repositories/role.repository'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validate'
 
@@ -22,7 +22,9 @@ export const accessTokenValidation = validate(
               ;(req as Request).decodedAuthorization = decodedAuthorization
 
               // set User
-              const role = (await findOneRole({ condition: { id: decodedAuthorization.roleId } })) as Role
+              const role = (await roleRepository.findOneRole({
+                condition: { id: decodedAuthorization.roleId }
+              })) as Role
 
               const user = new User()
               user.role = role
