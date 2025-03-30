@@ -64,7 +64,6 @@ roleRouter.post(
 roleRouter.put(
   '/:id',
   wrapRequestHandler(checkPermission('updateAny', Resource.ROLE)),
-  wrapRequestHandler(roleController.createRole),
   checkIdParamMiddleware(),
   wrapRequestHandler(roleController.putRole)
 )
@@ -73,7 +72,6 @@ roleRouter.put(
 roleRouter.delete(
   '/:id',
   wrapRequestHandler(checkPermission('deleteAny', Resource.ROLE)),
-  wrapRequestHandler(roleController.createRole),
   checkIdParamMiddleware(),
   wrapRequestHandler(roleController.deleteRoleById)
 )

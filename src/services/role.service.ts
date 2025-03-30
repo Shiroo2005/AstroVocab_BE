@@ -2,6 +2,7 @@ import { CreateRoleBodyReq } from '~/dto/req/roles/createRoleBody.req'
 import { Role } from '~/entities/role.entity'
 import { RolePermission } from '~/entities/rolePermission.entity'
 import { permissionService } from './permission.service'
+import { roleRepository } from '~/repositories/role.repository'
 
 class RoleService {
   createRole = async ({ name, description, permissionIds }: CreateRoleBodyReq) => {
@@ -9,13 +10,11 @@ class RoleService {
 
     // create ROLE_PERMISSION
     if (permissionIds && permissionIds.length > 0) {
-      console.log('cacassacsac')
-
-      const transforPermissions = permissionIds.map((permissionId) => ({
+      const transformPermissions = permissionIds.map((permissionId) => ({
         roleId: createdRole.id as number,
         permissionId: permissionId
       }))
-      await RolePermission.bulkCreate(transforPermissions)
+      await RolePermission.bulkCreate(transformPermissions)
     }
     return createdRole
   }
@@ -52,9 +51,14 @@ class RoleService {
   }
 
   getRoleById = async (id: string) => {
-    const foundRole = await Role.findByPk(id, {
+    const foundRole = await Role.findOne({
+      where: {
+        id: id,
+        isDeleted: false
+      },
       attributes: ['id', 'name', 'description']
     })
+
     if (!foundRole) return {}
     const permissions = await permissionService.findPermissionByRole(Number(id))
 
@@ -75,6 +79,16 @@ class RoleService {
     description?: string
     permissionIds?: number[]
   }) => {
+    // role deleted ?
+    const foundRole = (await roleRepository.findOneRole({
+      condition: {
+        where: {
+          id
+        }
+      }
+    })) as Role
+    if (!foundRole || foundRole.isDeleted) return {}
+
     const updatedRole = await Role.update(
       {
         name,
@@ -82,9 +96,9 @@ class RoleService {
       },
       {
         where: {
-          id
-        },
-        returning: true
+          id,
+          isDeleted: false
+        }
       }
     )
 

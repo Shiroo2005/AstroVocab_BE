@@ -6,6 +6,7 @@ export class Permission extends Model<InferAttributes<Permission>, InferCreation
   declare id?: number
   declare resource: Resource
   declare action: Action
+  declare isDeleted?: boolean
 
   static initModel(sequelize: Sequelize) {
     Permission.init(
@@ -26,6 +27,10 @@ export class Permission extends Model<InferAttributes<Permission>, InferCreation
           validate: {
             len: [2, 50]
           }
+        },
+        isDeleted: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: false
         }
       },
       {

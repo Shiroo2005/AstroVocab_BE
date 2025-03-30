@@ -1,7 +1,11 @@
 import express from 'express'
-import { createPermissionController, findPermissonController } from '~/controllers/permission.controller'
+import {
+  createPermissionController,
+  deletePermissionController,
+  findPermissonController
+} from '~/controllers/permission.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
-import { checkQueryRequiredMiddleware } from '~/middlewares/common.middlewares'
+import { checkIdParamMiddleware, checkQueryRequiredMiddleware } from '~/middlewares/common.middlewares'
 import { createPermissionValidation } from '~/middlewares/permission/createPermission.middleware'
 import { wrapRequestHandler } from '~/utils/handler'
 export const permissionRouter = express.Router()
@@ -19,12 +23,7 @@ permissionRouter.use(accessTokenValidation)
  * @header : Authorization
  * @body :{}
  */
-permissionRouter.get(
-  '/',
-  accessTokenValidation,
-  checkQueryRequiredMiddleware(['roleId']),
-  wrapRequestHandler(findPermissonController)
-)
+permissionRouter.get('/', checkQueryRequiredMiddleware(['roleId']), wrapRequestHandler(findPermissonController))
 
 /**
  * @description : Create permissions
@@ -42,15 +41,19 @@ permissionRouter.get(
  * ]
  * }
  */
-permissionRouter.post(
-  '/',
-  accessTokenValidation,
-  createPermissionValidation,
-  wrapRequestHandler(createPermissionController)
-)
+permissionRouter.post('/', createPermissionValidation, wrapRequestHandler(createPermissionController))
 
 // POST
 
 // PUT
 
 // DELETE
+/**
+ * @description : Delete permission by id
+ * @method : DELETE
+ * @path : /
+ * @header : Authorization
+ * @params : id
+ * }
+ */
+permissionRouter.delete('/:id', checkIdParamMiddleware(), wrapRequestHandler(deletePermissionController))
