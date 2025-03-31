@@ -1,6 +1,5 @@
 import { checkSchema } from 'express-validator'
 import { isRequired } from '../common.middlewares'
-import { Op } from 'sequelize'
 import { BadRequestError } from '~/core/error.response'
 import { validate } from '~/utils/validate'
 import { compareBcrypt } from '~/utils/jwt'
@@ -17,17 +16,17 @@ export const loginValidation = validate(
         ...isRequired('Username'),
         custom: {
           options: async (value, { req }) => {
-            const foundUser = (await userRepository.findOneUser({
-              condition: {
-                [Op.or]: [{ [Op.and]: [{ email: value }] }, { [Op.and]: [{ username: value }] }]
-              }
+            const foundUser = (await userRepository.findOne({
+              where: [{ email: value }, { username: value }],
+              relations: ['role']
             })) as User
 
             if (!foundUser || !compareBcrypt(req.body?.password, foundUser.password)) {
-              throw new BadRequestError('Email or username incorrect!')
+              throw new BadRequestError('Username or password incorrect!')
             }
 
             ;(req as Request).user = foundUser as User
+            console.log(foundUser)
 
             return true
           }

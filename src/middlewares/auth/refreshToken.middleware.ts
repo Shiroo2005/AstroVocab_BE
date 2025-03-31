@@ -2,6 +2,7 @@ import { Request } from 'express'
 import { checkSchema } from 'express-validator'
 import { BadRequestError } from '~/core/error.response'
 import { Token } from '~/entities/token.entity'
+import { tokenRepository } from '~/repositories/token.repository'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validate'
 
@@ -23,7 +24,7 @@ export const refreshTokenValidation = validate(
             }
 
             // can refresh token use ?
-            const foundToken: Token[] = await Token.findAll({
+            const foundToken = await tokenRepository.findOne({
               where: {
                 refreshToken: value
               }
@@ -35,7 +36,7 @@ export const refreshTokenValidation = validate(
             if (decodedAuthorization && decodedAuthorization.userId != decodedRefreshToken?.userId)
               throw new BadRequestError('Access and refresh token must belong to the same user!')
 
-            if (!foundToken || (foundToken as Token[]).length == 0) throw new BadRequestError('Please login again!')
+            if (!foundToken) throw new BadRequestError('Please login again!')
 
             return true
           }

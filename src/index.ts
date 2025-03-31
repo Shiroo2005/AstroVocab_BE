@@ -1,12 +1,13 @@
+import 'reflect-metadata'
 import express from 'express'
 import { config } from 'dotenv'
 import { errorHandler, notFoundHandler } from './utils/handler'
 import { morganMiddleware } from './middlewares/morgan.middlewares'
 import helmet from 'helmet'
 import compression from 'compression'
-import { databaseService } from './services/database.service'
 import router from './routes'
 import { corsConfig } from './config/cors.config'
+import { DatabaseService } from './services/database.service'
 const app = express()
 const port = 8081
 config()
@@ -31,7 +32,7 @@ app.use(express.json())
 
 // DATABASE
 // init db
-databaseService.init()
+DatabaseService.getInstance().init()
 //////////////////////////////
 
 //ROUTES

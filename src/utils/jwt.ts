@@ -63,7 +63,7 @@ export const signRefreshToken = async ({
   }
 
   return await signToken({
-    payload: { userId, status, tokenType: TokenType.refreshToken },
+    payload: { userId, status, roleId, tokenType: TokenType.refreshToken },
     optional: { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME as string }
   })
 }

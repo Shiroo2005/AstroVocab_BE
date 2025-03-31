@@ -1,4 +1,4 @@
-import status from 'http-status'
+import { status } from 'http-status'
 
 export class ErrorResponse extends Error {
   public statusCode: number
@@ -33,7 +33,7 @@ export class ForbiddenRequestError extends ErrorResponse {
 }
 
 export class EntityError extends ErrorResponse {
-  errors: ErrorsType
+  errors: object[]
   constructor({
     message = 'Validate error',
     statusCode = status.BAD_REQUEST,
@@ -41,16 +41,9 @@ export class EntityError extends ErrorResponse {
   }: {
     message?: string
     statusCode?: number
-    errors: ErrorsType
+    errors: object[]
   }) {
     super(message, statusCode)
     this.errors = errors
   }
 }
-
-type ErrorsType = Record<
-  string,
-  {
-    msg: string
-  }
->

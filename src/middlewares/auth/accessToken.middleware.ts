@@ -1,9 +1,8 @@
 import { Request } from 'express'
 import { checkSchema } from 'express-validator'
 import { AuthRequestError } from '~/core/error.response'
-import { Role } from '~/entities/role.entity'
 import { User } from '~/entities/user.entity'
-import { roleRepository } from '~/repositories/role.repository'
+import { userRepository } from '~/repositories/user.repository'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validate'
 
@@ -22,13 +21,17 @@ export const accessTokenValidation = validate(
               ;(req as Request).decodedAuthorization = decodedAuthorization
 
               // set User
-              const role = (await roleRepository.findOneRole({
-                condition: { id: decodedAuthorization.roleId }
-              })) as Role
+              const { userId } = decodedAuthorization
+              const foundUser = await userRepository.findOne({
+                where: {
+                  id: userId
+                },
+                relations: ['role']
+              })
 
-              const user = new User()
-              user.role = role
-              ;(req as Request).user = user
+              if (foundUser) {
+                ;(req as Request).user = foundUser as User
+              }
             } catch (error) {
               if (error === 'jwt expired') throw new AuthRequestError('Access token expired!')
               throw error

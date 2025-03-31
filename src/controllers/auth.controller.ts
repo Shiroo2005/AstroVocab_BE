@@ -6,6 +6,7 @@ import { TokenPayload } from '~/dto/common.dto'
 import { LoginBodyReq } from '~/dto/req/auth/loginBody.req'
 import { LogoutBodyReq } from '~/dto/req/auth/logoutBody.req'
 import { RegisterBodyReq } from '~/dto/req/auth/registerBody.req'
+import { Role } from '~/entities/role.entity'
 import { User } from '~/entities/user.entity'
 import { userService } from '~/services/user.service'
 
@@ -24,7 +25,7 @@ export const loginController = async (req: Request<ParamsDictionary, any, LoginB
     metaData: await userService.login({
       userId: user.id as number,
       status: user.status as UserStatus,
-      roleId: user.roleId
+      role: user.role as Role
     })
   }).send(res)
 }

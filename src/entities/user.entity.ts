@@ -1,91 +1,65 @@
-import { DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from 'sequelize'
+import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator'
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from 'typeorm'
 import { UserStatus } from '~/constants/userStatus'
 import { Role } from './role.entity'
+import { Token } from './token.entity'
 
-export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-  declare id?: number
-  declare email: string
-  declare username: string
-  declare password: string
-  declare fullName: string
-  declare avatar?: string
-  declare status?: UserStatus
-  declare roleId: number
-  declare role?: Role
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id?: number
 
-  static initModel(sequelize: Sequelize) {
-    User.init(
-      {
-        id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true
-        },
-        email: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          validate: {
-            is: {
-              args: /^[\w.-]+@([\w-]+\.)+[\w-]{2,20}$/,
-              msg: 'Email invalid format!'
-            }
-          }
-        },
-        username: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          validate: {
-            len: [5, 20]
-          }
-        },
-        password: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          validate: {
-            is: {
-              args: /^(?=.*[A-Z]).{6,}$/, // Min: 6 chars, 1 upper_case
-              msg: 'Password must be contain at least 6 chars, 1 upperCase!'
-            }
-          }
-        },
-        fullName: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          validate: {
-            is: {
-              args: /^(?=(?:.*\p{L}){3})[\p{L}0-9 \-']+$/u,
-              msg: 'Full name must contain at least 3 letters and only letters, number, some symbols!'
-            }
-          }
-        },
-        avatar: {
-          type: DataTypes.STRING,
-          allowNull: true,
-          defaultValue: 'N/A'
-        },
-        status: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          defaultValue: UserStatus.NOT_VERIFIED
-        },
-        roleId: {
-          type: DataTypes.INTEGER,
-          references: {
-            model: Role,
-            key: 'id'
-          },
-          allowNull: false
-        }
-      },
-      {
-        sequelize,
-        modelName: 'User',
-        tableName: 'Users',
-        indexes: [
-          { fields: ['email'], unique: true },
-          { fields: ['username'], unique: true }
-        ]
-      }
-    )
-  }
+  @Column('varchar', { unique: true })
+  @IsEmail()
+  @IsNotEmpty()
+  email!: string
+
+  @Column('varchar', { unique: true })
+  @Length(5, 20, { message: `Username's length must be between 5 and 20!` })
+  @IsNotEmpty()
+  username!: string
+
+  @Column('varchar')
+  @Matches(/^(?=.*[A-Z]).{6,}$/, { message: 'Password must contain at least 6 chars, 1 uppercase!' })
+  @IsNotEmpty()
+  password!: string
+
+  @Column('nvarchar')
+  @Matches(/^(?=(?:.*\p{L}){3})[\p{L}0-9 \-']+$/u, {
+    message: 'Full name must contain at least 3 letters and only letters, numbers, some symbols!'
+  })
+  @IsNotEmpty()
+  fullName!: string
+
+  @Column('varchar', { default: 'N/A' })
+  @IsNotEmpty()
+  avatar!: string
+
+  @Column({ default: UserStatus.NOT_VERIFIED, type: 'varchar' })
+  @IsNotEmpty()
+  status!: UserStatus
+
+  @ManyToOne(() => Role, (role) => role.users)
+  role?: Role
+
+  @OneToMany(() => Token, (token) => token.user)
+  tokens?: Token[]
+
+  @DeleteDateColumn()
+  deletedAt?: Date
+
+  @CreateDateColumn()
+  createdAt?: Date
+
+  @UpdateDateColumn()
+  updatedAt?: Date
 }

@@ -1,37 +1,30 @@
-import { DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from 'sequelize'
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from 'typeorm'
 import { User } from './user.entity'
+import { IsNotEmpty } from 'class-validator'
 
-export class Token extends Model<InferAttributes<Token>, InferCreationAttributes<Token>> {
-  declare id?: number
-  declare userId: number
-  declare refreshToken: string
-  static initModel(sequelize: Sequelize) {
-    Token.init(
-      {
-        id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true
-        },
-        userId: {
-          type: DataTypes.INTEGER,
-          references: {
-            model: User,
-            key: 'id'
-          },
-          allowNull: false
-        },
-        refreshToken: {
-          type: DataTypes.STRING,
-          allowNull: false
-        }
-      },
-      {
-        sequelize,
-        modelName: 'Token',
-        tableName: 'Tokens',
-        indexes: [{ fields: ['refreshToken'], unique: true }]
-      }
-    )
-  }
+@Entity()
+export class Token {
+  @PrimaryGeneratedColumn()
+  id?: number
+
+  @Column('varchar')
+  @IsNotEmpty()
+  refreshToken!: string
+
+  @ManyToOne(() => User, (user) => user.tokens, { cascade: true })
+  user?: User
+
+  @CreateDateColumn()
+  createdAt?: Date
+
+  @UpdateDateColumn()
+  updatedAt?: Date
 }
