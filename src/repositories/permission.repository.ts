@@ -1,41 +1,65 @@
-import { IsNull, Not, Repository } from 'typeorm'
+import { FindOptionsWhere, IsNull, Not, Repository } from 'typeorm'
 import { Permission } from '~/entities/permission.entity'
-import { databaseService } from '~/services/database.service'
 import { unGetData } from '~/utils'
+console.log('PermissionRepository loaded')
 
 class PermissionRepository {
   permissionRepo: Repository<Permission>
 
   constructor() {
-    this.permissionRepo = databaseService.appDataSource.getRepository(Permission)
+    this.init()
   }
-  create = async (permission: Permission) => {
-    const createdPermission = await this.permissionRepo.create(permission)
-    return createdPermission
+
+  private async init() {
+    const { DatabaseService } = await import('~/services/database.service.js')
+    this.permissionRepo = await DatabaseService.getInstance().getRepository(Permission)
+  }
+  // constructor() {
+  //   console.log('PermissionRepository loaded')
+  //   this.permissionRepo = DatabaseService.getInstance().getRepository(Permission)
+  // }
+  async saveOne({ action, resource }: Partial<Permission>) {
+    return await this.permissionRepo.save({
+      action,
+      resource
+    })
   }
 
   async findOne({
-    conditions,
+    where,
     unGetFields,
     relations,
     isDeleted = false
   }: {
-    conditions: Partial<Permission>
+    where: FindOptionsWhere<Permission> | FindOptionsWhere<Permission>[]
     unGetFields?: string[]
     relations?: string[]
     isDeleted?: boolean
   }) {
     const foundPermission = await this.permissionRepo.findOne({
-      where: {
-        ...conditions,
-        deletedAt: isDeleted ? Not(IsNull()) : IsNull()
-      },
+      where: Array.isArray(where)
+        ? where.map((w) => ({ ...w, deletedAt: isDeleted ? Not(IsNull()) : IsNull() }))
+        : { ...where, deletedAt: isDeleted ? Not(IsNull()) : IsNull() },
       relations
     })
 
     if (!foundPermission) return null
 
     return unGetData({ fields: unGetFields, object: foundPermission })
+  }
+
+  async softDelete({ conditions }: { conditions: Partial<Permission> }) {
+    return await this.permissionRepo.softDelete({
+      ...conditions
+    })
+  }
+
+  async count({ conditions = {} }: { conditions?: Partial<Permission> }) {
+    return await this.permissionRepo.findAndCount({
+      where: {
+        ...conditions
+      }
+    })
   }
 }
 

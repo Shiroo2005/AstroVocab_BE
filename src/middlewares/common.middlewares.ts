@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
 import { BadRequestError } from '~/core/error.response'
-import { isValidNumber } from '~/utils'
+import { isValidNumber, toNumber } from '~/utils'
 
 export const checkIdParamMiddleware = (options?: { id?: string }) => {
   const id = options?.id || 'id'
@@ -9,6 +9,7 @@ export const checkIdParamMiddleware = (options?: { id?: string }) => {
     if (req.params[id] && !isValidNumber(req.params[id])) {
       throw new BadRequestError('Id invalid!')
     }
+    ;(req as Request).idParams = toNumber(req.params[id])
     next()
   }
 }

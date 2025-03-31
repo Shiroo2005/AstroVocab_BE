@@ -18,13 +18,13 @@ export class Role {
   @PrimaryGeneratedColumn()
   id?: number
 
-  @Column()
+  @Column('nvarchar')
   @Matches(/^(?=.*[a-zA-Z])[a-zA-Z0-9 ]{3,}$/, {
     message: 'Name must contain at least 3 chars, 1 letter and only letter, number'
   })
   name!: string
 
-  @Column({ default: 'N/A' })
+  @Column({ default: 'N/A', type: 'nvarchar' })
   description?: string
 
   @OneToMany(() => User, (user) => user.role)

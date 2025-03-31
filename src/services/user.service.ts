@@ -6,20 +6,20 @@ import { RegisterBodyReq } from '~/dto/req/auth/registerBody.req'
 import { Role } from '~/entities/role.entity'
 import { Token } from '~/entities/token.entity'
 import { User } from '~/entities/user.entity'
-import { roleRepository } from '~/repositories/role.repository'
-import { userRepository } from '~/repositories/user.repository'
 import { unGetData } from '~/utils'
 import { hashData, signAccessToken, signRefreshToken } from '~/utils/jwt'
-import { databaseService } from './database.service'
 import { BadRequestError } from '~/core/error.response'
 import { tokenRepository } from '~/repositories/token.repository'
+import { roleRepository } from '~/repositories/role.repository'
+import { userRepository } from '~/repositories/user.repository'
+import { DatabaseService } from './database.service'
 
 class UserService {
-  login = async ({ userId, status, roleId }: { userId: number; status: UserStatus; roleId: number }) => {
+  login = async ({ userId, status, role }: { userId: number; status: UserStatus; role: Role }) => {
     // create access, refresh token
     const [accessToken, refreshToken] = await Promise.all([
-      signAccessToken({ userId, status, roleId }),
-      signRefreshToken({ userId, status, roleId })
+      signAccessToken({ userId, status, roleId: role.id as number }),
+      signRefreshToken({ userId, status, roleId: role.id as number })
     ])
 
     // save refreshToken
@@ -51,7 +51,9 @@ class UserService {
 
   logout = async ({ refreshToken }: LogoutBodyReq) => {
     // delete refresh token in db
-    const result = await databaseService.getRepository(Token).softDelete({
+    const result = await (
+      await DatabaseService.getInstance().getRepository(Token)
+    ).softDelete({
       refreshToken
     })
 
@@ -72,7 +74,7 @@ class UserService {
   }
 
   getAccount = async ({ userId }: TokenPayload) => {
-    const foundUser = await userRepository.findOne({ conditions: { id: userId }, unGetFields: ['password'] })
+    const foundUser = await userRepository.findOne({ where: { id: userId }, unGetFields: ['password'] })
 
     if (!foundUser) return {}
     return foundUser

@@ -15,15 +15,12 @@ export class Token {
   @PrimaryGeneratedColumn()
   id?: number
 
-  @Column()
+  @Column('varchar')
   @IsNotEmpty()
   refreshToken!: string
 
   @ManyToOne(() => User, (user) => user.tokens, { cascade: true })
   user?: User
-
-  @DeleteDateColumn()
-  deletedAt?: Date
 
   @CreateDateColumn()
   createdAt?: Date

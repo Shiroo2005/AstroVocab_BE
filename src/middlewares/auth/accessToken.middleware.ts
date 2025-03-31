@@ -1,9 +1,7 @@
 import { Request } from 'express'
 import { checkSchema } from 'express-validator'
 import { AuthRequestError } from '~/core/error.response'
-import { Role } from '~/entities/role.entity'
 import { User } from '~/entities/user.entity'
-import { roleRepository } from '~/repositories/role.repository'
 import { userRepository } from '~/repositories/user.repository'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validate'
@@ -25,7 +23,7 @@ export const accessTokenValidation = validate(
               // set User
               const { userId } = decodedAuthorization
               const foundUser = await userRepository.findOne({
-                conditions: {
+                where: {
                   id: userId
                 },
                 relations: ['role']

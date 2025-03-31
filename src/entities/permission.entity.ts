@@ -1,19 +1,31 @@
 import { Action, Resource } from '~/constants/access'
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from 'typeorm'
 import { IsNotEmpty } from 'class-validator'
+import { Role } from './role.entity'
 
 @Entity()
 export class Permission {
   @PrimaryGeneratedColumn()
   id?: number
 
-  @Column()
+  @Column('text')
   @IsNotEmpty()
   resource!: Resource
 
-  @Column()
+  @Column('text')
   @IsNotEmpty()
   action!: Action
+
+  @ManyToMany(() => Role, (role) => role.permissions)
+  roles?: Role[]
 
   @DeleteDateColumn()
   deletedAt?: Date

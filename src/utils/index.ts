@@ -12,6 +12,10 @@ export const unGetData = ({ fields = [], object = {} }: { fields?: Array<string>
   return _.omit(object, fields)
 }
 
+export const unGetDataArray = ({ fields = [], objects = [] }: { fields?: Array<string>; objects?: object[] }) => {
+  return objects.map((object) => unGetData({ fields, object }))
+}
+
 export const getResourceValues = <T extends object>(enumType: T) => {
   return Object.values(enumType)
 }

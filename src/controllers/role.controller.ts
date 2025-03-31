@@ -4,6 +4,7 @@ import { CreateRoleBodyReq } from '~/dto/req/roles/createRoleBody.req'
 import { CREATED, SuccessResponse } from '../core/success.response'
 import { roleService } from '~/services/role.service'
 import { UpdateRoleBodyReq } from '~/dto/req/roles/updateRoleBody.req'
+import { toNumber } from '~/utils'
 
 class RoleController {
   createRole = async (req: Request<ParamsDictionary, any, CreateRoleBodyReq>, res: Response, next: NextFunction) => {
@@ -21,23 +22,29 @@ class RoleController {
   }
 
   getRole = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+    const searchId = toNumber(req.params?.id)
+
     return new SuccessResponse({
       message: 'Get role by id successful!',
-      metaData: await roleService.getRoleById(req.params?.id)
+      metaData: await roleService.getRoleById(searchId)
     }).send(res)
   }
 
-  putRole = async (req: Request<ParamsDictionary, any, UpdateRoleBodyReq>, res: Response, next: NextFunction) => {
+  updateRole = async (req: Request<ParamsDictionary, any, UpdateRoleBodyReq>, res: Response, next: NextFunction) => {
+    const searchId = toNumber(req.params?.id)
+
     return new SuccessResponse({
       message: 'Update role by id successful!',
-      metaData: await roleService.putRoleById({ ...req.body, id: req.params?.id })
+      metaData: await roleService.updateRoleById({ ...req.body, id: searchId })
     }).send(res)
   }
 
   deleteRoleById = async (req: Request<ParamsDictionary, any, UpdateRoleBodyReq>, res: Response) => {
+    const searchId = toNumber(req.params?.id)
+
     return new SuccessResponse({
       message: 'Delete role by id successful!',
-      metaData: await roleService.deleteRoleById({ id: req.params?.id })
+      metaData: await roleService.deleteRoleById({ id: searchId })
     }).send(res)
   }
 }

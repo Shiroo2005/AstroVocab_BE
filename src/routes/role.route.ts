@@ -65,7 +65,7 @@ roleRouter.put(
   '/:id',
   wrapRequestHandler(checkPermission('updateAny', Resource.ROLE)),
   checkIdParamMiddleware(),
-  wrapRequestHandler(roleController.putRole)
+  wrapRequestHandler(roleController.updateRole)
 )
 
 // DELETE

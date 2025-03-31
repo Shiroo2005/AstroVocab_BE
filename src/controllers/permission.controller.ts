@@ -5,6 +5,7 @@ import { permissionService } from '~/services/permission.service'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { toNumber } from '~/utils'
 import { CreatePermissionBodyReq } from '~/dto/req/permission/createPermissionBody.req'
+import { roleService } from '~/services/role.service'
 
 export const createPermissionController = async (
   req: Request<ParamsDictionary, any, CreatePermissionBodyReq>,
@@ -17,9 +18,11 @@ export const createPermissionController = async (
 }
 
 export const findPermissonController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const roleId = (req as Request).idParams as number
+
   return new SuccessResponse({
     message: 'Find permissions by role successful!',
-    metaData: await permissionService.findPermissionByRole(toNumber(req.query.roleId as string))
+    metaData: await roleService.findPermissionByRole({ roleId })
   }).send(res)
 }
 
@@ -27,11 +30,11 @@ export const updatePermissionController = async (
   req: Request<ParamsDictionary, any, UpdatePermissionBodyReq>,
   res: Response
 ) => {
-  const roleId = toNumber(req.params.roleId)
+  const id = (req as Request).idParams as number
 
   return new SuccessResponse({
     message: 'Update permissions successful!',
-    metaData: await permissionService.updatePermission({ roleId, ...req.body })
+    metaData: await permissionService.updatePermission({ ...req.body, id })
   }).send(res)
 }
 

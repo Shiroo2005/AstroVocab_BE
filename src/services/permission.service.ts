@@ -1,76 +1,30 @@
 import { Action, Resource } from '~/constants/access'
+import { BadRequestError } from '~/core/error.response'
 import { CreatePermissionBodyReq } from '~/dto/req/permission/createPermissionBody.req'
 import { Permission } from '~/entities/permission.entity'
-import { RolePermission } from '~/entities/rolePermission.entity'
 import { permissionRepository } from '~/repositories/permission.repository'
 
 class PermissionService {
   createPermission = async (permission: CreatePermissionBodyReq) => {
     // create permission
-    const createdPermission = await permissionRepository.create(permission.permission)
+    const createdPermission = await permissionRepository.saveOne(permission.permission)
 
     return createdPermission
   }
 
-  findPermissionByRole = async (roleId: number) => {
-    const foundRolePermission = await RolePermission.findAll({
-      where: {
-        roleId
-      }
-    })
+  updatePermission = async ({ id, action, resource }: { id: number; resource: Resource; action: Action }) => {
+    const foundPermission = (await permissionRepository.findOne({ where: { id } })) as Permission | null
+    if (!foundPermission) throw new BadRequestError('Permission not found!')
 
-    if (foundRolePermission.length == 0) {
-      return []
-    }
+    // set data
+    foundPermission.resource = resource
+    foundPermission.action = action
 
-    const permissionIds = foundRolePermission.map((rp) => rp.permissionId)
-
-    const foundPermissions = await permissionRepository.find({
-      condition: {
-        id: permissionIds
-      }
-    })
-
-    if (!foundPermissions || foundPermissions.length == 0) {
-      return []
-    }
-
-    return foundPermissions as Permission[]
-  }
-
-  updatePermission = async ({ roleId, action, resource }: { roleId: number; resource: Resource; action: Action }) => {
-    const updatedPermission = await Permission.update(
-      { action, resource },
-      {
-        where: {
-          id: roleId
-        }
-      }
-    )
-
-    return updatedPermission
+    return await permissionRepository.saveOne(foundPermission)
   }
 
   deletePermission = async (id: number) => {
-    // delete RolePermission
-    await RolePermission.destroy({
-      where: {
-        permissionId: id
-      }
-    })
-
-    // isDeleted = true
-    return await Permission.update(
-      {
-        isDeleted: true
-      },
-      {
-        where: {
-          id
-        },
-        returning: true
-      }
-    )
+    return await permissionRepository.softDelete({ conditions: { id } })
   }
 }
 

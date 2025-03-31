@@ -2,7 +2,6 @@ import { checkSchema } from 'express-validator'
 import { validate } from '~/utils/validate'
 import { isLength, isRequired, isString } from '../common.middlewares'
 import { BadRequestError } from '~/core/error.response'
-import { roleRepository } from '~/repositories/role.repository'
 import { permissionRepository } from '~/repositories/permission.repository'
 import { Permission } from '~/entities/permission.entity'
 
@@ -44,16 +43,16 @@ import { Permission } from '~/entities/permission.entity'
 export const createPermissionValidation = validate(
   checkSchema({
     resource: {
-      ...isString('permissions.*.resource'),
-      ...isLength({ fieldName: 'permission.*.resource', min: 2, max: 50 })
+      ...isString('resource'),
+      ...isLength({ fieldName: 'resource', min: 2, max: 50 })
     },
     action: {
-      ...isString('permissions.*.action'),
-      ...isLength({ fieldName: 'permission.*.action', min: 2, max: 50 }),
+      ...isString('action'),
+      ...isLength({ fieldName: 'action', min: 2, max: 50 }),
       custom: {
         options: async (value, { req }) => {
-          const foundPermission = await permissionRepository.find({
-            condition: {
+          const foundPermission = await permissionRepository.findOne({
+            where: {
               action: (value as Permission).action,
               resource: (value as Permission).resource
             }
