@@ -1,17 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { ValidationChain, validationResult } from 'express-validator'
 import { RunnableValidationChains } from 'express-validator/lib/middlewares/schema'
-import { ValidationError } from 'sequelize'
 import { EntityError } from '~/core/error.response'
-
-export const convertValidateErr = (err: ValidationError) => {
-  const errorFields = err.errors.map((e) => ({
-    field: e.path,
-    message: e.message
-  }))
-
-  return errorFields
-}
 
 // can be reused by many routes
 export const validate = (validation: RunnableValidationChains<ValidationChain>) => {

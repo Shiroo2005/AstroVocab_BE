@@ -1,35 +1,41 @@
-import { WhereOptions } from 'sequelize'
+import { IsNull, Not, Repository } from 'typeorm'
 import { Permission } from '~/entities/permission.entity'
+import { databaseService } from '~/services/database.service'
 import { unGetData } from '~/utils'
 
 class PermissionRepository {
+  permissionRepo: Repository<Permission>
+
+  constructor() {
+    this.permissionRepo = databaseService.appDataSource.getRepository(Permission)
+  }
   create = async (permission: Permission) => {
-    const createdPermission = await Permission.create(permission)
+    const createdPermission = await this.permissionRepo.create(permission)
     return createdPermission
   }
 
-  find = async ({
-    condition,
+  async findOne({
+    conditions,
     unGetFields,
-    isRaw = true
+    relations,
+    isDeleted = false
   }: {
-    condition: WhereOptions
-    status?: string
+    conditions: Partial<Permission>
     unGetFields?: string[]
-    isRaw?: boolean
-  }) => {
-    const foundPermissions = await Permission.findAll({
+    relations?: string[]
+    isDeleted?: boolean
+  }) {
+    const foundPermission = await this.permissionRepo.findOne({
       where: {
-        ...condition
+        ...conditions,
+        deletedAt: isDeleted ? Not(IsNull()) : IsNull()
       },
-      raw: isRaw
+      relations
     })
 
-    if (!foundPermissions) return null
+    if (!foundPermission) return null
 
-    return foundPermissions.map((permission) => {
-      return unGetData({ fields: unGetFields, object: permission })
-    })
+    return unGetData({ fields: unGetFields, object: foundPermission })
   }
 }
 

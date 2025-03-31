@@ -10,6 +10,9 @@ import { roleRepository } from '~/repositories/role.repository'
 import { userRepository } from '~/repositories/user.repository'
 import { unGetData } from '~/utils'
 import { hashData, signAccessToken, signRefreshToken } from '~/utils/jwt'
+import { databaseService } from './database.service'
+import { BadRequestError } from '~/core/error.response'
+import { tokenRepository } from '~/repositories/token.repository'
 
 class UserService {
   login = async ({ userId, status, roleId }: { userId: number; status: UserStatus; roleId: number }) => {
@@ -20,7 +23,10 @@ class UserService {
     ])
 
     // save refreshToken
-    await Token.create({ userId, refreshToken })
+    const token = new Token()
+    token.refreshToken = refreshToken
+    token.user = { id: userId } as User
+    await tokenRepository.saveOne(token)
 
     return {
       accessToken,
@@ -29,28 +35,27 @@ class UserService {
   }
 
   register = async ({ email, username, fullName, password }: RegisterBodyReq) => {
-    const userRole = await roleRepository.findOneRole({ condition: { name: RoleName.USER } })
+    const userRole = (await roleRepository.findOne({ conditions: { name: RoleName.USER } })) as Role | null
 
-    const createdUser = await User.create({
+    if (!userRole) throw new BadRequestError('Role user not exist!')
+    const createdUser = await userRepository.saveOne({
       email,
       username,
       password: hashData(password),
       fullName: fullName,
-      roleId: (userRole as Role).id as number
+      role: { id: userRole.id } as Role
     })
 
-    return unGetData({ fields: ['password'], object: createdUser.dataValues })
+    return unGetData({ fields: ['password'], object: createdUser })
   }
 
   logout = async ({ refreshToken }: LogoutBodyReq) => {
     // delete refresh token in db
-    await Token.destroy({
-      where: {
-        refreshToken
-      }
+    const result = await databaseService.getRepository(Token).softDelete({
+      refreshToken
     })
 
-    return {}
+    return result
   }
 
   newToken = async ({ userId, exp, status, roleId }: TokenPayload) => {
@@ -61,13 +66,13 @@ class UserService {
     ])
 
     // save refreshToken
-    await Token.create({ userId: userId, refreshToken })
+    await tokenRepository.saveOne({ user: { id: userId } as User, refreshToken })
 
     return { accessToken, refreshToken }
   }
 
   getAccount = async ({ userId }: TokenPayload) => {
-    const foundUser = await userRepository.findOneUser({ condition: { id: userId }, unGetFields: ['password'] })
+    const foundUser = await userRepository.findOne({ conditions: { id: userId }, unGetFields: ['password'] })
 
     if (!foundUser) return {}
     return foundUser

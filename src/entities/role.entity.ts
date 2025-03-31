@@ -1,45 +1,45 @@
-import { DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from 'sequelize'
+import { Matches } from 'class-validator'
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from 'typeorm'
+import { User } from './user.entity'
+import { Permission } from './permission.entity'
 
-export class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
-  declare id?: number
-  declare name: string
-  declare description?: string
-  declare isDeleted?: boolean
-  static initModel(sequelize: Sequelize) {
-    Role.init(
-      {
-        id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true
-        },
-        name: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          validate: {
-            is: {
-              args: /^(?=.*[a-zA-Z])[a-zA-Z0-9 ]{3,}$/,
-              msg: 'Name must contain at least 3 chars, 1 letter and only letter, number'
-            },
-            notNull: {
-              msg: 'Name not be null!'
-            }
-          }
-        },
-        description: {
-          type: DataTypes.STRING,
-          defaultValue: 'N/A'
-        },
-        isDeleted: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: false
-        }
-      },
-      {
-        sequelize,
-        modelName: 'Role',
-        tableName: 'Roles'
-      }
-    )
-  }
+@Entity()
+export class Role {
+  @PrimaryGeneratedColumn()
+  id?: number
+
+  @Column()
+  @Matches(/^(?=.*[a-zA-Z])[a-zA-Z0-9 ]{3,}$/, {
+    message: 'Name must contain at least 3 chars, 1 letter and only letter, number'
+  })
+  name!: string
+
+  @Column({ default: 'N/A' })
+  description?: string
+
+  @OneToMany(() => User, (user) => user.role)
+  users?: User[]
+
+  @ManyToMany(() => Permission)
+  @JoinTable()
+  permissions!: Permission[]
+
+  @DeleteDateColumn()
+  deletedAt?: Date
+
+  @CreateDateColumn()
+  createdAt?: Date
+
+  @UpdateDateColumn()
+  updatedAt?: Date
 }
