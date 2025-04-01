@@ -1,7 +1,10 @@
 import { IsNull, Not, Repository } from 'typeorm'
+import { Permission } from '~/entities/permission.entity'
 import { Role } from '~/entities/role.entity'
+import { User } from '~/entities/user.entity'
 import { DatabaseService } from '~/services/database.service'
 import { unGetData, unGetDataArray } from '~/utils'
+import { validateClass } from '~/utils/validate'
 
 class RoleRepository {
   roleRepo: Repository<Role>
@@ -37,13 +40,13 @@ class RoleRepository {
     return unGetData({ fields: unGetFields, object: foundRole })
   }
 
-  async saveOne({ name, permissions, description, users }: Partial<Role>) {
-    return await this.roleRepo.save({
-      name,
-      users,
-      description,
-      permissions
-    })
+  async saveOne({ name, permissions, description, users }: Role) {
+    const role = Role.create({ name: name, permissions, description, users })
+
+    //class validator
+    await validateClass(role)
+
+    return await this.roleRepo.save(role)
   }
 
   async findAll({

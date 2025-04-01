@@ -35,4 +35,14 @@ export class Permission {
 
   @UpdateDateColumn()
   updatedAt?: Date
+
+  static create = ({ action, resource, roles }: Permission) => {
+    const newPermission = new Permission()
+
+    newPermission.action = action as Action
+    newPermission.resource = resource as Resource
+    newPermission.roles = roles
+
+    return newPermission
+  }
 }

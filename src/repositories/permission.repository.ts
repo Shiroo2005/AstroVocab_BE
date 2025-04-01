@@ -18,7 +18,7 @@ class PermissionRepository {
   //   console.log('PermissionRepository loaded')
   //   this.permissionRepo = DatabaseService.getInstance().getRepository(Permission)
   // }
-  async saveOne({ action, resource }: Partial<Permission>) {
+  async saveOne({ action, resource }: Permission) {
     return await this.permissionRepo.save({
       action,
       resource

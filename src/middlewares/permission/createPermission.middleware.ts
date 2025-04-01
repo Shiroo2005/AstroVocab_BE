@@ -1,6 +1,6 @@
 import { checkSchema } from 'express-validator'
-import { validate } from '~/utils/validate'
-import { isLength, isRequired, isString } from '../common.middlewares'
+import { validateSchema } from '~/utils/validate'
+import { isLength, isString } from '../common.middlewares'
 import { BadRequestError } from '~/core/error.response'
 import { permissionRepository } from '~/repositories/permission.repository'
 import { Permission } from '~/entities/permission.entity'
@@ -40,7 +40,7 @@ import { Permission } from '~/entities/permission.entity'
 //   })
 // )
 
-export const createPermissionValidation = validate(
+export const createPermissionValidation = validateSchema(
   checkSchema({
     resource: {
       ...isString('resource'),

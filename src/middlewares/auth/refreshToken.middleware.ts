@@ -1,12 +1,11 @@
 import { Request } from 'express'
 import { checkSchema } from 'express-validator'
 import { BadRequestError } from '~/core/error.response'
-import { Token } from '~/entities/token.entity'
 import { tokenRepository } from '~/repositories/token.repository'
 import { verifyToken } from '~/utils/jwt'
-import { validate } from '~/utils/validate'
+import { validateSchema } from '~/utils/validate'
 
-export const refreshTokenValidation = validate(
+export const refreshTokenValidation = validateSchema(
   checkSchema(
     {
       refreshToken: {

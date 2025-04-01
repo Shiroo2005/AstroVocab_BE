@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator'
+import { IsEmail, IsNotEmpty, Length, Matches, validate } from 'class-validator'
 import {
   Column,
   CreateDateColumn,
@@ -12,6 +12,7 @@ import {
 import { UserStatus } from '~/constants/userStatus'
 import { Role } from './role.entity'
 import { Token } from './token.entity'
+import { BadRequestError } from '~/core/error.response'
 
 @Entity()
 export class User {
@@ -26,6 +27,7 @@ export class User {
   @Column('varchar', { unique: true })
   @Length(5, 20, { message: `Username's length must be between 5 and 20!` })
   @IsNotEmpty()
+  @Matches(/^[a-zA-Z0-9]+$/, { message: 'Username contain only letter and number' })
   username!: string
 
   @Column('varchar')
@@ -41,12 +43,10 @@ export class User {
   fullName!: string
 
   @Column('varchar', { default: 'N/A' })
-  @IsNotEmpty()
-  avatar!: string
+  avatar?: string
 
   @Column({ default: UserStatus.NOT_VERIFIED, type: 'varchar' })
-  @IsNotEmpty()
-  status!: UserStatus
+  status?: UserStatus
 
   @ManyToOne(() => Role, (role) => role.users)
   role?: Role
@@ -62,4 +62,18 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt?: Date
+
+  static create = ({ email, username, fullName, password, avatar, status, role, tokens }: User) => {
+    const newUser = new User()
+    newUser.email = email
+    newUser.username = username
+    newUser.fullName = fullName
+    newUser.password = password
+    newUser.avatar = avatar
+    newUser.status = status
+    newUser.role = role
+    newUser.tokens = tokens
+
+    return newUser
+  }
 }
