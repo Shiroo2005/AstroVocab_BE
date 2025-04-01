@@ -1,11 +1,11 @@
 import { checkSchema } from 'express-validator'
 import { isEmail, isLength, isPassword, isRequired, isUsername } from '../common.middlewares'
 import { BadRequestError } from '~/core/error.response'
-import { validate } from '~/utils/validate'
+import { validateSchema } from '~/utils/validate'
 import { userRepository } from '~/repositories/user.repository'
 
 // Validate Register
-export const registerValidation = validate(
+export const registerValidation = validateSchema(
   checkSchema(
     {
       username: {

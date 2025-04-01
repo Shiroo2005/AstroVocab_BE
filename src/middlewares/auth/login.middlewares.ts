@@ -1,14 +1,14 @@
 import { checkSchema } from 'express-validator'
 import { isRequired } from '../common.middlewares'
 import { BadRequestError } from '~/core/error.response'
-import { validate } from '~/utils/validate'
+import { validateSchema } from '~/utils/validate'
 import { compareBcrypt } from '~/utils/jwt'
 import { Request } from 'express'
 import { User } from '~/entities/user.entity'
 import { userRepository } from '~/repositories/user.repository'
 
 // Validate login
-export const loginValidation = validate(
+export const loginValidation = validateSchema(
   checkSchema(
     {
       username: {

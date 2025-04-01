@@ -1,12 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from 'typeorm'
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import { User } from './user.entity'
 import { IsNotEmpty } from 'class-validator'
 
@@ -27,4 +19,12 @@ export class Token {
 
   @UpdateDateColumn()
   updatedAt?: Date
+
+  static create = ({ refreshToken, user }: Token) => {
+    const newToken = new Token()
+    newToken.refreshToken = refreshToken
+    newToken.user = user
+
+    return newToken
+  }
 }

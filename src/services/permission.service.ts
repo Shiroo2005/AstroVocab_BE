@@ -7,7 +7,10 @@ import { permissionRepository } from '~/repositories/permission.repository'
 class PermissionService {
   createPermission = async (permission: CreatePermissionBodyReq) => {
     // create permission
-    const createdPermission = await permissionRepository.saveOne(permission.permission)
+    const createdPermission = await permissionRepository.saveOne({
+      action: permission.action as Action,
+      resource: permission.resource as Resource
+    })
 
     return createdPermission
   }

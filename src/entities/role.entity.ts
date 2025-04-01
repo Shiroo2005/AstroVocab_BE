@@ -32,7 +32,7 @@ export class Role {
 
   @ManyToMany(() => Permission)
   @JoinTable()
-  permissions!: Permission[]
+  permissions?: Permission[]
 
   @DeleteDateColumn()
   deletedAt?: Date
@@ -42,4 +42,16 @@ export class Role {
 
   @UpdateDateColumn()
   updatedAt?: Date
+
+  static create = ({ name, permissions, description, users, id }: Role) => {
+    const newRole = new Role()
+
+    newRole.id = id
+    newRole.name = name
+    newRole.description = description
+    newRole.users = users
+    newRole.permissions = permissions
+
+    return newRole
+  }
 }

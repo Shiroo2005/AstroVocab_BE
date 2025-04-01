@@ -1,9 +1,11 @@
 import { checkSchema } from 'express-validator'
-import { validate } from '~/utils/validate'
-import { isLength, isRequired, isString } from '../common.middlewares'
+import { validateSchema } from '~/utils/validate'
+import { isLength, isString } from '../common.middlewares'
 import { BadRequestError } from '~/core/error.response'
 import { permissionRepository } from '~/repositories/permission.repository'
 import { Permission } from '~/entities/permission.entity'
+import { isValidEnumValue } from '~/utils'
+import { Action, Resource } from '~/constants/access'
 
 // export const createPermissionValidation = validate(
 //   checkSchema({
@@ -40,27 +42,36 @@ import { Permission } from '~/entities/permission.entity'
 //   })
 // )
 
-export const createPermissionValidation = validate(
-  checkSchema({
-    resource: {
-      ...isString('resource'),
-      ...isLength({ fieldName: 'resource', min: 2, max: 50 })
-    },
-    action: {
-      ...isString('action'),
-      ...isLength({ fieldName: 'action', min: 2, max: 50 }),
-      custom: {
-        options: async (value, { req }) => {
-          const foundPermission = await permissionRepository.findOne({
-            where: {
-              action: (value as Permission).action,
-              resource: (value as Permission).resource
-            }
-          })
+export const createPermissionValidation = validateSchema(
+  checkSchema(
+    {
+      resource: {
+        ...isString('resource'),
+        ...isLength({ fieldName: 'resource', min: 2, max: 50 })
+      },
+      action: {
+        ...isString('action'),
+        ...isLength({ fieldName: 'action', min: 2, max: 50 }),
+        custom: {
+          options: async (value, { req }) => {
+            const action = req.body.action as Action,
+              resource = req.body.resource as Resource
 
-          if (foundPermission) throw new BadRequestError('Permission with this action and resource already existing!')
+            if (!isValidEnumValue(action, Action) || !isValidEnumValue(resource, Resource))
+              throw new BadRequestError('Field action or resource not exist in Enum Action, Resource!')
+
+            const foundPermission = await permissionRepository.findOne({
+              where: {
+                resource,
+                action
+              }
+            })
+
+            if (foundPermission) throw new BadRequestError('Permission with this action and resource already existing!')
+          }
         }
       }
-    }
-  })
+    },
+    ['body']
+  )
 )

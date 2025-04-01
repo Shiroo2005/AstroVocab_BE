@@ -4,9 +4,9 @@ import { AuthRequestError } from '~/core/error.response'
 import { User } from '~/entities/user.entity'
 import { userRepository } from '~/repositories/user.repository'
 import { verifyToken } from '~/utils/jwt'
-import { validate } from '~/utils/validate'
+import { validateSchema } from '~/utils/validate'
 
-export const accessTokenValidation = validate(
+export const accessTokenValidation = validateSchema(
   checkSchema(
     {
       authorization: {
@@ -26,7 +26,7 @@ export const accessTokenValidation = validate(
                 where: {
                   id: userId
                 },
-                relations: ['role']
+                relations: ['role', 'role.permissions']
               })
 
               if (foundUser) {

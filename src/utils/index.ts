@@ -1,6 +1,12 @@
-import _, { parseInt } from 'lodash'
+import _ from 'lodash'
 
-export const isValidNumber = (num: string) => !Number.isNaN(parseInt(num))
+export const isValidNumber = (num: string) => {
+  try {
+    return toNumber(num)
+  } catch (error) {
+    return false
+  }
+}
 
 export const toNumber = (num: string) => _.toNumber(num)
 
@@ -18,6 +24,10 @@ export const unGetDataArray = ({ fields = [], objects = [] }: { fields?: Array<s
 
 export const getResourceValues = <T extends object>(enumType: T) => {
   return Object.values(enumType)
+}
+
+export const isValidEnumValue = <T extends object>(value: string, enumObj: T): boolean => {
+  return Object.values(enumObj).includes(value as T[keyof T])
 }
 
 // export const getSelectData = (select = []) => {

@@ -1,6 +1,7 @@
 import { FindOptionsWhere, IsNull, Not, Repository } from 'typeorm'
 import { Permission } from '~/entities/permission.entity'
 import { unGetData } from '~/utils'
+import { validateClass } from '~/utils/validate'
 console.log('PermissionRepository loaded')
 
 class PermissionRepository {
@@ -18,11 +19,17 @@ class PermissionRepository {
   //   console.log('PermissionRepository loaded')
   //   this.permissionRepo = DatabaseService.getInstance().getRepository(Permission)
   // }
-  async saveOne({ action, resource }: Partial<Permission>) {
-    return await this.permissionRepo.save({
-      action,
-      resource
+  async saveOne({ action, resource, id }: Permission) {
+    const permission = Permission.create({
+      id,
+      resource,
+      action
     })
+
+    //class validator
+    await validateClass(permission)
+
+    return await this.permissionRepo.save(permission)
   }
 
   async findOne({
@@ -44,6 +51,7 @@ class PermissionRepository {
     })
 
     if (!foundPermission) return null
+    console.log('>>>>>>>>>>>>>>>>>>>>', foundPermission)
 
     return unGetData({ fields: unGetFields, object: foundPermission })
   }

@@ -31,7 +31,7 @@ class RoleController {
   }
 
   updateRole = async (req: Request<ParamsDictionary, any, UpdateRoleBodyReq>, res: Response, next: NextFunction) => {
-    const searchId = toNumber(req.params?.id)
+    const searchId = (req as Request).idParams as number
 
     return new SuccessResponse({
       message: 'Update role by id successful!',

@@ -1,6 +1,7 @@
 import { FindOptionsWhere, IsNull, Not, Repository } from 'typeorm'
 import { User } from '~/entities/user.entity'
 import { unGetData } from '~/utils'
+import { validateClass } from '~/utils/validate'
 
 class UserRepository {
   userRepo: Repository<User>
@@ -37,35 +38,40 @@ class UserRepository {
     return unGetData({ fields: unGetFields, object: foundUser })
   }
 
-  async saveOne({ email, username, password, fullName, avatar, status, role, tokens }: Partial<User>) {
-    return await this.userRepo.save({
-      email,
-      username,
-      password,
-      fullName,
+  async saveOne({ id, email, username, password, fullName, avatar, status, role, tokens }: User) {
+    const user = User.create({
+      id,
+      email: email,
+      username: username,
+      password: password,
+      fullName: fullName,
       avatar,
       status,
       role,
       tokens
     })
+
+    // class validate
+    await validateClass(user)
+
+    return await this.userRepo.save(user)
   }
 
   async findAll({
-    conditions,
+    where,
     unGetFields,
     relations,
     isDeleted = false
   }: {
-    conditions: Partial<User>
+    where: FindOptionsWhere<User> | FindOptionsWhere<User>[]
     unGetFields?: string[]
     relations?: string[]
     isDeleted?: boolean
   }) {
     const foundUsers = await this.userRepo.find({
-      where: {
-        ...conditions,
-        deletedAt: isDeleted ? Not(IsNull()) : IsNull()
-      },
+      where: Array.isArray(where)
+        ? where.map((w) => ({ ...w, deletedAt: isDeleted ? Not(IsNull()) : IsNull() }))
+        : { ...where, deletedAt: isDeleted ? Not(IsNull()) : IsNull() },
       relations
     })
 
@@ -74,11 +80,9 @@ class UserRepository {
     return unGetData({ fields: unGetFields, object: foundUsers })
   }
 
-  async count({ conditions = {} }: { conditions?: Partial<User> }) {
+  async count({ where = {} }: { where?: FindOptionsWhere<User> }) {
     return await this.userRepo.findAndCount({
-      where: {
-        ...conditions
-      }
+      where
     })
   }
 }
