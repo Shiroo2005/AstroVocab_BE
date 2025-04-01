@@ -13,8 +13,6 @@ export const refreshTokenValidation = validateSchema(
           options: async (value: string, { req }) => {
             // check refresh token valid
             try {
-              console.log(value)
-
               const decodedRefreshToken = await verifyToken({ token: value })
               ;(req as Request).decodedRefreshToken = decodedRefreshToken
             } catch (error) {
@@ -30,10 +28,10 @@ export const refreshTokenValidation = validateSchema(
             })
 
             // access and refresh token must be 1 userId
-            const decodedAuthorization = (req as Request).decodedAuthorization
-            const decodedRefreshToken = (req as Request).decodedRefreshToken
-            if (decodedAuthorization && decodedAuthorization.userId != decodedRefreshToken?.userId)
-              throw new BadRequestError('Access and refresh token must belong to the same user!')
+            // const decodedAuthorization = (req as Request).decodedAuthorization
+            // const decodedRefreshToken = (req as Request).decodedRefreshToken
+            // if (decodedAuthorization && decodedAuthorization.userId != decodedRefreshToken?.userId)
+            //   throw new BadRequestError('Access and refresh token must belong to the same user!')
 
             if (!foundToken) throw new BadRequestError('Please login again!')
 

@@ -41,6 +41,12 @@ class TokenRepository {
 
     return unGetData({ fields: unGetFields, object: foundUser })
   }
+
+  async softDelete({ conditions }: { conditions: Partial<Token> }) {
+    return await this.tokenRepo.softDelete({
+      ...conditions
+    })
+  }
 }
 
 export const tokenRepository = new TokenRepository()

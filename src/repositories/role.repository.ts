@@ -40,8 +40,8 @@ class RoleRepository {
     return unGetData({ fields: unGetFields, object: foundRole })
   }
 
-  async saveOne({ name, permissions, description, users }: Role) {
-    const role = Role.create({ name: name, permissions, description, users })
+  async saveOne({ name, permissions, description, users, id }: Role) {
+    const role = Role.create({ id, name: name, permissions, description, users })
 
     //class validator
     await validateClass(role)

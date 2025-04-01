@@ -38,8 +38,9 @@ class UserRepository {
     return unGetData({ fields: unGetFields, object: foundUser })
   }
 
-  async saveOne({ email, username, password, fullName, avatar, status, role, tokens }: User) {
+  async saveOne({ id, email, username, password, fullName, avatar, status, role, tokens }: User) {
     const user = User.create({
+      id,
       email: email,
       username: username,
       password: password,

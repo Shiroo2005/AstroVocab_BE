@@ -12,7 +12,6 @@ import { BadRequestError } from '~/core/error.response'
 import { tokenRepository } from '~/repositories/token.repository'
 import { roleRepository } from '~/repositories/role.repository'
 import { userRepository } from '~/repositories/user.repository'
-import { DatabaseService } from './database.service'
 
 class UserService {
   login = async ({ userId, status, role }: { userId: number; status: UserStatus; role: Role }) => {
@@ -51,11 +50,7 @@ class UserService {
 
   logout = async ({ refreshToken }: LogoutBodyReq) => {
     // delete refresh token in db
-    const result = await (
-      await DatabaseService.getInstance().getRepository(Token)
-    ).softDelete({
-      refreshToken
-    })
+    const result = await tokenRepository.softDelete({ conditions: { refreshToken } })
 
     return result
   }

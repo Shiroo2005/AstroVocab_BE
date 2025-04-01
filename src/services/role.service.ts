@@ -81,6 +81,8 @@ class RoleService {
     foundRole.description = description
     if (permissions) foundRole.permissions = permissions
 
+    console.log(foundRole)
+
     // save role
     return await roleRepository.saveOne(foundRole)
   }

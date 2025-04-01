@@ -26,7 +26,7 @@ export const accessTokenValidation = validateSchema(
                 where: {
                   id: userId
                 },
-                relations: ['role']
+                relations: ['role', 'role.permissions']
               })
 
               if (foundUser) {

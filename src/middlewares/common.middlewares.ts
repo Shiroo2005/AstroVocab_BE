@@ -5,6 +5,7 @@ import { isValidNumber, toNumber } from '~/utils'
 
 export const checkIdParamMiddleware = (options?: { id?: string }) => {
   const id = options?.id || 'id'
+
   return (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
     if (req.params[id] && !isValidNumber(req.params[id])) {
       throw new BadRequestError('Id invalid!')

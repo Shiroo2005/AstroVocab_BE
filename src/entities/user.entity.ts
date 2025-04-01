@@ -12,7 +12,6 @@ import {
 import { UserStatus } from '~/constants/userStatus'
 import { Role } from './role.entity'
 import { Token } from './token.entity'
-import { BadRequestError } from '~/core/error.response'
 
 @Entity()
 export class User {
@@ -63,8 +62,10 @@ export class User {
   @UpdateDateColumn()
   updatedAt?: Date
 
-  static create = ({ email, username, fullName, password, avatar, status, role, tokens }: User) => {
+  static create = ({ id, email, username, fullName, password, avatar, status, role, tokens }: User) => {
     const newUser = new User()
+
+    newUser.id = id
     newUser.email = email
     newUser.username = username
     newUser.fullName = fullName
