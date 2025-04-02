@@ -78,7 +78,7 @@ async function seedPermissions() {
       }
     ]
     for (const permission of permissions) {
-      await permissionService.createPermission({ permission })
+      await permissionService.createPermission(permission)
     }
 
     console.log('✅ Seeded Permissions successfully!')

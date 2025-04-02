@@ -8,12 +8,12 @@ import { LogoutBodyReq } from '~/dto/req/auth/logoutBody.req'
 import { RegisterBodyReq } from '~/dto/req/auth/registerBody.req'
 import { Role } from '~/entities/role.entity'
 import { User } from '~/entities/user.entity'
-import { userService } from '~/services/user.service'
+import { authService } from '~/services/auth.service'
 
 export const registerController = async (req: Request<ParamsDictionary, any, RegisterBodyReq>, res: Response) => {
   return new CREATED({
     message: 'Register successful!',
-    metaData: await userService.register(req.body)
+    metaData: await authService.register(req.body)
   }).send(res)
 }
 
@@ -22,7 +22,7 @@ export const loginController = async (req: Request<ParamsDictionary, any, LoginB
 
   return new SuccessResponse({
     message: 'Login successful!',
-    metaData: await userService.login({
+    metaData: await authService.login({
       userId: user.id as number,
       status: user.status as UserStatus,
       role: user.role as Role
@@ -35,7 +35,7 @@ export const logoutController = async (req: Request<ParamsDictionary, any, Logou
 
   return new SuccessResponse({
     message: 'Logout successful!',
-    metaData: await userService.logout({ refreshToken })
+    metaData: await authService.logout({ refreshToken })
   }).send(res)
 }
 
@@ -44,7 +44,7 @@ export const refreshTokenController = async (req: Request<ParamsDictionary, any,
 
   return new SuccessResponse({
     message: 'Get new tokens successful!',
-    metaData: await userService.newToken(decodedRefreshToken as TokenPayload)
+    metaData: await authService.newToken(decodedRefreshToken as TokenPayload)
   }).send(res)
 }
 
@@ -53,6 +53,6 @@ export const accountController = async (req: Request<ParamsDictionary, any, any>
 
   return new SuccessResponse({
     message: 'Get account successful!',
-    metaData: await userService.getAccount(decodedAuthorization as TokenPayload)
+    metaData: await authService.getAccount(decodedAuthorization as TokenPayload)
   }).send(res)
 }

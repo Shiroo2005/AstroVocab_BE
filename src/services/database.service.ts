@@ -55,7 +55,7 @@ export class DatabaseService {
       // seed data
       seedData()
     } catch (error) {
-      console.log((error as Error).message)
+      console.log((error as Error).message, (error as Error).stack)
     }
   }
 
