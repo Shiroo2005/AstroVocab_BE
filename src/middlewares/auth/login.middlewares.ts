@@ -26,7 +26,6 @@ export const loginValidation = validateSchema(
             }
 
             ;(req as Request).user = foundUser as User
-            console.log(foundUser)
 
             return true
           }

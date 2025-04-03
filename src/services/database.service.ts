@@ -2,7 +2,7 @@ import { config } from 'dotenv'
 import { env } from 'process'
 import { parseInt } from 'lodash'
 import * as mysql2 from 'mysql2'
-import { LogCustomize } from '~/utils/log'
+import { customLogger } from '~/utils/log'
 import { DataSource, ObjectLiteral, Repository } from 'typeorm'
 import { Permission } from '~/entities/permission.entity'
 import { User } from '~/entities/user.entity'
@@ -27,7 +27,7 @@ export class DatabaseService {
       host: env.DB_HOST as string,
       port: parseInt(env.DB_PORT as string),
       entities: [Token, User, Role, Permission],
-      logging: ['query', 'error']
+      logger: customLogger
       // synchronize: true
       // logger: LogCustomize
     })
@@ -36,9 +36,9 @@ export class DatabaseService {
   async connect() {
     try {
       await this.appDataSource.initialize()
-      LogCustomize.logSuccess('Database connected successfully ✅')
+      customLogger.log('info', 'Database connected successfully ✅')
     } catch (error) {
-      LogCustomize.logError(`Unable to connect to the database: ${(error as Error).message}`)
+      console.log(`Unable to connect to the database: ${(error as Error).message}`)
     }
   }
 
@@ -50,7 +50,7 @@ export class DatabaseService {
   async syncDB() {
     try {
       await this.appDataSource.synchronize()
-      LogCustomize.logSuccess('Database synchronized (alter mode) 🔄')
+      customLogger.log('info', 'Database synchronized (alter mode) 🔄')
 
       // seed data
       seedData()

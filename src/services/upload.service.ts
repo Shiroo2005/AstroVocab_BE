@@ -47,10 +47,7 @@ export const processAndSaveImage = async (file: Express.Multer.File, type: strin
   const destinationPath = path.resolve('uploads', folder)
   const newFileName = `${Date.now()}-${path.parse(file.originalname).name}.jpeg`
   const destinationFile = path.join(destinationPath, newFileName)
-
   const urlImage = `${env.HOST_URL}/uploads/${folder}/${newFileName}`
-
-  console.log(filePath, destinationPath, file, destinationFile)
 
   await sharp(filePath).jpeg().toFile(destinationFile)
 
