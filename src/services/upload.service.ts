@@ -6,6 +6,7 @@ import sharp from 'sharp'
 import path from 'path'
 import { FolderUpload } from '~/constants/upload'
 import { env } from 'process'
+import { promisify } from 'util'
 
 const storage = multer.diskStorage({
   destination: (req: Request, file, cb) => {
@@ -28,6 +29,11 @@ export const uploadImages = async (files: Record<string, Express.Multer.File[]>,
 
   const _files = await Promise.all(fileArray.map((file) => processAndSaveImage(file, type)))
 
+  // delete temp files
+  fileArray.map((file) => {
+    unlinkAsync(file.path)
+  })
+
   return _files
 }
 
@@ -41,7 +47,7 @@ export const processAndSaveImage = async (file: Express.Multer.File, type: strin
   if (foundFolder && foundFolder.length == 1) folder = foundFolder[0]
 
   // create folder if not exist
-  if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true })
+  ensureFolderExists(`uploads/${folder}`)
 
   const filePath = path.resolve(file.path)
   const destinationPath = path.resolve('uploads', folder)
@@ -53,6 +59,8 @@ export const processAndSaveImage = async (file: Express.Multer.File, type: strin
 
   return { filename: file.fieldname, destination: urlImage }
 }
+
+export const unlinkAsync = promisify(fs.unlink)
 
 // Middleware upload
 export const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }) // 5Mb
