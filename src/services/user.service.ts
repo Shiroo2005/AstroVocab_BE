@@ -80,6 +80,11 @@ class UserService {
     const deletedUser = await userRepository.softDelete(id)
     return deletedUser
   }
+
+  restoreUserById = async ({ id }: { id: number }) => {
+    const restoreUser = await userRepository.restore(id)
+    return restoreUser
+  }
 }
 
 export const userService = new UserService()

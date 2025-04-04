@@ -140,6 +140,10 @@ class UserRepository {
       id
     })
   }
+
+  async restore(id: number) {
+    return await this.userRepo.restore({ id })
+  }
 }
 
 export const userRepository = new UserRepository()

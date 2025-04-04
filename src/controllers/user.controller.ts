@@ -45,3 +45,12 @@ export const deleteUserById = async (req: Request<ParamsDictionary, any, any>, r
     metaData: await userService.deleteUserById({ id })
   }).send(res)
 }
+
+export const restoreUserById = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const id = (req as Request).idParams as number
+
+  return new SuccessResponse({
+    message: 'Restore user by id successful!',
+    metaData: await userService.restoreUserById({ id })
+  }).send(res)
+}

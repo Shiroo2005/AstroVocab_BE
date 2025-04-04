@@ -5,6 +5,7 @@ import {
   deleteUserById,
   getAllUsers,
   getUser,
+  restoreUserById,
   updateUserController
 } from '~/controllers/user.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
@@ -87,6 +88,21 @@ userRouter.patch(
   updateUserValidation,
   wrapRequestHandler(updateUserController)
 )
+
+/**
+ * @description : Restore user from deleted
+ * @method : PATCH
+ * @path : /:id/restore
+ * @header : Authorization
+ * @params: id
+ */
+userRouter.patch(
+  '/:id/restore',
+  wrapRequestHandler(checkPermission('updateAny', Resource.USER)),
+  checkIdParamMiddleware(),
+  wrapRequestHandler(restoreUserById)
+)
+
 // DELETE
 
 /**
