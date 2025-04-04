@@ -3,7 +3,7 @@ import { Resource } from '~/constants/access'
 import { createRole, deleteRoleById, getAllRoles, getRole, updateRole } from '~/controllers/role.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
-import { checkIdParamMiddleware } from '~/middlewares/common.middlewares'
+import { checkIdParamMiddleware, checkQueryMiddleware } from '~/middlewares/common.middlewares'
 import { wrapRequestHandler } from '~/utils/handler'
 const roleRouter = express.Router()
 
@@ -18,7 +18,12 @@ roleRouter.use(accessTokenValidation)
  * @path : /all
  * @header : Authorization
  */
-roleRouter.get('/all', wrapRequestHandler(checkPermission('readAny', Resource.ROLE)), wrapRequestHandler(getAllRoles))
+roleRouter.get(
+  '/',
+  wrapRequestHandler(checkPermission('readAny', Resource.ROLE)),
+  checkQueryMiddleware({ numbericFields: ['limit', 'page'] }),
+  wrapRequestHandler(getAllRoles)
+)
 
 /**
  * @description : Get role by id

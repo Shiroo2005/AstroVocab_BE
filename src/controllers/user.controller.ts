@@ -15,10 +15,33 @@ export const createUserController = async (req: Request<ParamsDictionary, any, C
 export const updateUserController = async (req: Request<ParamsDictionary, any, UpdateUserBodyReq>, res: Response) => {
   const id = (req as Request).idParams as number
 
-  console.log(id)
-
   return new SuccessResponse({
     message: 'Update user by id successful!',
     metaData: await userService.updateUser(id, req.body)
+  }).send(res)
+}
+
+export const getUser = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const id = (req as Request).idParams as number
+
+  return new SuccessResponse({
+    message: 'Get user by id successful!',
+    metaData: await userService.getUserById(id)
+  }).send(res)
+}
+
+export const getAllUsers = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  return new SuccessResponse({
+    message: 'Get all users successful!',
+    metaData: await userService.getAllUser(req.query)
+  }).send(res)
+}
+
+export const deleteUserById = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const id = (req as Request).idParams as number
+
+  return new SuccessResponse({
+    message: 'Delete user by id successful!',
+    metaData: await userService.deleteUserById({ id })
   }).send(res)
 }

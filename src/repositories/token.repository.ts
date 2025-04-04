@@ -1,6 +1,5 @@
 import { FindOptionsWhere, Repository } from 'typeorm'
 import { Token } from '~/entities/token.entity'
-import { DatabaseService } from '~/services/database.service'
 import { unGetData } from '~/utils'
 import { validateClass } from '~/utils/validate'
 
@@ -12,6 +11,7 @@ class TokenRepository {
   }
 
   private async init() {
+    const { DatabaseService } = await import('~/services/database.service.js')
     this.tokenRepo = await DatabaseService.getInstance().getRepository(Token)
   }
 
@@ -42,8 +42,8 @@ class TokenRepository {
     return unGetData({ fields: unGetFields, object: foundUser })
   }
 
-  async softDelete({ conditions }: { conditions: Partial<Token> }) {
-    return await this.tokenRepo.softDelete({
+  async hardDelete({ conditions }: { conditions: Partial<Token> }) {
+    return await this.tokenRepo.delete({
       ...conditions
     })
   }

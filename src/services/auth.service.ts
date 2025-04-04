@@ -50,7 +50,7 @@ class AuthService {
 
   logout = async ({ refreshToken }: LogoutBodyReq) => {
     // delete refresh token in db
-    const result = await tokenRepository.softDelete({ conditions: { refreshToken } })
+    const result = await tokenRepository.hardDelete({ conditions: { refreshToken } })
 
     return result
   }

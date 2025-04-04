@@ -1,6 +1,7 @@
 export enum Resource {
   USER = 'user',
-  ROLE = 'role'
+  ROLE = 'role',
+  PERMISSION = 'permission'
 }
 
 export enum RoleName {

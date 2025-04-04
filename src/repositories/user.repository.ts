@@ -3,8 +3,9 @@ import { UserStatus } from '~/constants/userStatus'
 import { BadRequestError } from '~/core/error.response'
 import { Role } from '~/entities/role.entity'
 import { User } from '~/entities/user.entity'
-import { unGetData } from '~/utils'
+import { unGetData, unGetDataArray } from '~/utils'
 import { validateClass } from '~/utils/validate'
+import { tokenRepository } from './token.repository'
 
 class UserRepository {
   userRepo: Repository<User>
@@ -21,16 +22,14 @@ class UserRepository {
   async findOne({
     where,
     unGetFields,
-    relations,
-    status = UserStatus.NOT_VERIFIED
+    relations
   }: {
     where: FindOptionsWhere<User> | FindOptionsWhere<User>[]
     unGetFields?: string[]
     relations?: string[]
-    status?: UserStatus
   }) {
     const foundUser = await this.userRepo.findOne({
-      where: Array.isArray(where) ? where.map((w) => ({ ...w, status })) : { ...where, status },
+      where,
       relations
     })
 
@@ -92,26 +91,53 @@ class UserRepository {
   }
 
   async findAll({
+    limit = 10,
+    page = 1,
     where,
-    relations
+    relations,
+    unGetFields
   }: {
-    where: FindOptionsWhere<User> | FindOptionsWhere<User>[]
+    limit?: number
+    page?: number
+    where?: FindOptionsWhere<User> | FindOptionsWhere<User>[]
+    unGetFields?: string[]
     relations?: string[]
-    status?: UserStatus
   }) {
-    const foundUsers = await this.userRepo.find({
+    const skip = (page - 1) * limit
+    const [foundUsers, total] = await this.userRepo.findAndCount({
       where,
-      relations
+      relations,
+      skip,
+      take: limit
     })
 
     if (!foundUsers || foundUsers.length === 0) return null
 
-    return foundUsers
+    return {
+      foundUsers: unGetDataArray({ fields: unGetFields, objects: foundUsers }),
+      total
+    }
   }
 
   async count({ where = {} }: { where?: FindOptionsWhere<User> }) {
     return await this.userRepo.findAndCount({
       where
+    })
+  }
+
+  async softDelete(id: number, { conditions }: { conditions?: Partial<User> } = {}) {
+    // delete token user has
+    await tokenRepository.hardDelete({
+      conditions: {
+        user: {
+          id
+        } as User
+      }
+    })
+
+    return await this.userRepo.softDelete({
+      ...conditions,
+      id
     })
   }
 }
