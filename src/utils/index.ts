@@ -30,6 +30,10 @@ export const isValidEnumValue = <T extends object>(value: string, enumObj: T): b
   return Object.values(enumObj).includes(value as T[keyof T])
 }
 
+export const objectToArray = <T>(obj: Record<string, T>): T[] => {
+  return Object.values(obj)
+}
+
 // export const getSelectData = (select = []) => {
 //   return Object.fromEntries(select.map((el) => [el, 1]))
 // }

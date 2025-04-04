@@ -15,16 +15,33 @@ export const checkIdParamMiddleware = (options?: { id?: string }) => {
   }
 }
 
-export const checkQueryRequiredMiddleware = (fields: string[]) => {
+export const checkQueryMiddleware = ({
+  requiredFields,
+  numbericFields
+}: {
+  requiredFields?: string[]
+  numbericFields?: string[]
+}) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const queryKeys = Object.keys(req.query)
 
     // Kiểm tra xem có query nào không nằm trong fields không
-    const invalidFields = fields.filter((field) => !req.query[field])
-    console.log(invalidFields, queryKeys, fields, req.query, !req.query['roleId'])
+    if (requiredFields) {
+      const invalidFields = requiredFields.filter((field) => !req.query[field])
+      console.log(invalidFields, queryKeys, requiredFields, req.query, !req.query['roleId'])
 
-    if (invalidFields.length > 0) {
-      throw new BadRequestError(`${fields.join(', ')} is required on query!`)
+      if (invalidFields.length > 0) {
+        throw new BadRequestError(`${requiredFields.join(', ')} is required on query!`)
+      }
+    }
+
+    // check is number field
+    if (numbericFields) {
+      numbericFields.forEach((field) => {
+        if (req.query[field] && !isValidNumber(req.query[field] as string)) {
+          throw new BadRequestError(`${field} must be a numberic string`)
+        }
+      })
     }
 
     next()

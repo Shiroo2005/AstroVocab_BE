@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -51,6 +52,7 @@ export class User {
   role?: Role
 
   @OneToMany(() => Token, (token) => token.user)
+  @JoinColumn({ name: 'roleId' })
   tokens?: Token[]
 
   @DeleteDateColumn()
@@ -76,5 +78,37 @@ export class User {
     newUser.tokens = tokens
 
     return newUser
+  }
+
+  static update = (
+    user: User,
+    {
+      email,
+      username,
+      fullName,
+      avatar,
+      status,
+      role,
+      tokens
+    }: {
+      email?: string
+      username?: string
+      fullName?: string
+      avatar?: string
+      status?: UserStatus
+      roleId?: number
+      role?: Role
+      tokens?: Token[]
+    }
+  ) => {
+    if (email) user.email = email
+    if (username) user.username = username
+    if (fullName) user.fullName = fullName
+    if (avatar) user.avatar = avatar
+    if (status) user.status = status
+    if (role && role.id) user.role = role
+    if (tokens && tokens.length == 0) user.tokens = tokens
+
+    return user
   }
 }

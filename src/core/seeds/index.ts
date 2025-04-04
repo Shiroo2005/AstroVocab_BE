@@ -75,10 +75,28 @@ async function seedPermissions() {
       {
         resource: Resource.ROLE,
         action: Action.DELETE_ANY
+      },
+      // user
+      {
+        resource: Resource.USER,
+        action: Action.READ_ANY
+      },
+      {
+        resource: Resource.USER,
+        action: Action.CREATE_ANY
+      },
+      {
+        resource: Resource.USER,
+        action: Action.UPDATE_ANY
+      },
+      {
+        resource: Resource.USER,
+        action: Action.DELETE_ANY
       }
     ]
+
     for (const permission of permissions) {
-      await permissionService.createPermission({ permission })
+      await permissionService.createPermission(permission)
     }
 
     console.log('✅ Seeded Permissions successfully!')

@@ -54,6 +54,16 @@ class RoleService {
     }
   }
 
+  isExistRoleId = async (id: number) => {
+    const foundRole = roleRepository.findOne({
+      conditions: {
+        id
+      }
+    })
+
+    return foundRole
+  }
+
   updateRoleById = async ({
     id,
     name,

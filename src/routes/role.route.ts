@@ -1,9 +1,9 @@
 import express from 'express'
 import { Resource } from '~/constants/access'
-import { roleController } from '~/controllers/role.controller'
+import { createRole, deleteRoleById, getAllRoles, getRole, updateRole } from '~/controllers/role.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
-import { checkIdParamMiddleware } from '~/middlewares/common.middlewares'
+import { checkIdParamMiddleware, checkQueryMiddleware } from '~/middlewares/common.middlewares'
 import { wrapRequestHandler } from '~/utils/handler'
 const roleRouter = express.Router()
 
@@ -19,9 +19,10 @@ roleRouter.use(accessTokenValidation)
  * @header : Authorization
  */
 roleRouter.get(
-  '/all',
+  '/',
   wrapRequestHandler(checkPermission('readAny', Resource.ROLE)),
-  wrapRequestHandler(roleController.getAllRoles)
+  checkQueryMiddleware({ numbericFields: ['limit', 'page'] }),
+  wrapRequestHandler(getAllRoles)
 )
 
 /**
@@ -35,7 +36,7 @@ roleRouter.get(
   '/:id',
   wrapRequestHandler(checkPermission('readAny', Resource.ROLE)),
   checkIdParamMiddleware(),
-  wrapRequestHandler(roleController.getRole)
+  wrapRequestHandler(getRole)
 )
 
 // POST
@@ -46,11 +47,7 @@ roleRouter.get(
  * @header : Authorization
  * @body : {name: string, description?: string, permissionIds?: number[]}
  */
-roleRouter.post(
-  '/',
-  wrapRequestHandler(checkPermission('createAny', Resource.ROLE)),
-  wrapRequestHandler(roleController.createRole)
-)
+roleRouter.post('/', wrapRequestHandler(checkPermission('createAny', Resource.ROLE)), wrapRequestHandler(createRole))
 
 // PUT
 
@@ -65,7 +62,7 @@ roleRouter.put(
   '/:id',
   wrapRequestHandler(checkPermission('updateAny', Resource.ROLE)),
   checkIdParamMiddleware(),
-  wrapRequestHandler(roleController.updateRole)
+  wrapRequestHandler(updateRole)
 )
 
 // DELETE
@@ -73,7 +70,7 @@ roleRouter.delete(
   '/:id',
   wrapRequestHandler(checkPermission('deleteAny', Resource.ROLE)),
   checkIdParamMiddleware(),
-  wrapRequestHandler(roleController.deleteRoleById)
+  wrapRequestHandler(deleteRoleById)
 )
 
 export default roleRouter

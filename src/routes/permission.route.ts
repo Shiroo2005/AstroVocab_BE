@@ -1,4 +1,5 @@
 import express from 'express'
+import { Resource } from '~/constants/access'
 import {
   createPermissionController,
   deletePermissionController,
@@ -6,7 +7,8 @@ import {
   updatePermissionController
 } from '~/controllers/permission.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
-import { checkIdParamMiddleware, checkQueryRequiredMiddleware } from '~/middlewares/common.middlewares'
+import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
+import { checkIdParamMiddleware, checkQueryMiddleware } from '~/middlewares/common.middlewares'
 import { createPermissionValidation } from '~/middlewares/permission/createPermission.middleware'
 import { updatePermissionValidation } from '~/middlewares/permission/updatePermission.middleware'
 import { wrapRequestHandler } from '~/utils/handler'
@@ -25,7 +27,12 @@ permissionRouter.use(accessTokenValidation)
  * @header : Authorization
  * @body :{}
  */
-permissionRouter.get('/', checkQueryRequiredMiddleware(['roleId']), wrapRequestHandler(findPermissonController))
+permissionRouter.get(
+  '/',
+  wrapRequestHandler(checkPermission('readAny', Resource.PERMISSION)),
+  checkQueryMiddleware({ requiredFields: ['roleId'] }),
+  wrapRequestHandler(findPermissonController)
+)
 
 //  POST
 /**
@@ -44,7 +51,13 @@ permissionRouter.get('/', checkQueryRequiredMiddleware(['roleId']), wrapRequestH
  * ]
  * }
  */
-permissionRouter.post('/', createPermissionValidation, wrapRequestHandler(createPermissionController))
+
+permissionRouter.post(
+  '/',
+  wrapRequestHandler(checkPermission('createAny', Resource.PERMISSION)),
+  createPermissionValidation,
+  wrapRequestHandler(createPermissionController)
+)
 
 // PUT
 /**
@@ -64,7 +77,12 @@ permissionRouter.post('/', createPermissionValidation, wrapRequestHandler(create
  * ]
  * }
  */
-permissionRouter.put('/:id', updatePermissionValidation, wrapRequestHandler(updatePermissionController))
+permissionRouter.put(
+  '/:id',
+  wrapRequestHandler(checkPermission('updateAny', Resource.PERMISSION)),
+  updatePermissionValidation,
+  wrapRequestHandler(updatePermissionController)
+)
 
 // DELETE
 /**
@@ -75,4 +93,9 @@ permissionRouter.put('/:id', updatePermissionValidation, wrapRequestHandler(upda
  * @params : id
  * }
  */
-permissionRouter.delete('/:id', checkIdParamMiddleware(), wrapRequestHandler(deletePermissionController))
+permissionRouter.delete(
+  '/:id',
+  wrapRequestHandler(checkPermission('deleteAny', Resource.PERMISSION)),
+  checkIdParamMiddleware(),
+  wrapRequestHandler(deletePermissionController)
+)

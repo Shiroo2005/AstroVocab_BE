@@ -53,20 +53,17 @@ class RoleRepository {
     limit,
     page,
     conditions,
-    unGetFields,
-    isDeleted = false
+    unGetFields
   }: {
     limit: number
     page: number
     conditions?: Partial<Role>
     unGetFields?: string[]
-    isDeleted?: boolean
   }) {
     const skip = (page - 1) * limit
     const [foundRoles, total] = await this.roleRepo.findAndCount({
       where: {
-        ...conditions,
-        deletedAt: isDeleted ? Not(IsNull()) : IsNull()
+        ...conditions
       },
       skip,
       take: limit
