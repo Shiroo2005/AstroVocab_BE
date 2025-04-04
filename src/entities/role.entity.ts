@@ -31,7 +31,7 @@ export class Role {
   users?: User[]
 
   @ManyToMany(() => Permission)
-  @JoinTable()
+  @JoinTable({ name: 'role_permission' })
   permissions?: Permission[]
 
   @DeleteDateColumn()

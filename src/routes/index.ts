@@ -3,6 +3,7 @@ import roleRouter from './role.route'
 import authRouter from './auth.route'
 import { permissionRouter } from './permission.route'
 import uploadRouter from './upload.route'
+import { userRouter } from './user.route'
 const router = express.Router()
 
 router.use('/auth', authRouter)
@@ -13,4 +14,5 @@ router.use('/permissions', permissionRouter)
 
 router.use('/upload', uploadRouter)
 
+router.use('/users', userRouter)
 export default router

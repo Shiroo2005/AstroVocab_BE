@@ -3,6 +3,6 @@ export interface CreateUserBodyReq {
   username: string
   password: string
   fullName: string
-  avatar: string
+  avatar?: string
   roleId: number
 }

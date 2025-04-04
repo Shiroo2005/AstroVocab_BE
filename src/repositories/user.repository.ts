@@ -1,4 +1,7 @@
-import { FindOptionsWhere, IsNull, Not, Repository } from 'typeorm'
+import { FindOptionsWhere, Repository } from 'typeorm'
+import { UserStatus } from '~/constants/userStatus'
+import { BadRequestError } from '~/core/error.response'
+import { Role } from '~/entities/role.entity'
 import { User } from '~/entities/user.entity'
 import { unGetData } from '~/utils'
 import { validateClass } from '~/utils/validate'
@@ -19,17 +22,15 @@ class UserRepository {
     where,
     unGetFields,
     relations,
-    isDeleted = false
+    status = UserStatus.NOT_VERIFIED
   }: {
     where: FindOptionsWhere<User> | FindOptionsWhere<User>[]
     unGetFields?: string[]
     relations?: string[]
-    isDeleted?: boolean
+    status?: UserStatus
   }) {
     const foundUser = await this.userRepo.findOne({
-      where: Array.isArray(where)
-        ? where.map((w) => ({ ...w, deletedAt: isDeleted ? Not(IsNull()) : IsNull() }))
-        : { ...where, deletedAt: isDeleted ? Not(IsNull()) : IsNull() },
+      where: Array.isArray(where) ? where.map((w) => ({ ...w, status })) : { ...where, status },
       relations
     })
 
@@ -57,27 +58,55 @@ class UserRepository {
     return await this.userRepo.save(user)
   }
 
+  async updateOne({
+    id,
+    email,
+    username,
+    fullName,
+    avatar,
+    status,
+    roleId
+  }: {
+    id: number
+    email?: string
+    username?: string
+    fullName?: string
+    avatar?: string
+    status?: UserStatus
+    roleId?: number
+  }) {
+    const foundUser = (await this.findOne({ where: { id } })) as User | null
+
+    if (!foundUser) throw new BadRequestError('User id not found!')
+
+    const _foundUser = User.update(foundUser, {
+      email,
+      username,
+      fullName,
+      avatar,
+      status,
+      role: { id: roleId } as Role
+    })
+
+    return await this.userRepo.save(_foundUser)
+  }
+
   async findAll({
     where,
-    unGetFields,
-    relations,
-    isDeleted = false
+    relations
   }: {
     where: FindOptionsWhere<User> | FindOptionsWhere<User>[]
-    unGetFields?: string[]
     relations?: string[]
-    isDeleted?: boolean
+    status?: UserStatus
   }) {
     const foundUsers = await this.userRepo.find({
-      where: Array.isArray(where)
-        ? where.map((w) => ({ ...w, deletedAt: isDeleted ? Not(IsNull()) : IsNull() }))
-        : { ...where, deletedAt: isDeleted ? Not(IsNull()) : IsNull() },
+      where,
       relations
     })
 
     if (!foundUsers || foundUsers.length === 0) return null
 
-    return unGetData({ fields: unGetFields, object: foundUsers })
+    return foundUsers
   }
 
   async count({ where = {} }: { where?: FindOptionsWhere<User> }) {
