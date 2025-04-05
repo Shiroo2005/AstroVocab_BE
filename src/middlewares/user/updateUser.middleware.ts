@@ -30,14 +30,10 @@ export const updateUserValidation = validateSchema(
               where: [{ email: value }, { username: req.body.username }]
             })) as User[] | null
 
-            console.log(foundUser)
-
             if (foundUser) {
               const userId = (req as Request).idParams as number
               foundUser.forEach((user) => {
                 if (user.id != userId) {
-                  console.log('>>>>>>>>>>>>.', user.id != userId, user.id, userId)
-
                   throw new BadRequestError('Email or username already taken!')
                 }
               })

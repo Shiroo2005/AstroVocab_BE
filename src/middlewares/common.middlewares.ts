@@ -23,12 +23,9 @@ export const checkQueryMiddleware = ({
   numbericFields?: string[]
 }) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const queryKeys = Object.keys(req.query)
-
     // Kiểm tra xem có query nào không nằm trong fields không
     if (requiredFields) {
       const invalidFields = requiredFields.filter((field) => !req.query[field])
-      console.log(invalidFields, queryKeys, requiredFields, req.query, !req.query['roleId'])
 
       if (invalidFields.length > 0) {
         throw new BadRequestError(`${requiredFields.join(', ')} is required on query!`)

@@ -4,11 +4,11 @@ import { parseInt } from 'lodash'
 import * as mysql2 from 'mysql2'
 import { customLogger } from '~/utils/log'
 import { DataSource, ObjectLiteral, Repository } from 'typeorm'
-import { Permission } from '~/entities/permission.entity'
 import { User } from '~/entities/user.entity'
 import { Role } from '~/entities/role.entity'
 import { Token } from '~/entities/token.entity'
 import { seedData } from '~/core/seeds'
+import { Permission } from '~/entities/permission.entity'
 console.log('DatabaseService loaded')
 
 config()

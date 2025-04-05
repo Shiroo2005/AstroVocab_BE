@@ -1,14 +1,11 @@
 import { CreateRoleBodyReq } from '~/dto/req/roles/createRoleBody.req'
 import { Role } from '~/entities/role.entity'
 import { roleRepository } from '~/repositories/role.repository'
-import { Permission } from '~/entities/permission.entity'
 import { BadRequestError } from '~/core/error.response'
 
 class RoleService {
   createRole = async ({ name, description, permissionIds }: CreateRoleBodyReq) => {
-    const permissions = permissionIds?.map((permissionId) => ({ id: permissionId }) as Permission)
-
-    const createdRole = await roleRepository.saveOne({ name, description, permissions })
+    const createdRole = await roleRepository.saveOne({ name, description })
 
     return createdRole
   }
@@ -41,7 +38,7 @@ class RoleService {
 
   getRoleById = async (id: number) => {
     const foundRole = await roleRepository.findOne({
-      conditions: {
+      where: {
         id
       },
       relations: ['permissions']
@@ -56,7 +53,7 @@ class RoleService {
 
   isExistRoleId = async (id: number) => {
     const foundRole = roleRepository.findOne({
-      conditions: {
+      where: {
         id
       }
     })
@@ -64,22 +61,10 @@ class RoleService {
     return foundRole
   }
 
-  updateRoleById = async ({
-    id,
-    name,
-    description,
-    permissionIds
-  }: {
-    id: number
-    name: string
-    description?: string
-    permissionIds?: number[]
-  }) => {
-    const permissions = permissionIds?.map((permissionId) => ({ id: permissionId }) as Permission)
-
+  updateRoleById = async ({ id, name, description }: { id: number; name: string; description?: string }) => {
     // find role
     const foundRole = (await roleRepository.findOne({
-      conditions: {
+      where: {
         id
       }
     })) as Role | null
@@ -89,9 +74,6 @@ class RoleService {
     // change data
     foundRole.name = name
     foundRole.description = description
-    if (permissions) foundRole.permissions = permissions
-
-    console.log(foundRole)
 
     // save role
     return await roleRepository.saveOne(foundRole)
@@ -99,13 +81,13 @@ class RoleService {
 
   deleteRoleById = async ({ id }: { id: number }) => {
     // soft delete
-    const result = await roleRepository.softDelete({ conditions: { id } })
+    const result = await roleRepository.softDelete({ where: { id } })
     return result
   }
 
   findPermissionByRole = async ({ roleId }: { roleId: number }) => {
     const foundRole = (await roleRepository.findOne({
-      conditions: {
+      where: {
         id: roleId
       },
       relations: ['permissions']

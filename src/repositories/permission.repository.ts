@@ -35,39 +35,28 @@ class PermissionRepository {
   async findOne({
     where,
     unGetFields,
-    relations,
-    isDeleted = false
+    relations
   }: {
     where: FindOptionsWhere<Permission> | FindOptionsWhere<Permission>[]
     unGetFields?: string[]
     relations?: string[]
-    isDeleted?: boolean
   }) {
     const foundPermission = await this.permissionRepo.findOne({
-      where: Array.isArray(where)
-        ? where.map((w) => ({ ...w, deletedAt: isDeleted ? Not(IsNull()) : IsNull() }))
-        : { ...where, deletedAt: isDeleted ? Not(IsNull()) : IsNull() },
+      where,
       relations
     })
 
     if (!foundPermission) return null
-    console.log('>>>>>>>>>>>>>>>>>>>>', foundPermission)
 
     return unGetData({ fields: unGetFields, object: foundPermission })
   }
 
-  async softDelete({ conditions }: { conditions: Partial<Permission> }) {
-    return await this.permissionRepo.softDelete({
-      ...conditions
-    })
+  async softDelete({ where }: { where: FindOptionsWhere<Permission> }) {
+    return await this.permissionRepo.softDelete(where)
   }
 
-  async count({ conditions = {} }: { conditions?: Partial<Permission> }) {
-    return await this.permissionRepo.findAndCount({
-      where: {
-        ...conditions
-      }
-    })
+  async count({ where = {} }: { where?: FindOptionsWhere<Permission> }) {
+    return await this.permissionRepo.findAndCount({ where })
   }
 }
 
