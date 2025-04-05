@@ -27,7 +27,7 @@ class PermissionService {
   }
 
   deletePermission = async (id: number) => {
-    return await permissionRepository.softDelete({ conditions: { id } })
+    return await permissionRepository.softDelete({ where: { id } })
   }
 }
 

@@ -34,7 +34,7 @@ class AuthService {
   }
 
   register = async ({ email, username, fullName, password }: RegisterBodyReq) => {
-    const userRole = (await roleRepository.findOne({ conditions: { name: RoleName.USER } })) as Role | null
+    const userRole = (await roleRepository.findOne({ where: { name: RoleName.USER } })) as Role | null
 
     if (!userRole) throw new BadRequestError('Role user not exist!')
     const createdUser = await userRepository.saveOne({

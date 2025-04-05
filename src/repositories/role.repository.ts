@@ -1,7 +1,5 @@
-import { IsNull, Not, Repository } from 'typeorm'
-import { Permission } from '~/entities/permission.entity'
+import { FindOptionsWhere, Repository } from 'typeorm'
 import { Role } from '~/entities/role.entity'
-import { User } from '~/entities/user.entity'
 import { DatabaseService } from '~/services/database.service'
 import { unGetData, unGetDataArray } from '~/utils'
 import { validateClass } from '~/utils/validate'
@@ -18,21 +16,16 @@ class RoleRepository {
   }
 
   async findOne({
-    conditions,
+    where,
     unGetFields,
-    relations,
-    isDeleted = false
+    relations
   }: {
-    conditions: Partial<Role>
+    where: FindOptionsWhere<Role>
     unGetFields?: string[]
     relations?: string[]
-    isDeleted?: boolean
   }) {
     const foundRole = await this.roleRepo.findOne({
-      where: {
-        ...conditions,
-        deletedAt: isDeleted ? Not(IsNull()) : IsNull()
-      },
+      where,
       relations
     })
 
@@ -52,19 +45,17 @@ class RoleRepository {
   async findAll({
     limit,
     page,
-    conditions,
+    where,
     unGetFields
   }: {
     limit: number
     page: number
-    conditions?: Partial<Role>
+    where?: FindOptionsWhere<Role>
     unGetFields?: string[]
   }) {
     const skip = (page - 1) * limit
     const [foundRoles, total] = await this.roleRepo.findAndCount({
-      where: {
-        ...conditions
-      },
+      where,
       skip,
       take: limit
     })
@@ -76,41 +67,20 @@ class RoleRepository {
     }
   }
 
-  async updateOne({
-    conditions,
-    data,
-    isDeleted = false
-  }: {
-    conditions: Partial<Role>
-    data: Partial<Role>
-    unGetFields?: string[]
-    isDeleted?: boolean
-  }) {
-    const updatedRole = await this.roleRepo.update(
-      {
-        ...conditions,
-        deletedAt: isDeleted ? Not(IsNull()) : IsNull()
-      },
-      {
-        ...data
-      }
-    )
+  async updateOne({ where, data }: { where: FindOptionsWhere<Role>; data: Partial<Role>; unGetFields?: string[] }) {
+    const updatedRole = await this.roleRepo.update(where, {
+      ...data
+    })
 
     return updatedRole
   }
 
-  async softDelete({ conditions }: { conditions: Partial<Role> }) {
-    return await this.roleRepo.softDelete({
-      ...conditions
-    })
+  async softDelete({ where }: { where: FindOptionsWhere<Role> }) {
+    return await this.roleRepo.softDelete(where)
   }
 
-  async count({ conditions = {} }: { conditions?: Partial<Role> }) {
-    return await this.roleRepo.findAndCount({
-      where: {
-        ...conditions
-      }
-    })
+  async count({ where = {} }: { where?: FindOptionsWhere<Role> }) {
+    return await this.roleRepo.findAndCount({ where })
   }
 }
 

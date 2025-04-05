@@ -125,7 +125,7 @@ class UserRepository {
     })
   }
 
-  async softDelete(id: number, { conditions }: { conditions?: Partial<User> } = {}) {
+  async softDelete(id: number, { where }: { where?: FindOptionsWhere<User> } = {}) {
     // delete token user has
     await tokenRepository.hardDelete({
       conditions: {
@@ -136,7 +136,7 @@ class UserRepository {
     })
 
     return await this.userRepo.softDelete({
-      ...conditions,
+      ...where,
       id
     })
   }

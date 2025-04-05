@@ -1,5 +1,7 @@
 import { IsEmail, IsNotEmpty, Length, Matches, validate } from 'class-validator'
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -13,6 +15,7 @@ import {
 import { UserStatus } from '~/constants/userStatus'
 import { Role } from './role.entity'
 import { Token } from './token.entity'
+import { hashData } from '~/utils/jwt'
 
 @Entity()
 export class User {
@@ -52,7 +55,6 @@ export class User {
   role?: Role
 
   @OneToMany(() => Token, (token) => token.user)
-  @JoinColumn({ name: 'roleId' })
   tokens?: Token[]
 
   @DeleteDateColumn()
@@ -63,6 +65,11 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt?: Date
+
+  @BeforeInsert()
+  hashPassword?() {
+    this.password = hashData(this.password)
+  }
 
   static create = ({ id, email, username, fullName, password, avatar, status, role, tokens }: User) => {
     const newUser = new User()

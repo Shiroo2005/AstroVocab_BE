@@ -4,11 +4,6 @@ export enum Resource {
   PERMISSION = 'permission'
 }
 
-export enum RoleName {
-  USER = 'user',
-  ADMIN = 'admin'
-}
-
 export enum Action {
   CREATE_ANY = 'create:any',
   UPDATE_ANY = 'update:any',
@@ -18,4 +13,9 @@ export enum Action {
   UPDATE_OWN = 'update:own',
   READ_OWN = 'read:own',
   DELETE_OWN = 'delete:own'
+}
+
+export enum RoleName {
+  USER = 'user',
+  ADMIN = 'admin'
 }
