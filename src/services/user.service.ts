@@ -55,11 +55,11 @@ class UserService {
     limit = 10,
     email = '',
     fullName = '',
-    roleName = '%%',
-    status = UserStatus.NOT_VERIFIED
+    username = '',
+    roleName = '',
+    status = UserStatus.NOT_VERIFIED,
+    sort
   }: findUserQueryReq = {}) => {
-    // parse
-
     const relations = []
     if (isEmpty(roleName)) {
       roleName = '%%'
@@ -74,12 +74,14 @@ class UserService {
       where: {
         email: Like(`%${email}%`),
         fullName: Like(`%${fullName}%`),
+        username: Like(`%${username}%`),
         status: Like(`%${status}%` as UserStatus),
         role: {
           name: Like(`%${roleName}%`)
         }
       },
-      relations
+      relations,
+      order: sort
     })
     if (!result) {
       return {

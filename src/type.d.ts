@@ -9,5 +9,6 @@ declare module 'express' {
     idParams?: number
     decodedAuthorization?: TokenPayload
     decodedRefreshToken?: TokenPayload
+    sortParsed?: Record<string, 'ASC' | 'DESC'>
   }
 }

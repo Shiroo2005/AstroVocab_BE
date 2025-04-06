@@ -12,6 +12,7 @@ import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
 import { checkIdParamMiddleware, checkQueryMiddleware } from '~/middlewares/common.middlewares'
 import { createUserValidation } from '~/middlewares/user/createUser.middleware'
+import { findUserValidation } from '~/middlewares/user/findUser.middleware'
 import { updateUserValidation } from '~/middlewares/user/updateUser.middleware'
 import { wrapRequestHandler } from '~/utils/handler'
 export const userRouter = express.Router()
@@ -40,6 +41,7 @@ userRouter.get(
   '/',
   wrapRequestHandler(checkPermission('readAny', Resource.USER)),
   checkQueryMiddleware({ numbericFields: ['page', 'limit'] }),
+  findUserValidation,
   wrapRequestHandler(getAllUsers)
 )
 // POST
