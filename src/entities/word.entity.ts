@@ -28,12 +28,10 @@ export class Word {
 
   @Column('varchar', { default: 'N/A' })
   @IsOptional()
-  @IsUrl({}, { message: 'Audio must be a valid URL or "N/A"!' })
   audio?: string
 
   @Column('varchar', { default: 'N/A' })
   @IsOptional()
-  @IsUrl({}, { message: 'Image must be a valid URL or "N/A"!' })
   image?: string
 
   @Column('varchar', { default: WordRank.A1 })
@@ -86,5 +84,42 @@ export class Word {
     newWord.translateExample = translateExample
 
     return newWord
+  }
+
+  static update = (
+    word: Word,
+    {
+      content,
+      meaning,
+      pronunciation,
+      audio,
+      image,
+      rank,
+      position,
+      example,
+      translateExample
+    }: {
+      content?: string
+      pronunciation?: string
+      meaning?: string
+      position?: WordPosition
+      audio?: string
+      image?: string
+      rank?: WordRank
+      example?: string
+      translateExample?: string
+    }
+  ) => {
+    if (content) word.content = content
+    if (meaning) word.meaning = meaning
+    if (pronunciation) word.pronunciation = pronunciation
+    if (audio) word.audio = audio
+    if (image) word.image = image
+    if (rank) word.rank = rank
+    if (position) word.position = position
+    if (example) word.example = example
+    if (translateExample) word.translateExample = translateExample
+
+    return word
   }
 }

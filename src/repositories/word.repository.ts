@@ -1,4 +1,6 @@
 import { FindOptionsWhere, Repository } from 'typeorm'
+import { WordPosition, WordRank } from '~/constants/word'
+import { BadRequestError } from '~/core/error.response'
 import { Word } from '~/entities/word.entity'
 import { DatabaseService } from '~/services/database.service'
 import { unGetData, unGetDataArray } from '~/utils'
@@ -89,12 +91,49 @@ class WordRepository {
   //     }
   //   }
 
-  async updateOne({ where, data }: { where: FindOptionsWhere<Word>; data: Partial<Word>; unGetFields?: string[] }) {
-    const updatedRole = await this.wordRepo.update(where, {
-      ...data
+  async updateOne({
+    id,
+    content,
+    meaning,
+    pronunciation,
+    audio,
+    image,
+    rank,
+    position,
+    example,
+    translateExample
+  }: {
+    id: number
+    content?: string
+    pronunciation?: string
+    meaning?: string
+    position?: WordPosition
+    audio?: string
+    image?: string
+    rank?: WordRank
+    example?: string
+    translateExample?: string
+  }) {
+    const foundWord = (await wordRepository.findOne({
+      where: {
+        id
+      }
+    })) as Word | null
+    if (!foundWord) throw new BadRequestError('Word id not found!')
+
+    const updatedWord = Word.update(foundWord, {
+      content,
+      meaning,
+      pronunciation,
+      audio,
+      image,
+      rank,
+      position,
+      example,
+      translateExample
     })
 
-    return updatedRole
+    return await this.saveOne(updatedWord)
   }
 
   async softDelete({ where }: { where: FindOptionsWhere<Word> }) {
