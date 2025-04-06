@@ -1,4 +1,8 @@
+import { isEmpty } from 'lodash'
+import { Like } from 'typeorm'
+import { UserStatus } from '~/constants/userStatus'
 import { CreateUserBodyReq } from '~/dto/req/user/createUserBody.req'
+import { findUserQueryReq } from '~/dto/req/user/findUserQuery.req'
 import { UpdateUserBodyReq } from '~/dto/req/user/updateUserBody.req'
 import { Role } from '~/entities/role.entity'
 import { userRepository } from '~/repositories/user.repository'
@@ -46,15 +50,36 @@ class UserService {
     return foundUser
   }
 
-  getAllUsers = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
+  getAllUsers = async ({
+    page = 1,
+    limit = 10,
+    email = '',
+    fullName = '',
+    roleName = '%%',
+    status = UserStatus.NOT_VERIFIED
+  }: findUserQueryReq = {}) => {
     // parse
-    page = Number(page)
-    limit = Number(limit)
+
+    const relations = []
+    if (isEmpty(roleName)) {
+      roleName = '%%'
+    } else {
+      relations.push('role')
+    }
 
     const result = await userRepository.findAll({
       limit,
       page,
-      unGetFields: ['password', 'deletedAt', 'createdAt', 'updatedAt']
+      unGetFields: ['password', 'deletedAt', 'createdAt', 'updatedAt'],
+      where: {
+        email: Like(`%${email}%`),
+        fullName: Like(`%${fullName}%`),
+        status: Like(`%${status}%` as UserStatus),
+        role: {
+          name: Like(`%${roleName}%`)
+        }
+      },
+      relations
     })
     if (!result) {
       return {

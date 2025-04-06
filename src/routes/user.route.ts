@@ -34,7 +34,7 @@ userRouter.use(accessTokenValidation)
  * @method : GET
  * @path : /
  * @header : Authorization
- * @query : {limit, page}
+ * @query : {limit: number, page:number, fullName:string, roleName:string, status:userStatus}
  */
 userRouter.get(
   '/',
