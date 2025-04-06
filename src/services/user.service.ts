@@ -46,7 +46,7 @@ class UserService {
     return foundUser
   }
 
-  getAllUser = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
+  getAllUsers = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
     // parse
     page = Number(page)
     limit = Number(limit)
@@ -58,7 +58,7 @@ class UserService {
     })
     if (!result) {
       return {
-        foundRoles: {},
+        foundRoles: [],
         page,
         limit,
         total: 0

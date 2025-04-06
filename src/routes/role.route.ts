@@ -15,7 +15,7 @@ roleRouter.use(accessTokenValidation)
 /**
  * @description : Get all roles
  * @method : GET
- * @path : /all
+ * @path : /
  * @header : Authorization
  */
 roleRouter.get(

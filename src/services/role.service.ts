@@ -1,4 +1,4 @@
-import { CreateRoleBodyReq } from '~/dto/req/roles/createRoleBody.req'
+import { CreateRoleBodyReq } from '~/dto/req/role/createRoleBody.req'
 import { Role } from '~/entities/role.entity'
 import { roleRepository } from '~/repositories/role.repository'
 import { BadRequestError } from '~/core/error.response'
@@ -10,7 +10,7 @@ class RoleService {
     return createdRole
   }
 
-  getAllRole = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
+  getAllRoles = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
     // parse
     page = Number(page)
     limit = Number(limit)
@@ -21,7 +21,7 @@ class RoleService {
     })
     if (!result) {
       return {
-        foundRoles: {},
+        foundRoles: [],
         page,
         limit,
         total: 0
