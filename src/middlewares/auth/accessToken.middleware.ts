@@ -12,6 +12,7 @@ export const accessTokenValidation = validateSchema(
       authorization: {
         custom: {
           options: async (value: string, { req }) => {
+            if (!value || value.length === 0) throw new AuthRequestError('Access token is required!')
             const accessToken = value.split(' ')[1]
             if (accessToken.length == 0) throw new AuthRequestError('Access token invalid!')
 
