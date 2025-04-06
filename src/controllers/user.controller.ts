@@ -33,7 +33,7 @@ export const getUser = async (req: Request<ParamsDictionary, any, any>, res: Res
 export const getAllUsers = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
   return new SuccessResponse({
     message: 'Get all users successful!',
-    metaData: await userService.getAllUsers(req.query)
+    metaData: await userService.getAllUsers({ ...req.query, sort: (req as Request).sortParsed })
   }).send(res)
 }
 

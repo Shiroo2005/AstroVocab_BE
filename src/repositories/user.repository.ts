@@ -1,4 +1,4 @@
-import { FindOptionsWhere, Repository } from 'typeorm'
+import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm'
 import { UserStatus } from '~/constants/userStatus'
 import { BadRequestError } from '~/core/error.response'
 import { Role } from '~/entities/role.entity'
@@ -96,20 +96,23 @@ class UserRepository {
     page = 1,
     where,
     relations,
-    unGetFields
+    unGetFields,
+    order
   }: {
     limit?: number
     page?: number
     where?: FindOptionsWhere<User> | FindOptionsWhere<User>[]
     unGetFields?: string[]
     relations?: string[]
+    order?: FindOptionsOrder<User>
   }) {
     const skip = (page - 1) * limit
     const [foundUsers, total] = await this.userRepo.findAndCount({
       where,
       relations,
       skip,
-      take: limit
+      take: limit,
+      order
     })
 
     if (!foundUsers || foundUsers.length === 0) return null
