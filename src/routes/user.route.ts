@@ -35,7 +35,9 @@ userRouter.use(accessTokenValidation)
  * @method : GET
  * @path : /
  * @header : Authorization
- * @query : {limit: number, page:number, fullName:string, roleName:string, status:userStatus}
+ * @query : {limit: number, page:number, fullName:string, roleName:string, status:userStatus, sort: string}
+ * sort like +id | -id
+ * sort field must be in [id, fullName, username, email, status]
  */
 userRouter.get(
   '/',
