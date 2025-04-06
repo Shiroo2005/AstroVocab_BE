@@ -20,6 +20,7 @@ export const loginValidation = validateSchema(
               where: [{ email: value }, { username: value }],
               relations: ['role']
             })) as User
+            console.log(foundUser, compareBcrypt(req.body.password, foundUser.password))
 
             if (!foundUser || !compareBcrypt(req.body?.password, foundUser.password)) {
               throw new BadRequestError('Username or password incorrect!')

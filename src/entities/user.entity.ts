@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, Length, Matches, validate } from 'class-validator'
+import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator'
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -6,7 +6,6 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -67,10 +66,10 @@ export class User {
   updatedAt?: Date
 
   @BeforeInsert()
-  hashPassword?() {
+  @BeforeUpdate()
+  async hashPassword?() {
     this.password = hashData(this.password)
   }
-
   static create = ({ id, email, username, fullName, password, avatar, status, role, tokens }: User) => {
     const newUser = new User()
 

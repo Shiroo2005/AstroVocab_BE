@@ -40,8 +40,8 @@ class AuthService {
     const createdUser = await userRepository.saveOne({
       email,
       username,
-      password: hashData(password),
-      fullName: fullName,
+      password,
+      fullName,
       role: { id: userRole.id } as Role
     })
 

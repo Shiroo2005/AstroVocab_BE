@@ -71,7 +71,7 @@ userRouter.post(
  * @method : PATCH
  * @path : /:id
  * @header : Authorization
- * @params: id
+ * @params : id
  * @body : {
  *  email?: string
     username?: string

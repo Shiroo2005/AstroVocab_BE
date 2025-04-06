@@ -22,15 +22,18 @@ class UserRepository {
   async findOne({
     where,
     unGetFields,
-    relations
+    relations,
+    withDeleted = false
   }: {
     where: FindOptionsWhere<User> | FindOptionsWhere<User>[]
     unGetFields?: string[]
     relations?: string[]
+    withDeleted?: boolean
   }) {
     const foundUser = await this.userRepo.findOne({
       where,
-      relations
+      relations,
+      withDeleted
     })
 
     if (!foundUser) return null
@@ -51,9 +54,7 @@ class UserRepository {
       tokens
     })
 
-    // class validate
     await validateClass(user)
-
     return await this.userRepo.save(user)
   }
 
