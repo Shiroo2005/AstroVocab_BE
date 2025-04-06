@@ -1,18 +1,40 @@
 import express from 'express'
 import { Resource } from '~/constants/access'
-import { createWordController, updateWordController } from '~/controllers/word.controller'
+import {
+  createWordController,
+  deleteWordById,
+  getAllWords,
+  getWord,
+  updateWordController
+} from '~/controllers/word.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
-import { checkIdParamMiddleware } from '~/middlewares/common.middlewares'
+import { checkIdParamMiddleware, checkQueryMiddleware } from '~/middlewares/common.middlewares'
 import { createWordValidation } from '~/middlewares/word/createWord.middlewares'
 import { updateWordValidation } from '~/middlewares/word/updateWord.middlewares'
 import { wrapRequestHandler } from '~/utils/handler'
 export const wordRouter = express.Router()
 
-// GET
-
 // authenticate....
 wordRouter.use(accessTokenValidation)
+
+// GET
+/**
+ * @description : Get word by id
+ * @method : GET
+ * @path : /:id
+ * @header : Authorization
+ */
+wordRouter.get('/:id', checkIdParamMiddleware({}), wrapRequestHandler(getWord))
+
+/**
+ * @description : Get all word
+ * @method : GET
+ * @path : /
+ * @header : Authorization
+ * @query : { page?: number, limit?: number}
+ */
+wordRouter.get('/', checkQueryMiddleware({ numbericFields: ['page', 'limit'] }), wrapRequestHandler(getAllWords))
 
 // POST
 /**
@@ -67,4 +89,17 @@ wordRouter.patch(
   updateWordValidation,
   wrapRequestHandler(updateWordController)
 )
+
 // DELETE
+/**
+ * @description : Delete word by id
+ * @method : DELETE
+ * @path : /:id
+ * @header : Authorization
+ */
+wordRouter.delete(
+  '/:id',
+  wrapRequestHandler(checkPermission('deleteAny', Resource.WORD)),
+  checkIdParamMiddleware({}),
+  wrapRequestHandler(deleteWordById)
+)

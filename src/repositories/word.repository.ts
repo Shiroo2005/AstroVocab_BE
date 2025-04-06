@@ -20,15 +20,18 @@ class WordRepository {
   async findOne({
     where,
     unGetFields,
-    relations
+    relations,
+    withDeleted = false
   }: {
     where: FindOptionsWhere<Word>
     unGetFields?: string[]
     relations?: string[]
+    withDeleted?: boolean
   }) {
     const foundRole = await this.wordRepo.findOne({
       where,
-      relations
+      relations,
+      withDeleted
     })
 
     if (!foundRole) return null
@@ -66,30 +69,30 @@ class WordRepository {
     return await this.wordRepo.save(word)
   }
 
-  //   async findAll({
-  //     limit,
-  //     page,
-  //     where,
-  //     unGetFields
-  //   }: {
-  //     limit: number
-  //     page: number
-  //     where?: FindOptionsWhere<Role>
-  //     unGetFields?: string[]
-  //   }) {
-  //     const skip = (page - 1) * limit
-  //     const [foundRoles, total] = await this.wordRepo.findAndCount({
-  //       where,
-  //       skip,
-  //       take: limit
-  //     })
+  async findAll({
+    limit,
+    page,
+    where,
+    unGetFields
+  }: {
+    limit: number
+    page: number
+    where?: FindOptionsWhere<Word>
+    unGetFields?: string[]
+  }) {
+    const skip = (page - 1) * limit
+    const [foundWords, total] = await this.wordRepo.findAndCount({
+      where,
+      skip,
+      take: limit
+    })
 
-  //     if (!foundRoles || foundRoles.length === 0) return null
-  //     return {
-  //       foundRoles: unGetDataArray({ fields: unGetFields, objects: foundRoles }),
-  //       total
-  //     }
-  //   }
+    if (!foundWords || foundWords.length === 0) return null
+    return {
+      foundWords: unGetDataArray({ fields: unGetFields, objects: foundWords }),
+      total
+    }
+  }
 
   async updateOne({
     id,

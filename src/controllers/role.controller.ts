@@ -20,7 +20,7 @@ export const createRole = async (
 export const getAllRoles = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
   return new SuccessResponse({
     message: 'Get all roles successful!',
-    metaData: await roleService.getAllRole(req.query)
+    metaData: await roleService.getAllRoles(req.query)
   }).send(res)
 }
 

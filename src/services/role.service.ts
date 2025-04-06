@@ -10,7 +10,7 @@ class RoleService {
     return createdRole
   }
 
-  getAllRole = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
+  getAllRoles = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
     // parse
     page = Number(page)
     limit = Number(limit)
@@ -21,7 +21,7 @@ class RoleService {
     })
     if (!result) {
       return {
-        foundRoles: {},
+        foundRoles: [],
         page,
         limit,
         total: 0

@@ -20,3 +20,28 @@ export const updateWordController = async (req: Request<ParamsDictionary, any, U
     metaData: await wordService.updateWord(id, req.body)
   }).send(res)
 }
+
+export const getWord = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const id = (req as Request).idParams as number
+
+  return new SuccessResponse({
+    message: 'Get word by id successful!',
+    metaData: await wordService.getWordById({ id })
+  }).send(res)
+}
+
+export const getAllWords = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  return new SuccessResponse({
+    message: 'Get word by id successful!',
+    metaData: await wordService.getAllWords(req.query)
+  }).send(res)
+}
+
+export const deleteWordById = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const id = (req as Request).idParams as number
+
+  return new SuccessResponse({
+    message: 'Delete word by id successful!',
+    metaData: await wordService.deleteWordById({ id })
+  }).send(res)
+}

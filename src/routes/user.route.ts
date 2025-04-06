@@ -32,7 +32,7 @@ userRouter.use(accessTokenValidation)
 /**
  * @description : Get all users
  * @method : GET
- * @path : /all
+ * @path : /
  * @header : Authorization
  * @query : {limit, page}
  */
