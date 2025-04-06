@@ -92,6 +92,11 @@ class WordService {
 
     return result
   }
+
+  restoreWordById = async ({ id }: { id: number }) => {
+    const restoreWord = await wordRepository.restore(id)
+    return restoreWord
+  }
 }
 
 export const wordService = new WordService()

@@ -146,6 +146,10 @@ class WordRepository {
   async count({ where = {} }: { where?: FindOptionsWhere<Word> }) {
     return await this.wordRepo.findAndCount({ where })
   }
+
+  async restore(id: number) {
+    return await this.wordRepo.restore({ id })
+  }
 }
 
 export const wordRepository = new WordRepository()

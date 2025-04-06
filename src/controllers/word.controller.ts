@@ -45,3 +45,12 @@ export const deleteWordById = async (req: Request<ParamsDictionary, any, any>, r
     metaData: await wordService.deleteWordById({ id })
   }).send(res)
 }
+
+export const restoreWordById = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const id = (req as Request).idParams as number
+
+  return new SuccessResponse({
+    message: 'Restore word by id successful!',
+    metaData: await wordService.restoreWordById({ id })
+  }).send(res)
+}

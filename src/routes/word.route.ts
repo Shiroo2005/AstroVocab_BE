@@ -5,6 +5,7 @@ import {
   deleteWordById,
   getAllWords,
   getWord,
+  restoreWordById,
   updateWordController
 } from '~/controllers/word.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
@@ -61,6 +62,19 @@ wordRouter.post(
   wrapRequestHandler(createWordController)
 )
 
+/**
+ * @description : Restore word from deleted
+ * @method : PATCH
+ * @path : /:id/restore
+ * @header : Authorization
+ * @params: id
+ */
+wordRouter.patch(
+  '/:id/restore',
+  wrapRequestHandler(checkPermission('updateAny', Resource.WORD)),
+  checkIdParamMiddleware(),
+  wrapRequestHandler(restoreWordById)
+)
 // PUT
 
 // PATCH
