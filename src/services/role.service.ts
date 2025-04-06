@@ -1,4 +1,4 @@
-import { CreateRoleBodyReq } from '~/dto/req/roles/createRoleBody.req'
+import { CreateRoleBodyReq } from '~/dto/req/role/createRoleBody.req'
 import { Role } from '~/entities/role.entity'
 import { roleRepository } from '~/repositories/role.repository'
 import { BadRequestError } from '~/core/error.response'

@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
-import { CreateRoleBodyReq } from '~/dto/req/roles/createRoleBody.req'
+import { CreateRoleBodyReq } from '~/dto/req/role/createRoleBody.req'
 import { CREATED, SuccessResponse } from '../core/success.response'
 import { roleService } from '~/services/role.service'
-import { UpdateRoleBodyReq } from '~/dto/req/roles/updateRoleBody.req'
+import { UpdateRoleBodyReq } from '~/dto/req/role/updateRoleBody.req'
 import { toNumber } from '~/utils'
 
 export const createRole = async (
