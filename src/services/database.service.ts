@@ -4,12 +4,7 @@ import { parseInt } from 'lodash'
 import * as mysql2 from 'mysql2'
 import { customLogger } from '~/utils/log'
 import { DataSource, ObjectLiteral, Repository } from 'typeorm'
-import { User } from '~/entities/user.entity'
-import { Role } from '~/entities/role.entity'
-import { Token } from '~/entities/token.entity'
 import { seedData } from '~/core/seeds'
-import { Permission } from '~/entities/permission.entity'
-import { Word } from '~/entities/word.entity'
 console.log('DatabaseService loaded')
 
 config()
@@ -27,7 +22,7 @@ export class DatabaseService {
       password: env.DB_PASSWORD as string,
       host: env.DB_HOST as string,
       port: parseInt(env.DB_PORT as string),
-      entities: [Token, User, Role, Permission, Word],
+      entities: [__dirname + '/../entities/*.ts'],
       logger: customLogger
       // synchronize: true
       // logger: LogCustomize

@@ -8,9 +8,9 @@ export enum WordRank {
 }
 
 export enum WordPosition {
-  Noun = 'NOUN',
-  Verb = 'VERB',
-  Adjective = 'ADJECTIVE',
-  Adverb = 'ADVERB',
-  Others = 'OTHERS'
+  NOUN = 'Noun',
+  VERB = 'Verb',
+  ADJECTIVE = 'Adjective',
+  ADVERB = 'Adverb',
+  OTHERS = 'Others'
 }

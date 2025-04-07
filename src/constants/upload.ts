@@ -1,15 +1,15 @@
 export enum FolderUpload {
-  Avatar = 'avatar',
-  Word = 'word'
+  AVATAR = 'avatar',
+  WORD = 'word'
 }
 
 export const FieldMaxCount = [
   {
-    name: 'Avatar',
+    name: 'AVATAR',
     maxCount: 5
   },
   {
-    name: 'Word',
+    name: 'WORD',
     maxCount: 2
   }
 ]
