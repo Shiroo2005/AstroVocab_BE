@@ -7,7 +7,7 @@ export class Token {
   @PrimaryGeneratedColumn()
   id?: number
 
-  @Column('varchar')
+  @Column({ type: 'varchar', length: 1024 })
   @IsNotEmpty()
   refreshToken!: string
 

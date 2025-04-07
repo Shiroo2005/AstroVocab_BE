@@ -69,6 +69,19 @@ class WordRepository {
     return await this.wordRepo.save(word)
   }
 
+  async saveAll(words: Word[]) {
+    const validWords: Word[] = []
+
+    // push item into array
+    for (const word of words) {
+      //validate for each item
+      await validateClass(word)
+      validWords.push(word)
+    }
+
+    return await this.wordRepo.save(validWords)
+  }
+
   async findAll({
     limit,
     page,

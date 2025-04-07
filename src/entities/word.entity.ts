@@ -1,6 +1,15 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsUrl, Length } from 'class-validator'
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from 'typeorm'
 import { WordPosition, WordRank } from '~/constants/word'
+import { Topic } from './topic.entity'
 
 @Entity()
 export class Word {
@@ -14,10 +23,10 @@ export class Word {
 
   @Column('varchar')
   @IsNotEmpty({ message: 'Pronunciation must be a not empty string!' })
-  @Length(1, 255, { message: 'Content must be between 1 and 255 chars long!' })
+  @Length(1, 255, { message: 'Pronunciation must be between 1 and 255 chars long!' })
   pronunciation!: string
 
-  @Column('varchar', { default: WordPosition.Others })
+  @Column('varchar', { default: WordPosition.OTHERS })
   @IsEnum(WordPosition, { message: 'position must be in enum WordPosition' })
   position?: WordPosition
 
@@ -48,6 +57,10 @@ export class Word {
   @IsOptional()
   @Length(1, 255, { message: 'Translate example must be between 1 and 255 characters long.' })
   translateExample?: string
+
+  //foreign key
+  @ManyToMany(() => Topic, (topic) => topic.words)
+  topics?: Topic[]
 
   @DeleteDateColumn()
   deletedAt?: Date
