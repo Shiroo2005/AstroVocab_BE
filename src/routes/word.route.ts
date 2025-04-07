@@ -43,7 +43,7 @@ wordRouter.get('/', checkQueryMiddleware({ numbericFields: ['page', 'limit'] }),
  * @method : POST
  * @path : /
  * @header : Authorization
- * @body : words: {
+ * @body : {
         content: string
         pronunciation: string
         meaning: string

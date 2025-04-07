@@ -1,32 +1,20 @@
+import { BadRequestError } from '~/core/error.response'
 import { CreateWordBodyReq } from '~/dto/req/word/createWordBody.req'
 import { UpdateWordBodyReq } from '~/dto/req/word/updateWordBody.req'
+import { Word } from '~/entities/word.entity'
 import { wordRepository } from '~/repositories/word.repository'
 
 class WordService {
-  createWord = async ({
-    content,
-    meaning,
-    pronunciation,
-    audio,
-    example,
-    image,
-    position,
-    rank,
-    translateExample
-  }: CreateWordBodyReq) => {
-    const createdWord = await wordRepository.saveOne({
-      content,
-      meaning,
-      pronunciation,
-      audio,
-      example,
-      image,
-      position,
-      rank,
-      translateExample
-    })
+  createWords = async (words: CreateWordBodyReq[]) => {
+    console.log(words)
 
-    return createdWord
+    if (!words || !Array.isArray(words)) throw new BadRequestError('Request body invalid format!')
+
+    const _words = words.map((word) => Word.create(word))
+
+    const result = await wordRepository.saveAll(_words)
+
+    return result
   }
 
   updateWord = async (
