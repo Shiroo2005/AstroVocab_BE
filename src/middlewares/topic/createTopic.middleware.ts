@@ -4,26 +4,37 @@ import { isLength, isRequired } from '../common.middlewares'
 import { BadRequestError } from '~/core/error.response'
 import { isValidEnumValue } from '~/utils'
 import { TopicType } from '~/constants/topic'
-import { wordService } from '~/services/word.service'
 export const createTopicValidation = validateSchema(
   checkSchema(
     {
-      title: {
+      topics: {
+        isArray: true,
+        custom: {
+          options: (value) => {
+            if (!Array.isArray(value) || value.length === 0) {
+              throw new BadRequestError('topics must contain at least 1 item')
+            }
+            return true
+          },
+          bail: true
+        }
+      },
+      'topics.*.title': {
         ...isRequired('title'),
         isString: true,
         ...isLength({ fieldName: 'title', min: 10, max: 255 })
       },
-      description: {
+      'topics.*.description': {
         ...isRequired('description'),
         isString: true,
         ...isLength({ fieldName: 'description', min: 10, max: 255 })
       },
-      thumbnail: {
+      'topics.*.thumbnail': {
         optional: true,
         isString: true,
         ...isLength({ fieldName: 'thumbnail', max: 255 })
       },
-      type: {
+      'topics.*.type': {
         optional: true,
         custom: {
           options: (value) => {
@@ -33,8 +44,7 @@ export const createTopicValidation = validateSchema(
           }
         }
       },
-      wordIds: {
-        optional: true,
+      'topics.*.wordIds': {
         isArray: true
       }
     },

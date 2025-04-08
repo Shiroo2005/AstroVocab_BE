@@ -15,6 +15,21 @@ export const topicRouter = express.Router()
 topicRouter.use(accessTokenValidation)
 
 // POST
+/**
+ * @description : Create new topic
+ * @method : POST
+ * @path : /
+ * @header : Authorization
+ * @body : topics: [
+ *  {
+        title: string
+        description: string
+        thumbnail?: string
+        type?: TopicType
+        wordIds: number[]
+ * }
+    ]
+ */
 topicRouter.post(
   '/',
   wrapRequestHandler(checkPermission('createAny', Resource.TOPIC)),
@@ -24,6 +39,20 @@ topicRouter.post(
 // PUT
 
 // PATCH
+/**
+ * @description : Update topic by id
+ * @method : PATCH
+ * @path : /:id
+ * @header : Authorization
+ * @params : id
+ * @body : {
+ *  title: string
+    description: string
+    thumbnail?: string
+    type?: TopicType
+    wordIds: number[]
+ * }
+ */
 topicRouter.patch(
   '/:id',
   wrapRequestHandler(checkPermission('updateAny', Resource.TOPIC)),

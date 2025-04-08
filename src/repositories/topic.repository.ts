@@ -27,6 +27,18 @@ class TopicRepository {
     return await this.topicRepo.save(topic)
   }
 
+  async saveAll(topics: Topic[]) {
+    const validTopics = []
+    for (const _topic of topics) {
+      const topic = Topic.create(_topic)
+      //class validator
+      await validateClass(topic)
+      validTopics.push(topic)
+    }
+
+    return await this.topicRepo.save(validTopics)
+  }
+
   async updateOne({
     title,
     description,

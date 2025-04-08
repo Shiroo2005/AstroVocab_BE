@@ -6,8 +6,6 @@ import { wordRepository } from '~/repositories/word.repository'
 
 class WordService {
   createWords = async (words: CreateWordBodyReq[]) => {
-    console.log(words)
-
     if (!words || !Array.isArray(words)) throw new BadRequestError('Request body invalid format!')
 
     const _words = words.map((word) => Word.create(word))

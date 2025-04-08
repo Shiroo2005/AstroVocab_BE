@@ -8,7 +8,7 @@ import { topicService } from '~/services/topic.service'
 export const createTopicController = async (req: Request<ParamsDictionary, any, CreateTopicBodyReq>, res: Response) => {
   return new CREATED({
     message: 'Create new topic successful!',
-    metaData: await topicService.createTopic(req.body)
+    metaData: await topicService.createTopic(req.body.topics)
   }).send(res)
 }
 
