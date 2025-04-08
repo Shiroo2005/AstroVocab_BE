@@ -94,6 +94,22 @@ class TopicService {
       total
     }
   }
+
+  deleteTopicById = async ({ id }: { id: number }) => {
+    //soft delete
+    const result = await topicRepository.softDelete({
+      where: {
+        id
+      }
+    })
+
+    return result
+  }
+
+  restoreTopicById = async ({ id }: { id: number }) => {
+    const restoreWord = await topicRepository.restore(id)
+    return restoreWord
+  }
 }
 
 export const topicService = new TopicService()

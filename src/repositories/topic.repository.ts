@@ -116,10 +116,12 @@ class TopicRepository {
     }
   }
 
-  async hardDelete({ conditions }: { conditions: Partial<Token> }) {
-    return await this.topicRepo.delete({
-      ...conditions
-    })
+  async softDelete({ where }: { where: FindOptionsWhere<Topic> }) {
+    return await this.topicRepo.softDelete(where)
+  }
+
+  async restore(id: number) {
+    return await this.topicRepo.restore({ id })
   }
 }
 

@@ -36,3 +36,21 @@ export const getAllTopicsController = async (req: Request<ParamsDictionary, any,
     metaData: await topicService.getAllTopics(req.params)
   }).send(res)
 }
+
+export const deleteTopicController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const id = req.idParams as number
+
+  return new SuccessResponse({
+    message: 'Delete topic by id successful!',
+    metaData: await topicService.deleteTopicById({ id })
+  }).send(res)
+}
+
+export const restoreTopicById = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const id = req.idParams as number
+
+  return new SuccessResponse({
+    message: 'Restore topic by id successful!',
+    metaData: await topicService.restoreTopicById({ id })
+  }).send(res)
+}

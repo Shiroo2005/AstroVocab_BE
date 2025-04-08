@@ -2,8 +2,10 @@ import express from 'express'
 import { Resource } from '~/constants/access'
 import {
   createTopicController,
+  deleteTopicController,
   getAllTopicsController,
   getTopicController,
+  restoreTopicById,
   updateTopicController
 } from '~/controllers/topic.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
@@ -90,4 +92,32 @@ topicRouter.patch(
   updateTopicValidation,
   wrapRequestHandler(updateTopicController)
 )
+
+/**
+ * @description : Restore topic by id
+ * @method : PATCH
+ * @path : /:id
+ * @header : Authorization
+ * @params : id
+ */
+topicRouter.patch(
+  '/:id/restore',
+  wrapRequestHandler(checkPermission('updateAny', Resource.TOPIC)),
+  checkIdParamMiddleware({}),
+  wrapRequestHandler(restoreTopicById)
+)
+
 //DELETE
+/**
+ * @description : Delete topic by id
+ * @method : DELETE
+ * @path : /:id
+ * @header : Authorization
+ * @params : id
+ */
+topicRouter.delete(
+  '/:id',
+  wrapRequestHandler(checkPermission('deleteAny', Resource.TOPIC)),
+  checkIdParamMiddleware({}),
+  wrapRequestHandler(deleteTopicController)
+)
