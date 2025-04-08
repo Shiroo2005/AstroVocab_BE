@@ -10,7 +10,6 @@ import {
   UpdateDateColumn
 } from 'typeorm'
 import { TopicType } from '~/constants/topic'
-import { WordPosition, WordRank } from '~/constants/word'
 import { Word } from './word.entity'
 
 @Entity()
@@ -50,4 +49,41 @@ export class Topic {
 
   @UpdateDateColumn()
   updatedAt?: Date
+
+  static create = ({ title, description, thumbnail, type, words, id }: Topic) => {
+    const newTopic = new Topic()
+    newTopic.id = id
+    newTopic.title = title
+    newTopic.thumbnail = thumbnail
+    newTopic.description = description
+    newTopic.type = type
+    newTopic.words = words
+
+    return newTopic
+  }
+
+  static update = (
+    topic: Topic,
+    {
+      title,
+      description,
+      thumbnail,
+      type,
+      words
+    }: {
+      title?: string
+      description?: string
+      thumbnail?: string
+      type?: TopicType
+      words?: Word[]
+    }
+  ) => {
+    if (title) topic.title = title
+    if (description) topic.description = description
+    if (thumbnail) topic.thumbnail = thumbnail
+    if (type) topic.type = type
+    if (words) topic.words = words
+
+    return topic
+  }
 }
