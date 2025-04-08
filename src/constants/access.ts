@@ -2,7 +2,8 @@ export enum Resource {
   USER = 'user',
   ROLE = 'role',
   PERMISSION = 'permission',
-  WORD = 'word'
+  WORD = 'word',
+  TOPIC = 'topic'
 }
 
 export enum Action {

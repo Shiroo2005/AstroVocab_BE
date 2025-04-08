@@ -9,7 +9,7 @@ export const checkIdParamMiddleware = (options?: { id?: string }) => {
   console.log(id)
 
   return (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    if (req.params[id] && !isValidNumber(req.params[id])) {
+    if (!req.params[id] || !isValidNumber(req.params[id])) {
       throw new BadRequestError('Id invalid!')
     }
     ;(req as Request).idParams = toNumber(req.params[id])
