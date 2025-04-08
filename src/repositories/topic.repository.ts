@@ -4,7 +4,7 @@ import { BadRequestError } from '~/core/error.response'
 import { Token } from '~/entities/token.entity'
 import { Topic } from '~/entities/topic.entity'
 import { Word } from '~/entities/word.entity'
-import { unGetData } from '~/utils'
+import { unGetData, unGetDataArray } from '~/utils'
 import { validateClass } from '~/utils/validate'
 
 class TopicRepository {
@@ -74,7 +74,7 @@ class TopicRepository {
 
   async findOne({
     where,
-    unGetFields,
+    unGetFields = ['deletedAt', 'createdAt', 'updatedAt'],
     relations
   }: {
     where: FindOptionsWhere<Token> | FindOptionsWhere<Token>[]
@@ -89,6 +89,31 @@ class TopicRepository {
     if (!foundUser) return null
 
     return unGetData({ fields: unGetFields, object: foundUser })
+  }
+
+  async findAll({
+    limit,
+    page,
+    where,
+    unGetFields
+  }: {
+    limit: number
+    page: number
+    where?: FindOptionsWhere<Word>
+    unGetFields?: string[]
+  }) {
+    const skip = (page - 1) * limit
+    const [foundTopics, total] = await this.topicRepo.findAndCount({
+      where,
+      skip,
+      take: limit
+    })
+
+    if (!foundTopics || foundTopics.length === 0) return null
+    return {
+      foundTopics: unGetDataArray({ fields: unGetFields, objects: foundTopics }),
+      total
+    }
   }
 
   async hardDelete({ conditions }: { conditions: Partial<Token> }) {

@@ -4,7 +4,6 @@ import { topicRepository } from '~/repositories/topic.repository'
 import { wordService } from './word.service'
 import { UpdateTopicBodyReq } from '~/dto/req/topic/updateTopicBody.req'
 import { Topic } from '~/entities/topic.entity'
-import { promisify } from 'util'
 
 class TopicService {
   createTopic = async (topicsBody: TopicBody[]) => {
@@ -58,6 +57,42 @@ class TopicService {
     })
 
     return updatedTopic
+  }
+
+  getTopicById = async ({ id }: { id: number }) => {
+    const foundTopic = await topicRepository.findOne({
+      where: {
+        id
+      },
+      relations: ['words']
+    })
+
+    if (!foundTopic) return {}
+
+    return foundTopic
+  }
+
+  getAllTopics = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
+    const result = await topicRepository.findAll({
+      limit,
+      page
+    })
+
+    if (!result) {
+      return {
+        foundWords: [],
+        page,
+        limit,
+        total: 0
+      }
+    }
+    const { foundTopics, total } = result
+    return {
+      foundTopics,
+      page,
+      limit,
+      total
+    }
   }
 }
 

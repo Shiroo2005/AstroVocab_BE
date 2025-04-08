@@ -1,9 +1,14 @@
 import express from 'express'
 import { Resource } from '~/constants/access'
-import { createTopicController, updateTopicController } from '~/controllers/topic.controller'
+import {
+  createTopicController,
+  getAllTopicsController,
+  getTopicController,
+  updateTopicController
+} from '~/controllers/topic.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
-import { checkIdParamMiddleware } from '~/middlewares/common.middlewares'
+import { checkIdParamMiddleware, checkQueryMiddleware } from '~/middlewares/common.middlewares'
 import { createTopicValidation } from '~/middlewares/topic/createTopic.middleware'
 import { updateTopicValidation } from '~/middlewares/topic/updateTopic.middleware'
 import { wrapRequestHandler } from '~/utils/handler'
@@ -13,6 +18,31 @@ export const topicRouter = express.Router()
 
 // authenticate....
 topicRouter.use(accessTokenValidation)
+
+/**
+ * @description : Get topic by id
+ * @method : GET
+ * @path : /:id
+ * @header : Authorization
+ * @params : id
+ */
+topicRouter.get('/:id', checkIdParamMiddleware({}), wrapRequestHandler(getTopicController))
+
+/**
+ * @description : Get all topics
+ * @method : GET
+ * @path : /
+ * @header : Authorization
+ * @query : {
+ *        page?:number,
+ *        limit?:number
+ * }
+ */
+topicRouter.get(
+  '/',
+  checkQueryMiddleware({ numbericFields: ['page', 'limit'] }),
+  wrapRequestHandler(getAllTopicsController)
+)
 
 // POST
 /**

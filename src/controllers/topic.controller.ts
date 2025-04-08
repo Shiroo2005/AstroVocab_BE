@@ -20,3 +20,19 @@ export const updateTopicController = async (req: Request<ParamsDictionary, any, 
     metaData: await topicService.updateTopic(topicId, req.body)
   }).send(res)
 }
+
+export const getTopicController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const topicId = req.idParams as number
+
+  return new SuccessResponse({
+    message: 'Get topic by id successful!',
+    metaData: await topicService.getTopicById({ id: topicId })
+  }).send(res)
+}
+
+export const getAllTopicsController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  return new SuccessResponse({
+    message: 'Get all topics successful!',
+    metaData: await topicService.getAllTopics(req.params)
+  }).send(res)
+}
