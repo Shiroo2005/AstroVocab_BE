@@ -28,8 +28,6 @@ export const validateSchema = (validation: RunnableValidationChains<ValidationCh
 export const validateClass = async (obj: object) => {
   const err = await validate(obj)
 
-  console.log('?>>>>>>>>>>>>>>>>>>>>>>>>', err)
-
   if (err && err.length > 0) {
     throw new BadRequestError(`Validate ${obj.constructor.name} in DB error!`)
   }
