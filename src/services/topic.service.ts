@@ -34,9 +34,10 @@ class TopicService {
   }
 
   updateTopic = async (id: number, { title, description, thumbnail, type, wordIds }: UpdateTopicBodyReq) => {
-    const words = [] as Word[]
-
-    if (wordIds && wordIds.length > 0) {
+    //filter word id valid
+    let words
+    if (wordIds) {
+      words = []
       //filter word id valid
       for (const id of wordIds) {
         const foundWord = await wordService.getWordById({ id })

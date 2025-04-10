@@ -83,7 +83,7 @@ export class Course {
     if (description) course.description = description
     if (target) course.target = target
     if (level) course.level = level
-    if (topics && topics.length > 0) course.topics = topics
+    if (topics) course.topics = topics
 
     return course
   }

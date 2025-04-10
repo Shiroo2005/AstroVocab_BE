@@ -36,10 +36,10 @@ class CourseService {
   }
 
   updateCourse = async (id: number, { topicIds, description, level, target, title }: UpdateCourseBodyReq) => {
-    const topics = [] as Topic[]
-
-    if (topicIds && topicIds.length > 0) {
-      //filter word id valid
+    //filter topic id valid
+    let topics
+    if (topicIds) {
+      topics = []
       for (const id of topicIds) {
         const existTopic = await topicService.isExistTopic(id)
 
