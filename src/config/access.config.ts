@@ -39,7 +39,13 @@ export const getGrantList = () => {
     { role: RoleName.ADMIN, resource: Resource.TOPIC, action: Action.READ_ANY },
     { role: RoleName.ADMIN, resource: Resource.TOPIC, action: Action.CREATE_ANY },
     { role: RoleName.ADMIN, resource: Resource.TOPIC, action: Action.UPDATE_ANY },
-    { role: RoleName.ADMIN, resource: Resource.TOPIC, action: Action.DELETE_ANY }
+    { role: RoleName.ADMIN, resource: Resource.TOPIC, action: Action.DELETE_ANY },
+
+    //resource: course
+    { role: RoleName.ADMIN, resource: Resource.COURSE, action: Action.READ_ANY },
+    { role: RoleName.ADMIN, resource: Resource.COURSE, action: Action.CREATE_ANY },
+    { role: RoleName.ADMIN, resource: Resource.COURSE, action: Action.UPDATE_ANY },
+    { role: RoleName.ADMIN, resource: Resource.COURSE, action: Action.DELETE_ANY }
   ]
 
   // convert to grant list

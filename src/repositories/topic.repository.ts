@@ -77,18 +77,18 @@ class TopicRepository {
     unGetFields = ['deletedAt', 'createdAt', 'updatedAt'],
     relations
   }: {
-    where: FindOptionsWhere<Token> | FindOptionsWhere<Token>[]
+    where: FindOptionsWhere<Topic> | FindOptionsWhere<Topic>[]
     unGetFields?: string[]
     relations?: string[]
   }) {
-    const foundUser = await this.topicRepo.findOne({
+    const foundTopic = await this.topicRepo.findOne({
       where,
       relations
     })
 
-    if (!foundUser) return null
+    if (!foundTopic) return null
 
-    return unGetData({ fields: unGetFields, object: foundUser })
+    return unGetData({ fields: unGetFields, object: foundTopic })
   }
 
   async findAll({
@@ -99,7 +99,7 @@ class TopicRepository {
   }: {
     limit: number
     page: number
-    where?: FindOptionsWhere<Word>
+    where?: FindOptionsWhere<Topic>
     unGetFields?: string[]
   }) {
     const skip = (page - 1) * limit

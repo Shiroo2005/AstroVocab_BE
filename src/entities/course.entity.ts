@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsUrl, Length } from 'class-validator'
+import { IsEnum, IsNotEmpty, IsOptional, Length } from 'class-validator'
 import {
   Column,
   CreateDateColumn,
@@ -9,8 +9,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
-import { TopicType } from '~/constants/topic'
-import { Word } from './word.entity'
 import { CourseLevel } from '~/constants/couse'
 import { Topic } from './topic.entity'
 
@@ -53,13 +51,14 @@ export class Course {
   @UpdateDateColumn()
   updatedAt?: Date
 
-  static create = ({ id, title, description, target, level }: Course) => {
+  static create = ({ id, title, description, target, level, topics }: Course) => {
     const newCourse = new Course()
     newCourse.id = id
     newCourse.title = title
     newCourse.description = description
     newCourse.target = target
     newCourse.level = level
+    newCourse.topics = topics
 
     return newCourse
   }
@@ -70,18 +69,22 @@ export class Course {
       title,
       description,
       target,
-      level
+      level,
+      topics
     }: {
       title?: string
       description?: string
       target?: string
       level?: CourseLevel
+      topics?: Topic[]
     }
   ) => {
     if (title) course.title = title
     if (description) course.description = description
     if (target) course.target = target
     if (level) course.level = level
+    if (topics && topics.length > 0) course.topics = topics
+
     return course
   }
 }

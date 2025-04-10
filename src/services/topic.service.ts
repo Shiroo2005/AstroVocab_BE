@@ -43,7 +43,6 @@ class TopicService {
         if (foundWord && Object.keys(foundWord).length != 0) {
           words.push({ id } as Word)
         }
-        console.log(foundWord, Object.keys(foundWord))
       }
     }
 
@@ -70,6 +69,16 @@ class TopicService {
     if (!foundTopic) return {}
 
     return foundTopic
+  }
+
+  isExistTopic = async (id: number) => {
+    const foundTopic = await topicRepository.findOne({
+      where: {
+        id
+      }
+    })
+
+    return foundTopic != null
   }
 
   getAllTopics = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
