@@ -4,7 +4,9 @@ import { topicRepository } from '~/repositories/topic.repository'
 import { wordService } from './word.service'
 import { UpdateTopicBodyReq } from '~/dto/req/topic/updateTopicBody.req'
 import { Topic } from '~/entities/topic.entity'
-import { toNumber } from 'lodash'
+import { topicQueryReq } from '~/dto/req/topic/topicQuery.req'
+import { buildFilterLike } from './query.service'
+import { DataWithPagination } from '~/dto/res/pagination.res'
 
 class TopicService {
   createTopic = async (topicsBody: TopicBody[]) => {
@@ -83,23 +85,31 @@ class TopicService {
     return foundTopic != null
   }
 
-  getAllTopics = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
-    // parse page limit
-    page = toNumber(page)
-    limit = toNumber(limit)
+  getAllTopics = async ({ page = 1, limit = 10, description, title, type, sort }: topicQueryReq = {}) => {
+    // build where condition
+
+    const where = buildFilterLike({
+      likeFields: {
+        description,
+        title,
+        type
+      }
+    })
 
     const result = await topicRepository.findAll({
       limit,
-      page
+      page,
+      where,
+      sort
     })
 
     const { foundTopics, total } = result || { foundTopics: [], total: 0 }
-    return {
-      foundTopics,
-      page,
+    return new DataWithPagination({
+      data: foundTopics,
       limit,
-      total
-    }
+      page,
+      totalElements: total
+    })
   }
 
   deleteTopicById = async ({ id }: { id: number }) => {

@@ -86,4 +86,6 @@ export class Topic {
 
     return topic
   }
+
+  static allowSortList = ['title', 'description', 'type']
 }

@@ -6,6 +6,7 @@ import { wordQueryReq } from '~/dto/req/word/wordQuery.req'
 import { DataWithPagination } from '~/dto/res/pagination.res'
 import { Word } from '~/entities/word.entity'
 import { wordRepository } from '~/repositories/word.repository'
+import { buildFilterLike } from './query.service'
 
 class WordService {
   createWords = async (words: WordBody[]) => {
@@ -61,7 +62,7 @@ class WordService {
     sort
   }: wordQueryReq) => {
     //build where condition
-    const where = this.buildWordFilter({
+    const where = buildFilterLike({
       likeFields: {
         content,
         example,
@@ -104,19 +105,6 @@ class WordService {
   restoreWordById = async ({ id }: { id: number }) => {
     const restoreWord = await wordRepository.restore(id)
     return restoreWord
-  }
-
-  buildWordFilter = ({ likeFields }: { likeFields: Record<string, string | undefined> }) => {
-    const filter = {} as any
-
-    //mapping for like fields
-    Object.keys(likeFields).forEach((field) => {
-      if (likeFields[field]) {
-        filter[field] = Like(`%${field}%`)
-      }
-    })
-
-    return filter
   }
 }
 

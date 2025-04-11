@@ -8,9 +8,10 @@ import {
   restoreTopicById,
   updateTopicController
 } from '~/controllers/topic.controller'
+import { Topic } from '~/entities/topic.entity'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
-import { checkIdParamMiddleware, checkQueryMiddleware } from '~/middlewares/common.middlewares'
+import { checkIdParamMiddleware, checkQueryMiddleware, parseSort } from '~/middlewares/common.middlewares'
 import { createTopicValidation } from '~/middlewares/topic/createTopic.middleware'
 import { updateTopicValidation } from '~/middlewares/topic/updateTopic.middleware'
 import { wrapRequestHandler } from '~/utils/handler'
@@ -42,7 +43,8 @@ topicRouter.get('/:id', checkIdParamMiddleware({}), wrapRequestHandler(getTopicC
  */
 topicRouter.get(
   '/',
-  checkQueryMiddleware({ numbericFields: ['page', 'limit'] }),
+  checkQueryMiddleware(),
+  wrapRequestHandler(parseSort({ allowSortList: Topic.allowSortList })),
   wrapRequestHandler(getAllTopicsController)
 )
 

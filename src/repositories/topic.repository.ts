@@ -1,4 +1,4 @@
-import { FindOptionsWhere, Repository } from 'typeorm'
+import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm'
 import { TopicType } from '~/constants/topic'
 import { BadRequestError } from '~/core/error.response'
 import { Topic } from '~/entities/topic.entity'
@@ -94,18 +94,21 @@ class TopicRepository {
     limit,
     page,
     where,
-    unGetFields = ['createdAt', 'updatedAt', 'deletedAt']
+    unGetFields = ['createdAt', 'updatedAt', 'deletedAt'],
+    sort
   }: {
     limit: number
     page: number
     where?: FindOptionsWhere<Topic>
     unGetFields?: string[]
+    sort?: FindOptionsOrder<Topic>
   }) {
     const skip = (page - 1) * limit
     const [foundTopics, total] = await this.topicRepo.findAndCount({
       where,
       skip,
-      take: limit
+      take: limit,
+      order: sort
     })
 
     if (!foundTopics || foundTopics.length === 0) return null
