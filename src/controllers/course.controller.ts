@@ -27,6 +27,13 @@ export const updateCourseController = async (
   }).send(res)
 }
 
+export const getAllCoursesController = async (req: Request, res: Response) => {
+  return new SuccessResponse({
+    message: 'Get all courses successful!',
+    metaData: await courseService.getAllCourses({ ...req.query, ...req.parseQueryPagination, sort: req.sortParsed })
+  }).send(res)
+}
+
 export const getCourseController = async (req: Request, res: Response) => {
   const id = req.idParams as number
 
@@ -36,9 +43,20 @@ export const getCourseController = async (req: Request, res: Response) => {
   }).send(res)
 }
 
-export const getAllCoursesController = async (req: Request, res: Response) => {
+export const deleteCourseController = async (req: Request, res: Response) => {
+  const id = req.idParams as number
+
   return new SuccessResponse({
-    message: 'Get all courses successful!',
-    metaData: await courseService.getAllCourses({ ...req.query, ...req.parseQueryPagination, sort: req.sortParsed })
+    message: 'Delete course by id successful!',
+    metaData: await courseService.deleteCourseById({ id })
+  }).send(res)
+}
+
+export const restoreCourseController = async (req: Request, res: Response) => {
+  const id = req.idParams as number
+
+  return new SuccessResponse({
+    message: 'Restore course by id successful!',
+    metaData: await courseService.restoreCourseById({ id })
   }).send(res)
 }

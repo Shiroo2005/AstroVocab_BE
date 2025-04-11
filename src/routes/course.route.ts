@@ -2,12 +2,13 @@ import express from 'express'
 import { Resource } from '~/constants/access'
 import {
   createCourseController,
+  deleteCourseController,
   getAllCoursesController,
   getCourseController,
+  restoreCourseController,
   updateCourseController
 } from '~/controllers/course.controller'
 import { Course } from '~/entities/course.entity'
-import { Word } from '~/entities/word.entity'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
 import { checkIdParamMiddleware, checkQueryMiddleware, parseSort } from '~/middlewares/common.middlewares'
@@ -40,7 +41,6 @@ courseRouter.get(
  */
 courseRouter.get(
   '/',
-  // wrapRequestHandler(checkPermission('createAny', Resource.COURSE)),
   checkQueryMiddleware(),
   wrapRequestHandler(parseSort({ allowSortList: Course.allowSortList })),
   wrapRequestHandler(getAllCoursesController)
@@ -67,7 +67,7 @@ courseRouter.use(accessTokenValidation)
  */
 courseRouter.post(
   '/',
-  // wrapRequestHandler(checkPermission('createAny', Resource.COURSE)),
+  wrapRequestHandler(checkPermission('createAny', Resource.COURSE)),
   createCourseValidation,
   wrapRequestHandler(createCourseController)
 )
@@ -92,10 +92,37 @@ courseRouter.post(
  */
 courseRouter.patch(
   '/:id',
-  // wrapRequestHandler(checkPermission('createAny', Resource.COURSE)),
+  wrapRequestHandler(checkPermission('updateAny', Resource.COURSE)),
   checkIdParamMiddleware({}),
   updateCourseValidation,
   wrapRequestHandler(updateCourseController)
 )
 
+/**
+ * @description : Restore course by id
+ * @method : PATCH
+ * @path : /:id
+ * @params : id
+ * @header : Authorization
+ */
+courseRouter.patch(
+  '/:id/restore',
+  wrapRequestHandler(checkPermission('updateAny', Resource.COURSE)),
+  checkIdParamMiddleware({}),
+  wrapRequestHandler(restoreCourseController)
+)
+
 // DELETE
+/**
+ * @description : Delete course by id
+ * @method : DELETE
+ * @path : /:id
+ * @params : id
+ * @header : Authorization
+ */
+courseRouter.delete(
+  '/:id',
+  wrapRequestHandler(checkPermission('deleteAny', Resource.COURSE)),
+  checkIdParamMiddleware({}),
+  wrapRequestHandler(deleteCourseController)
+)

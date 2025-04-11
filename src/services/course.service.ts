@@ -95,6 +95,22 @@ class CourseService {
       totalElements: total
     })
   }
+
+  deleteCourseById = async ({ id }: { id: number }) => {
+    //soft delete
+    const result = await courseRepository.softDelete({
+      where: {
+        id
+      }
+    })
+
+    return result
+  }
+
+  restoreCourseById = async ({ id }: { id: number }) => {
+    const restoreCourse = await courseRepository.restore(id)
+    return restoreCourse
+  }
 }
 
 export const courseService = new CourseService()

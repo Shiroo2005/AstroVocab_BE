@@ -5,7 +5,7 @@ import {
   deleteTopicController,
   getAllTopicsController,
   getTopicController,
-  restoreTopicById,
+  restoreTopicController,
   updateTopicController
 } from '~/controllers/topic.controller'
 import { Topic } from '~/entities/topic.entity'
@@ -106,7 +106,7 @@ topicRouter.patch(
   '/:id/restore',
   wrapRequestHandler(checkPermission('updateAny', Resource.TOPIC)),
   checkIdParamMiddleware({}),
-  wrapRequestHandler(restoreTopicById)
+  wrapRequestHandler(restoreTopicController)
 )
 
 //DELETE

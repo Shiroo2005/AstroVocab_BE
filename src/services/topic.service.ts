@@ -123,9 +123,9 @@ class TopicService {
     return result
   }
 
-  restoreTopicById = async ({ id }: { id: number }) => {
-    const restoreWord = await topicRepository.restore(id)
-    return restoreWord
+  restoreTopicController = async ({ id }: { id: number }) => {
+    const restoreTopic = await topicRepository.restore(id)
+    return restoreTopic
   }
 }
 

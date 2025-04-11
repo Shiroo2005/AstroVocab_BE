@@ -22,12 +22,14 @@ export const checkQueryMiddleware = ({
   requiredFields,
   numbericFields = ['limit', 'page'],
   defaultLimit = 10,
-  defaultPage = 1
+  defaultPage = 1,
+  maxLimit = 30
 }: {
   requiredFields?: string[]
   numbericFields?: string[]
   defaultLimit?: number
   defaultPage?: number
+  maxLimit?: number
 } = {}) => {
   return (req: Request, res: Response, next: NextFunction) => {
     // Kiểm tra xem có query nào không nằm trong fields không
@@ -49,12 +51,15 @@ export const checkQueryMiddleware = ({
         }
       })
     }
-
     //parse limit, page
     req.parseQueryPagination = {
       limit: toNumberWithDefaultValue(req.query.limit, defaultLimit),
       page: toNumberWithDefaultValue(req.query.page, defaultPage)
     }
+
+    //check max limit & max page
+    if ((req.parseQueryPagination.limit as number) > maxLimit)
+      throw new BadRequestError(`Limit value is not greater than ${maxLimit}`)
 
     console.log(req.parseQueryPagination)
 
