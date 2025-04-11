@@ -10,5 +10,9 @@ declare module 'express' {
     decodedAuthorization?: TokenPayload
     decodedRefreshToken?: TokenPayload
     sortParsed?: Record<string, 'ASC' | 'DESC'>
+    parseQueryPagination?: {
+      page?: number
+      limit?: number
+    }
   }
 }

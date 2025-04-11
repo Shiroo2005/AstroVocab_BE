@@ -1,6 +1,9 @@
+import { Like } from 'typeorm'
 import { BadRequestError } from '~/core/error.response'
 import { WordBody } from '~/dto/req/word/createWordBody.req'
 import { UpdateWordBodyReq } from '~/dto/req/word/updateWordBody.req'
+import { wordQueryReq } from '~/dto/req/word/wordQuery.req'
+import { DataWithPagination } from '~/dto/res/pagination.res'
 import { Word } from '~/entities/word.entity'
 import { wordRepository } from '~/repositories/word.repository'
 
@@ -45,27 +48,46 @@ class WordService {
     return foundWord || {}
   }
 
-  getAllWords = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
-    const result = await wordRepository.findAll({
-      limit,
-      page
+  getAllWords = async ({
+    page = 1,
+    limit = 10,
+    content,
+    example,
+    meaning,
+    position,
+    pronunciation,
+    rank,
+    translateExample,
+    sort
+  }: wordQueryReq) => {
+    //build where condition
+    const where = this.buildWordFilter({
+      likeFields: {
+        content,
+        example,
+        meaning,
+        position,
+        pronunciation,
+        rank,
+        translateExample
+      }
     })
 
-    if (!result) {
-      return {
-        foundWords: [],
-        page,
-        limit,
-        total: 0
-      }
-    }
-    const { foundWords, total } = result
-    return {
-      foundWords,
-      page,
+    const result = await wordRepository.findAll({
       limit,
-      total
-    }
+      page,
+      where,
+      order: sort,
+      unGetFields: ['createdAt', 'deletedAt', 'updatedAt']
+    })
+
+    const { foundWords, total } = result || { foundWords: [], total: 0 }
+    return new DataWithPagination({
+      data: foundWords,
+      limit,
+      page,
+      totalElements: total
+    })
   }
 
   deleteWordById = async ({ id }: { id: number }) => {
@@ -82,6 +104,19 @@ class WordService {
   restoreWordById = async ({ id }: { id: number }) => {
     const restoreWord = await wordRepository.restore(id)
     return restoreWord
+  }
+
+  buildWordFilter = ({ likeFields }: { likeFields: Record<string, string | undefined> }) => {
+    const filter = {} as any
+
+    //mapping for like fields
+    Object.keys(likeFields).forEach((field) => {
+      if (likeFields[field]) {
+        filter[field] = Like(`%${field}%`)
+      }
+    })
+
+    return filter
   }
 }
 

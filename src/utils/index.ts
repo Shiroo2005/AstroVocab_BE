@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _, { toNumber } from 'lodash'
 
 export const isValidNumber = (num: string) => {
   try {
@@ -8,7 +8,14 @@ export const isValidNumber = (num: string) => {
   }
 }
 
-export const toNumber = (num: string) => _.toNumber(num)
+export const toNumberWithDefaultValue = (num: any, defaultValue: number) => {
+  if (!num) return defaultValue
+  try {
+    return toNumber(num)
+  } catch (error) {
+    return defaultValue
+  }
+}
 
 export const getInfoData = ({ fields = [], object = {} }: { fields: Array<string>; object: object }) => {
   return _.pick(object, fields)

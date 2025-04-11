@@ -3,9 +3,9 @@ import { CREATED, SuccessResponse } from '~/core/success.response'
 import { UpdatePermissionBodyReq } from '~/dto/req/permission/updatePermissionBody.req'
 import { permissionService } from '~/services/permission.service'
 import { ParamsDictionary } from 'express-serve-static-core'
-import { toNumber } from '~/utils'
 import { CreatePermissionBodyReq } from '~/dto/req/permission/createPermissionBody.req'
 import { roleService } from '~/services/role.service'
+import { toNumber } from 'lodash'
 
 export const createPermissionController = async (
   req: Request<ParamsDictionary, any, CreatePermissionBodyReq>,

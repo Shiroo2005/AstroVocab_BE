@@ -1,4 +1,4 @@
-import { FindOptionsWhere, Repository } from 'typeorm'
+import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm'
 import { WordPosition, WordRank } from '~/constants/word'
 import { BadRequestError } from '~/core/error.response'
 import { Word } from '~/entities/word.entity'
@@ -86,18 +86,21 @@ class WordRepository {
     limit,
     page,
     where,
-    unGetFields
+    unGetFields,
+    order
   }: {
     limit: number
     page: number
     where?: FindOptionsWhere<Word>
     unGetFields?: string[]
+    order?: FindOptionsOrder<Word>
   }) {
     const skip = (page - 1) * limit
     const [foundWords, total] = await this.wordRepo.findAndCount({
       where,
       skip,
-      take: limit
+      take: limit,
+      order
     })
 
     if (!foundWords || foundWords.length === 0) return null
