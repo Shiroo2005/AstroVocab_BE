@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
+import { isEmpty } from 'lodash'
 import { BadRequestError } from '~/core/error.response'
 import { isValidNumber, toNumber } from '~/utils'
 
@@ -99,5 +100,29 @@ export const isString = (fieldName: string) => {
     isString: {
       errorMessage: `${fieldName} must be a string!`
     }
+  }
+}
+
+export const parseSort = ({ allowSortList }: { allowSortList: string[] }) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    //convert sort to sort statement in typeorm
+    // sort like sort =-id,+name
+
+    const sort = req.query.sort as string | null
+
+    const orderStatement: Record<string, 'ASC' | 'DESC'> = {}
+    if (sort && !isEmpty(sort)) {
+      const sortFields = sort.split(',')
+      sortFields.forEach((sortField) => {
+        const orderSort = sortField[0],
+          fieldSort = sortField.substring(1)
+        if (fieldSort && orderSort && allowSortList.includes(fieldSort)) {
+          // Ensure the sort order is either ASC or DESC
+          orderStatement[fieldSort] = orderSort === '-' ? 'DESC' : 'ASC'
+        }
+      })
+      req.sortParsed = orderStatement
+    }
+    next()
   }
 }

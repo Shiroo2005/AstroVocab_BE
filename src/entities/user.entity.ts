@@ -51,7 +51,7 @@ export class User {
   status?: UserStatus
 
   @ManyToOne(() => Role, (role) => role.users)
-  role?: Role
+  role: Role
 
   @OneToMany(() => Token, (token) => token.user)
   tokens?: Token[]
@@ -117,4 +117,6 @@ export class User {
 
     return user
   }
+
+  static allowSortList = ['id', 'username', 'email', 'fullName']
 }
