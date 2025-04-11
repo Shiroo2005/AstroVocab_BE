@@ -8,11 +8,11 @@ import {
   restoreUserById,
   updateUserController
 } from '~/controllers/user.controller'
+import { User } from '~/entities/user.entity'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
-import { checkIdParamMiddleware, checkQueryMiddleware } from '~/middlewares/common.middlewares'
+import { checkIdParamMiddleware, checkQueryMiddleware, parseSort } from '~/middlewares/common.middlewares'
 import { createUserValidation } from '~/middlewares/user/createUser.middleware'
-import { findUserValidation } from '~/middlewares/user/findUser.middleware'
 import { updateUserValidation } from '~/middlewares/user/updateUser.middleware'
 import { wrapRequestHandler } from '~/utils/handler'
 export const userRouter = express.Router()
@@ -36,14 +36,20 @@ userRouter.use(accessTokenValidation)
  * @path : /
  * @header : Authorization
  * @query : {limit: number, page:number, fullName:string, roleName:string, status:userStatus, sort: string}
- * sort like +id | -id
- * sort field must be in [id, fullName, username, email, status]
+ * sort like id | -id
+ * sort field must be in [id, fullName, username, email]
+ * filter field must be in [
+ *  fullName?: string
+    username?: string
+    roleName?: string
+    status?: UserStatus
+ * ]
  */
 userRouter.get(
   '/',
   wrapRequestHandler(checkPermission('readAny', Resource.USER)),
   checkQueryMiddleware({ numbericFields: ['page', 'limit'] }),
-  findUserValidation,
+  wrapRequestHandler(parseSort({ allowSortList: User.allowSortList })),
   wrapRequestHandler(getAllUsers)
 )
 // POST

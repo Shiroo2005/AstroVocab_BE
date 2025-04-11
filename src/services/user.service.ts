@@ -1,10 +1,12 @@
-import { isEmpty } from 'lodash'
+import { isEmpty, toNumber } from 'lodash'
 import { Like } from 'typeorm'
 import { UserStatus } from '~/constants/userStatus'
 import { CreateUserBodyReq } from '~/dto/req/user/createUserBody.req'
 import { findUserQueryReq } from '~/dto/req/user/findUserQuery.req'
 import { UpdateUserBodyReq } from '~/dto/req/user/updateUserBody.req'
+import { DataWithPagination } from '~/dto/res/pagination.res'
 import { Role } from '~/entities/role.entity'
+import { User } from '~/entities/user.entity'
 import { userRepository } from '~/repositories/user.repository'
 import { unGetData } from '~/utils'
 
@@ -53,51 +55,30 @@ class UserService {
   getAllUsers = async ({
     page = 1,
     limit = 10,
-    email = '',
-    fullName = '',
-    username = '',
-    roleName = '',
-    status = UserStatus.NOT_VERIFIED,
-    sort
-  }: findUserQueryReq = {}) => {
-    const relations = []
-    if (isEmpty(roleName)) {
-      roleName = '%%'
-    } else {
-      relations.push('role')
-    }
+    email,
+    fullName,
+    roleName,
+    sort,
+    status,
+    username
+  }: findUserQueryReq) => {
+    //parse page
+    page = toNumber(page)
+    limit = toNumber(limit)
 
+    //build filter to where condition
+    const where = this.buildUserFilters({ email, fullName, roleName, status, username })
+
+    //find user with condition
     const result = await userRepository.findAll({
       limit,
       page,
-      unGetFields: ['password', 'deletedAt', 'createdAt', 'updatedAt'],
-      where: {
-        email: Like(`%${email}%`),
-        fullName: Like(`%${fullName}%`),
-        username: Like(`%${username}%`),
-        status: Like(`%${status}%` as UserStatus),
-        role: {
-          name: Like(`%${roleName}%`)
-        }
-      },
-      relations,
+      where,
+      relations: ['role'],
       order: sort
     })
-    if (!result) {
-      return {
-        foundRoles: [],
-        page,
-        limit,
-        total: 0
-      }
-    }
-    const { foundUsers, total } = result
-    return {
-      foundUsers,
-      page,
-      limit,
-      total
-    }
+    const { foundUsers, total } = result || { foundUsers: [], total: 0 }
+    return new DataWithPagination({ data: foundUsers, limit, page, totalElements: total })
   }
 
   deleteUserById = async ({ id }: { id: number }) => {
@@ -109,6 +90,27 @@ class UserService {
   restoreUserById = async ({ id }: { id: number }) => {
     const restoreUser = await userRepository.restore(id)
     return restoreUser
+  }
+
+  buildUserFilters = ({
+    email = '',
+    fullName = '',
+    username = '',
+    roleName = '',
+    status = UserStatus.NOT_VERIFIED
+  }: findUserQueryReq) => {
+    const filters: any = {}
+
+    if (email) filters.email = Like(`%${email}%`)
+    if (fullName) filters.fullName = Like(`%${fullName}%`)
+    if (username) filters.username = Like(`%${username}%`)
+    if (status) filters.status = Like(`%${status}%` as UserStatus)
+
+    if (roleName) {
+      filters.role = { name: Like(`%${roleName}%`) }
+    }
+
+    return filters
   }
 }
 
