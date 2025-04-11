@@ -33,7 +33,7 @@ export const getWord = async (req: Request<ParamsDictionary, any, any>, res: Res
 export const getAllWords = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
   return new SuccessResponse({
     message: 'Get word by id successful!',
-    metaData: await wordService.getAllWords({ ...req.query, ...req.parseQueryPagination })
+    metaData: await wordService.getAllWords({ ...req.query, ...req.parseQueryPagination, sort: req.sortParsed })
   }).send(res)
 }
 

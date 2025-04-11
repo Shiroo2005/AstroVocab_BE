@@ -94,7 +94,7 @@ class TopicRepository {
     limit,
     page,
     where,
-    unGetFields
+    unGetFields = ['createdAt', 'updatedAt', 'deletedAt']
   }: {
     limit: number
     page: number
