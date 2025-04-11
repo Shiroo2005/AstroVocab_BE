@@ -26,3 +26,19 @@ export const updateCourseController = async (
     metaData: await courseService.updateCourse(id, req.body)
   }).send(res)
 }
+
+export const getCourseController = async (req: Request, res: Response) => {
+  const id = req.idParams as number
+
+  return new SuccessResponse({
+    message: 'Get course by id successful!',
+    metaData: await courseService.getCourseById({ id })
+  }).send(res)
+}
+
+export const getAllCoursesController = async (req: Request, res: Response) => {
+  return new SuccessResponse({
+    message: 'Get course by id successful!',
+    metaData: await courseService.getAllCourses(req.query)
+  }).send(res)
+}

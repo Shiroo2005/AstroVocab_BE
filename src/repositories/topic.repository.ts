@@ -1,7 +1,6 @@
 import { FindOptionsWhere, Repository } from 'typeorm'
 import { TopicType } from '~/constants/topic'
 import { BadRequestError } from '~/core/error.response'
-import { Token } from '~/entities/token.entity'
 import { Topic } from '~/entities/topic.entity'
 import { Word } from '~/entities/word.entity'
 import { unGetData, unGetDataArray } from '~/utils'

@@ -33,7 +33,7 @@ export const getTopicController = async (req: Request<ParamsDictionary, any, any
 export const getAllTopicsController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
   return new SuccessResponse({
     message: 'Get all topics successful!',
-    metaData: await topicService.getAllTopics(req.params)
+    metaData: await topicService.getAllTopics(req.query)
   }).send(res)
 }
 

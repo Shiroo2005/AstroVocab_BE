@@ -1,16 +1,47 @@
 import express from 'express'
 import { Resource } from '~/constants/access'
-import { createCourseController, updateCourseController } from '~/controllers/course.controller'
-import { createTopicController } from '~/controllers/topic.controller'
+import {
+  createCourseController,
+  getAllCoursesController,
+  getCourseController,
+  updateCourseController
+} from '~/controllers/course.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
-import { checkIdParamMiddleware } from '~/middlewares/common.middlewares'
+import { checkIdParamMiddleware, checkQueryMiddleware } from '~/middlewares/common.middlewares'
 import { createCourseValidation } from '~/middlewares/course/createCourse.middleware'
 import { updateCourseValidation } from '~/middlewares/course/updateCourse.middleware'
 import { wrapRequestHandler } from '~/utils/handler'
 export const courseRouter = express.Router()
 
 // GET
+/**
+ * @description : Get course by id
+ * @method : GET
+ * @path : /:id
+ */
+courseRouter.get(
+  '/:id',
+  // wrapRequestHandler(checkPermission('createAny', Resource.COURSE)),
+  checkIdParamMiddleware({}),
+  wrapRequestHandler(getCourseController)
+)
+
+/**
+ * @description : Get all courses
+ * @method : GET
+ * @path : /
+ * @query : {
+ *  page?: number
+ *  limit?: number
+ *  }
+ */
+courseRouter.get(
+  '/',
+  // wrapRequestHandler(checkPermission('createAny', Resource.COURSE)),
+  checkQueryMiddleware({ numbericFields: ['limit', 'page'] }),
+  wrapRequestHandler(getAllCoursesController)
+)
 
 // authenticate....
 courseRouter.use(accessTokenValidation)
@@ -63,4 +94,5 @@ courseRouter.patch(
   updateCourseValidation,
   wrapRequestHandler(updateCourseController)
 )
+
 // DELETE

@@ -4,6 +4,7 @@ import { topicRepository } from '~/repositories/topic.repository'
 import { wordService } from './word.service'
 import { UpdateTopicBodyReq } from '~/dto/req/topic/updateTopicBody.req'
 import { Topic } from '~/entities/topic.entity'
+import { toNumber } from 'lodash'
 
 class TopicService {
   createTopic = async (topicsBody: TopicBody[]) => {
@@ -83,20 +84,16 @@ class TopicService {
   }
 
   getAllTopics = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
+    // parse page limit
+    page = toNumber(page)
+    limit = toNumber(limit)
+
     const result = await topicRepository.findAll({
       limit,
       page
     })
 
-    if (!result) {
-      return {
-        foundWords: [],
-        page,
-        limit,
-        total: 0
-      }
-    }
-    const { foundTopics, total } = result
+    const { foundTopics, total } = result || { foundTopics: [], total: 0 }
     return {
       foundTopics,
       page,
