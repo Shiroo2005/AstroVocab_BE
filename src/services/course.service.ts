@@ -5,6 +5,9 @@ import { topicService } from './topic.service'
 import { courseRepository } from '~/repositories/course.repository'
 import { UpdateCourseBodyReq } from '~/dto/req/course/updateCourseBody.req'
 import { toNumber } from 'lodash'
+import { courseQueryReq } from '~/dto/req/course/courseQuery.req'
+import { buildFilterLike } from './query.service'
+import { DataWithPagination } from '~/dto/res/pagination.res'
 
 class CourseService {
   createCourse = async (coursesBody: CourseBody[]) => {
@@ -65,23 +68,32 @@ class CourseService {
     return foundCourse || {}
   }
 
-  getAllCourses = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
-    // parse page limit
-    page = toNumber(page)
-    limit = toNumber(limit)
+  getAllCourses = async ({ page = 1, limit = 10, description, level, target, title, sort }: courseQueryReq = {}) => {
+    // build where condition
+
+    const where = buildFilterLike({
+      likeFields: {
+        description,
+        level,
+        target,
+        title
+      }
+    })
 
     const result = await courseRepository.findAll({
       limit,
-      page
+      page,
+      where,
+      sort
     })
 
     const { foundCourses, total } = result || { foundCourses: [], total: 0 }
-    return {
-      foundCourses,
+    return new DataWithPagination({
+      data: foundCourses,
       page,
       limit,
-      total
-    }
+      totalElements: total
+    })
   }
 }
 

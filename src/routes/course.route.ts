@@ -6,9 +6,11 @@ import {
   getCourseController,
   updateCourseController
 } from '~/controllers/course.controller'
+import { Course } from '~/entities/course.entity'
+import { Word } from '~/entities/word.entity'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
-import { checkIdParamMiddleware, checkQueryMiddleware } from '~/middlewares/common.middlewares'
+import { checkIdParamMiddleware, checkQueryMiddleware, parseSort } from '~/middlewares/common.middlewares'
 import { createCourseValidation } from '~/middlewares/course/createCourse.middleware'
 import { updateCourseValidation } from '~/middlewares/course/updateCourse.middleware'
 import { wrapRequestHandler } from '~/utils/handler'
@@ -39,7 +41,8 @@ courseRouter.get(
 courseRouter.get(
   '/',
   // wrapRequestHandler(checkPermission('createAny', Resource.COURSE)),
-  checkQueryMiddleware({ numbericFields: ['limit', 'page'] }),
+  checkQueryMiddleware(),
+  wrapRequestHandler(parseSort({ allowSortList: Course.allowSortList })),
   wrapRequestHandler(getAllCoursesController)
 )
 

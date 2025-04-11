@@ -87,4 +87,6 @@ export class Course {
 
     return course
   }
+
+  static allowSortList = ['id', 'title', 'level', 'target', 'description']
 }

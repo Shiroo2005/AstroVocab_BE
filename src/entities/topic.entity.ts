@@ -87,5 +87,5 @@ export class Topic {
     return topic
   }
 
-  static allowSortList = ['title', 'description', 'type']
+  static allowSortList = ['id', 'title', 'description', 'type']
 }

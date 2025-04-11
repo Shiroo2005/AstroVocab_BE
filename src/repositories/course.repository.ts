@@ -1,4 +1,4 @@
-import { FindOptionsWhere, Repository } from 'typeorm'
+import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm'
 import { CourseLevel } from '~/constants/couse'
 import { BadRequestError } from '~/core/error.response'
 import { Course } from '~/entities/course.entity'
@@ -93,18 +93,21 @@ class CourseRepository {
     limit,
     page,
     where,
-    unGetFields
+    unGetFields = ['createdAt', 'updatedAt', 'deletedAt'],
+    sort
   }: {
     limit: number
     page: number
     where?: FindOptionsWhere<Course>
     unGetFields?: string[]
+    sort?: FindOptionsOrder<Course>
   }) {
     const skip = (page - 1) * limit
     const [foundCourses, total] = await this.courseRepo.findAndCount({
       where,
       skip,
-      take: limit
+      take: limit,
+      order: sort
     })
 
     if (!foundCourses || foundCourses.length === 0) return null

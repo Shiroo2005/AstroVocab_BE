@@ -38,7 +38,7 @@ export const getCourseController = async (req: Request, res: Response) => {
 
 export const getAllCoursesController = async (req: Request, res: Response) => {
   return new SuccessResponse({
-    message: 'Get course by id successful!',
-    metaData: await courseService.getAllCourses(req.query)
+    message: 'Get all courses successful!',
+    metaData: await courseService.getAllCourses({ ...req.query, ...req.parseQueryPagination, sort: req.sortParsed })
   }).send(res)
 }
