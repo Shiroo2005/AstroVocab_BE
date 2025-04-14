@@ -5,5 +5,8 @@ export interface UpdateCourseBodyReq {
   description?: string
   target?: string
   level?: CourseLevel
-  topicIds?: number[]
+  topics: {
+    id: number
+    displayOrder: number
+  }[]
 }

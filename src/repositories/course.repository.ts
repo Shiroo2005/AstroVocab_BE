@@ -2,6 +2,7 @@ import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm'
 import { CourseLevel } from '~/constants/couse'
 import { BadRequestError } from '~/core/error.response'
 import { Course } from '~/entities/course.entity'
+import { CourseTopic } from '~/entities/courseTopic.entity'
 import { Topic } from '~/entities/topic.entity'
 import { unGetData, unGetDataArray } from '~/utils'
 import { validateClass } from '~/utils/validate'
@@ -18,8 +19,8 @@ class CourseRepository {
     this.courseRepo = await DatabaseService.getInstance().getRepository(Course)
   }
 
-  async saveOne({ title, description, target, level, topics, id }: Course) {
-    const course = Course.create({ title, description, target, level, topics, id })
+  async saveOne({ title, description, target, level, courseTopics, id }: Course) {
+    const course = Course.create({ title, description, target, level, courseTopics, id })
     //class validator
     await validateClass(course)
 
@@ -34,6 +35,8 @@ class CourseRepository {
       await validateClass(course)
       validCourses.push(course)
     }
+    console.log(courses)
+
     return await this.courseRepo.save(validCourses)
   }
 
@@ -42,14 +45,14 @@ class CourseRepository {
     description,
     level,
     target,
-    topics,
+    courseTopics,
     id
   }: {
     title?: string
     description?: string
     target?: string
     level?: CourseLevel
-    topics?: Topic[]
+    courseTopics?: CourseTopic[]
     id: number
   }) {
     const foundCourse = (await courseRepository.findOne({
@@ -64,7 +67,7 @@ class CourseRepository {
       description,
       level,
       target,
-      topics
+      courseTopics
     })
 
     return await this.saveOne(updateCourse)

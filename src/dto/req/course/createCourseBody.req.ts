@@ -9,5 +9,8 @@ export interface CourseBody {
   description: string
   target: string
   level?: CourseLevel
-  topicIds: number[]
+  topics: {
+    id: number
+    displayOrder: number
+  }[]
 }

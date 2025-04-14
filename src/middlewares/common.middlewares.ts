@@ -122,6 +122,14 @@ export const isString = (fieldName: string) => {
   }
 }
 
+export const isNumber = (fieldName: string) => {
+  return {
+    isNumeric: {
+      errorMessage: `${fieldName} must be a numberic value!`
+    }
+  }
+}
+
 //pagination
 //parse sort
 export const parseSort = ({ allowSortList }: { allowSortList: string[] }) => {

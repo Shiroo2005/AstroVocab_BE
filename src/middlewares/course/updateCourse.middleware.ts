@@ -1,9 +1,10 @@
 import { checkSchema } from 'express-validator'
 import { validateSchema } from '~/utils/validate'
-import { isLength, isRequired } from '../common.middlewares'
+import { isLength, isNumber, isRequired } from '../common.middlewares'
 import { BadRequestError } from '~/core/error.response'
 import { isValidEnumValue } from '~/utils'
 import { CourseLevel } from '~/constants/couse'
+import { isValidAndUniqueDisplayOrder } from './createCourse.middleware'
 export const updateCourseValidation = validateSchema(
   checkSchema(
     {
@@ -33,9 +34,30 @@ export const updateCourseValidation = validateSchema(
           }
         }
       },
-      topicIds: {
+      topics: {
         optional: true,
-        isArray: true
+        isArray: true,
+        custom: {
+          options: (
+            topics: {
+              id: number
+              displayOrder: number
+            }[]
+          ) => {
+            // require display order is unique for each course
+            // display order array need to be from 1 - N
+            if (!isValidAndUniqueDisplayOrder(topics))
+              throw new BadRequestError('Display order array need to be unique for each course and from 1 to N!')
+
+            return true
+          }
+        }
+      },
+      'topics.*.id': {
+        ...isNumber('topicId')
+      },
+      'topics.*.displayOrder': {
+        ...isNumber('topicId')
       }
     },
     ['body']

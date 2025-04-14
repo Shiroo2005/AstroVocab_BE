@@ -4,14 +4,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
 import { CourseLevel } from '~/constants/couse'
-import { Topic } from './topic.entity'
+import { CourseTopic } from './courseTopic.entity'
 
 @Entity()
 export class Course {
@@ -39,9 +37,8 @@ export class Course {
   level?: CourseLevel
 
   //foreign key
-  @ManyToMany(() => Topic, { cascade: true })
-  @JoinTable({ name: 'course_topic' })
-  topics?: Topic[]
+  @OneToMany(() => CourseTopic, (courseTopic) => courseTopic.course, { cascade: true })
+  courseTopics?: CourseTopic[]
 
   @DeleteDateColumn()
   deletedAt?: Date
@@ -52,14 +49,14 @@ export class Course {
   @UpdateDateColumn()
   updatedAt?: Date
 
-  static create = ({ id, title, description, target, level, topics }: Course) => {
+  static create = ({ id, title, description, target, level, courseTopics }: Course) => {
     const newCourse = new Course()
     newCourse.id = id
     newCourse.title = title
     newCourse.description = description
     newCourse.target = target
     newCourse.level = level
-    newCourse.topics = topics
+    newCourse.courseTopics = courseTopics
 
     return newCourse
   }
@@ -71,20 +68,20 @@ export class Course {
       description,
       target,
       level,
-      topics
+      courseTopics
     }: {
       title?: string
       description?: string
       target?: string
       level?: CourseLevel
-      topics?: Topic[]
+      courseTopics?: CourseTopic[]
     }
   ) => {
     if (title) course.title = title
     if (description) course.description = description
     if (target) course.target = target
     if (level) course.level = level
-    if (topics) course.topics = topics
+    if (courseTopics) course.courseTopics = courseTopics
 
     return course
   }

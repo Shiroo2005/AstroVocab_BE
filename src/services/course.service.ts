@@ -4,10 +4,11 @@ import { Course } from '~/entities/course.entity'
 import { topicService } from './topic.service'
 import { courseRepository } from '~/repositories/course.repository'
 import { UpdateCourseBodyReq } from '~/dto/req/course/updateCourseBody.req'
-import { toNumber } from 'lodash'
 import { courseQueryReq } from '~/dto/req/course/courseQuery.req'
 import { buildFilterLike } from './query.service'
 import { DataWithPagination } from '~/dto/res/pagination.res'
+import { CourseTopic } from '~/entities/courseTopic.entity'
+import { DatabaseService } from './database.service'
 
 class CourseService {
   createCourse = async (coursesBody: CourseBody[]) => {
@@ -15,21 +16,22 @@ class CourseService {
 
     await Promise.all(
       coursesBody.map(async (course) => {
-        const { topicIds } = course
-        const topics = [] as Topic[]
+        const { topics } = course
+        const validTopics = [] as CourseTopic[]
 
-        if (topicIds && topicIds.length > 0) {
+        if (topics && topics.length > 0) {
           //filter word id valid
-          for (const id of topicIds) {
-            const existTopic = await topicService.isExistTopic(id)
+          for (let index = 0; index < topics.length; index++) {
+            const topic = topics[index]
+            const existTopic = await topicService.isExistTopic(topic.id)
 
             if (existTopic) {
-              topics.push({ id } as Topic)
+              validTopics.push({ displayOrder: topic.displayOrder, topic: { id: topic.id } as Topic, course: null })
             }
           }
         }
 
-        courses.push({ ...course, topics } as Course)
+        courses.push({ ...course, courseTopics: validTopics } as Course)
       })
     )
 
@@ -39,21 +41,42 @@ class CourseService {
     return createdTopic
   }
 
-  updateCourse = async (id: number, { topicIds, description, level, target, title }: UpdateCourseBodyReq) => {
+  updateCourse = async (id: number, { topics, description, level, target, title }: UpdateCourseBodyReq) => {
     //filter topic id valid
-    let topics
-    if (topicIds) {
-      topics = []
-      for (const id of topicIds) {
-        const existTopic = await topicService.isExistTopic(id)
+    let courseTopics
+    if (topics) {
+      courseTopics = [] as CourseTopic[]
+      for (const { displayOrder, id: topicId } of topics) {
+        // is courses_topics record exists
+        const foundCourseTopic = await (
+          await DatabaseService.getInstance().getRepository(CourseTopic)
+        ).findOne({
+          where: {
+            course: { id } as Course,
+            topic: { id: topicId } as Topic
+          }
+        })
 
-        if (existTopic) {
-          topics.push({ id } as Topic)
+        if (foundCourseTopic) {
+          courseTopics.push({ ...foundCourseTopic })
+        } else {
+          const existTopic = await topicService.isExistTopic(topicId)
+
+          if (existTopic) {
+            courseTopics.push({ displayOrder: displayOrder, topic: { id: topicId } as Topic, course: { id } as Course })
+          }
         }
       }
     }
 
-    const updatedCourse = await courseRepository.updateOne({ id, description, level, target, title, topics })
+    const updatedCourse = await courseRepository.updateOne({
+      id,
+      description,
+      level,
+      target,
+      title,
+      courseTopics
+    })
     return updatedCourse
   }
 
@@ -62,7 +85,7 @@ class CourseService {
       where: {
         id
       },
-      relations: ['topics']
+      relations: ['courseTopics']
     })
 
     return foundCourse || {}
