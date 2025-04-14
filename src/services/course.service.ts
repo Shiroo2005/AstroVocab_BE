@@ -46,25 +46,16 @@ class CourseService {
     let courseTopics
     if (topics) {
       courseTopics = [] as CourseTopic[]
+      // delete course topic before insert new
+      const courseTopicRepo = await DatabaseService.getInstance().getRepository(CourseTopic)
+      await courseTopicRepo.delete({ course: { id } })
+
+      // create valid courseTopics
       for (const { displayOrder, id: topicId } of topics) {
-        // is courses_topics record exists
-        const foundCourseTopic = await (
-          await DatabaseService.getInstance().getRepository(CourseTopic)
-        ).findOne({
-          where: {
-            course: { id } as Course,
-            topic: { id: topicId } as Topic
-          }
-        })
+        const existTopic = await topicService.isExistTopic(topicId)
 
-        if (foundCourseTopic) {
-          courseTopics.push({ ...foundCourseTopic })
-        } else {
-          const existTopic = await topicService.isExistTopic(topicId)
-
-          if (existTopic) {
-            courseTopics.push({ displayOrder: displayOrder, topic: { id: topicId } as Topic, course: { id } as Course })
-          }
+        if (existTopic) {
+          courseTopics.push({ displayOrder: displayOrder, topic: { id: topicId } as Topic, course: { id } as Course })
         }
       }
     }
