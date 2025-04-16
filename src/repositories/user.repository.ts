@@ -96,7 +96,7 @@ class UserRepository {
     page = 1,
     where,
     relations,
-    getFields = ['id', 'fullName', 'username', 'email', 'role'] as FindOptionsSelect<User>,
+    getFields = ['id', 'fullName', 'username', 'email', 'role', 'avatar'] as FindOptionsSelect<User>,
     unGetFields = [
       'password',
       'createdAt',
