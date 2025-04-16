@@ -22,9 +22,7 @@ export const refreshTokenValidation = validateSchema(
 
             // can refresh token use ?
             const foundToken = await tokenRepository.findOne({
-              where: {
-                refreshToken: value
-              }
+              refreshToken: value
             })
 
             // access and refresh token must be 1 userId

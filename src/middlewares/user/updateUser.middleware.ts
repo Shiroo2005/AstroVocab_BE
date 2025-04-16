@@ -26,11 +26,9 @@ export const updateUserValidation = validateSchema(
         ...isEmail,
         custom: {
           options: async (value, { req }) => {
-            const result = (await userRepository.findAll({
-              where: [{ email: value }, { username: req.body.username }]
-            })) as { foundUser: User[]; total: number } | null
-            if (result && result.foundUser) {
-              const foundUser = result.foundUser
+            const result = await userRepository.findAll({ where: [{ email: value }, { username: req.body.username }] })
+            if (result && result.data) {
+              const foundUser = result.data
               const userId = (req as Request).idParams as number
               foundUser.forEach((user) => {
                 if (user.id != userId) {

@@ -7,54 +7,59 @@ import helmet from 'helmet'
 import compression from 'compression'
 import router from './routes'
 import { corsConfig } from './config/cors.config'
-import { DatabaseService } from './services/database.service'
 import { servingStaticConfig } from './config/static.config'
+import { syncDatabase } from './services/database.service'
+import { seedData } from './core/seeds'
 const app = express()
 const port = 8081
 config()
 
-//MIDDLE_WARES
+async function initApp() {
+  //MIDDLE_WARES
 
-// cors
-app.use(corsConfig)
+  // cors
+  app.use(corsConfig)
 
-// log by morgan
-app.use(morganMiddleware)
+  // log by morgan
+  app.use(morganMiddleware)
 
-// protected by helmet
-app.use(helmet())
+  // protected by helmet
+  app.use(helmet())
 
-// optimize by compression request
-app.use(compression())
+  // optimize by compression request
+  app.use(compression())
 
-// convert request to json
-app.use(express.json())
-//////////////////////////////
+  // convert request to json
+  app.use(express.json())
+  //////////////////////////////
 
-// DATABASE
-// init db
-DatabaseService.getInstance().init()
-//////////////////////////////
+  // DATABASE
+  // init db
+  await syncDatabase()
+  await seedData()
+  //////////////////////////////
 
-// Serving static image
-servingStaticConfig(app)
+  // Serving static image
+  servingStaticConfig(app)
 
-//ROUTES
-app.use(router)
-//////////////////////////////
+  //ROUTES
+  app.use(router)
+  //////////////////////////////
 
-//init swagger
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+  //init swagger
+  // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
-//DEFAULT HANDLER
-//not found handler
-app.use(notFoundHandler)
+  //DEFAULT HANDLER
+  //not found handler
+  app.use(notFoundHandler)
 
-// error handler
-app.use(errorHandler)
-//////////////////////////////
+  // error handler
+  app.use(errorHandler)
+  //////////////////////////////
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-  console.log('📚 Swagger Docs: http://localhost:8081/api-docs')
-})
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+  })
+}
+
+initApp()

@@ -10,8 +10,6 @@ const checkPermission = (action: keyof Query, resource: string) => {
       throw new AuthRequestError('Unauthorized!')
     }
     const ac = await grantList(role)
-    console.log('>>>>>>>>>>>>>>>>>', ac)
-
     if (!Object.keys(ac.grant()).length) throw new BadRequestError(`Role don't have any permisison!`)
     const permission = ac.can(role.name)[action](resource) as Permission
 

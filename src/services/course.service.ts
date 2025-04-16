@@ -36,7 +36,7 @@ class CourseService {
     )
 
     //save topic into db
-    const createdTopic = await courseRepository.saveAll(courses)
+    const createdTopic = await courseRepository.save(courses)
 
     return createdTopic
   }
@@ -48,7 +48,7 @@ class CourseService {
       courseTopics = [] as CourseTopic[]
 
       // delete course topic before insert new
-      await courseTopicRepository.delete({ where: { course: { id } } })
+      await courseTopicRepository.delete({ course: { id } })
 
       // create valid courseTopics
       for (const { displayOrder, id: topicId } of topics) {
@@ -60,8 +60,7 @@ class CourseService {
       }
     }
 
-    const updatedCourse = await courseRepository.updateOne({
-      id,
+    const updatedCourse = await courseRepository.update(id, {
       description,
       level,
       target,
@@ -72,12 +71,12 @@ class CourseService {
   }
 
   getCourseById = async ({ id }: { id: number }) => {
-    const foundCourse = await courseRepository.findOne({
-      where: {
-        id
-      },
-      relations: ['courseTopics']
-    })
+    const foundCourse = await courseRepository.findOne(
+      { id },
+      {
+        relations: ['courseTopics']
+      }
+    )
 
     return foundCourse || {}
   }
@@ -98,12 +97,12 @@ class CourseService {
       limit,
       page,
       where,
-      sort
+      order: sort
     })
 
-    const { foundCourses, total } = result || { foundCourses: [], total: 0 }
+    const { data, total } = result || { data: [], total: 0 }
     return new DataWithPagination({
-      data: foundCourses,
+      data,
       page,
       limit,
       totalElements: total
@@ -112,17 +111,13 @@ class CourseService {
 
   deleteCourseById = async ({ id }: { id: number }) => {
     //soft delete
-    const result = await courseRepository.softDelete({
-      where: {
-        id
-      }
-    })
+    const result = await courseRepository.softDelete({ id })
 
     return result
   }
 
   restoreCourseById = async ({ id }: { id: number }) => {
-    const restoreCourse = await courseRepository.restore(id)
+    const restoreCourse = await courseRepository.restore({ id })
     return restoreCourse
   }
 }

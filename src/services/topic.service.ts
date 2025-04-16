@@ -31,7 +31,7 @@ class TopicService {
     )
 
     //save topic into db
-    const createdTopic = await topicRepository.saveAll(topics)
+    const createdTopic = await topicRepository.save(topics)
 
     return createdTopic
   }
@@ -50,25 +50,24 @@ class TopicService {
       }
     }
 
-    const updatedTopic = await topicRepository.updateOne({
+    const updatedTopic = await topicRepository.update(id, {
       title,
       description,
       thumbnail,
       type,
-      words,
-      id
+      words
     })
 
     return updatedTopic
   }
 
   getTopicById = async ({ id }: { id: number }) => {
-    const foundTopic = await topicRepository.findOne({
-      where: {
-        id
-      },
-      relations: ['words']
-    })
+    const foundTopic = await topicRepository.findOne(
+      { id },
+      {
+        relations: ['words']
+      }
+    )
 
     if (!foundTopic) return {}
 
@@ -77,9 +76,7 @@ class TopicService {
 
   isExistTopic = async (id: number) => {
     const foundTopic = await topicRepository.findOne({
-      where: {
-        id
-      }
+      id
     })
 
     return foundTopic != null
@@ -100,12 +97,12 @@ class TopicService {
       limit,
       page,
       where,
-      sort
+      order: sort
     })
 
-    const { foundTopics, total } = result || { foundTopics: [], total: 0 }
+    const { data, total } = result || { data: [], total: 0 }
     return new DataWithPagination({
-      data: foundTopics,
+      data,
       limit,
       page,
       totalElements: total
@@ -115,16 +112,14 @@ class TopicService {
   deleteTopicById = async ({ id }: { id: number }) => {
     //soft delete
     const result = await topicRepository.softDelete({
-      where: {
-        id
-      }
+      id
     })
 
     return result
   }
 
   restoreTopicController = async ({ id }: { id: number }) => {
-    const restoreTopic = await topicRepository.restore(id)
+    const restoreTopic = await topicRepository.restore({ id })
     return restoreTopic
   }
 }

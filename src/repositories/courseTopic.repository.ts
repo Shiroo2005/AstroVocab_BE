@@ -1,21 +1,7 @@
-import { FindOptionsWhere, Repository } from 'typeorm'
+import { BaseRepository } from '~/core/repository/base.repository'
 import { CourseTopic } from '~/entities/courseTopic.entity'
+import { getRepository } from '~/services/database.service'
 
-class CourseTopicRepository {
-  courseTopicRepo: Repository<CourseTopic>
+class CourseTopicRepository extends BaseRepository<CourseTopic> {}
 
-  constructor() {
-    this.init()
-  }
-
-  private async init() {
-    const { DatabaseService } = await import('~/services/database.service.js')
-    this.courseTopicRepo = await DatabaseService.getInstance().getRepository(CourseTopic)
-  }
-
-  async delete({ where }: { where: FindOptionsWhere<CourseTopic> }) {
-    return await this.courseTopicRepo.delete(where)
-  }
-}
-
-export const courseTopicRepository = new CourseTopicRepository()
+export const courseTopicRepository = new CourseTopicRepository(getRepository(CourseTopic))

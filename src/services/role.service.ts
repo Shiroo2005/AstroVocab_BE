@@ -4,8 +4,8 @@ import { roleRepository } from '~/repositories/role.repository'
 import { BadRequestError } from '~/core/error.response'
 
 class RoleService {
-  createRole = async ({ name, description, permissionIds }: CreateRoleBodyReq) => {
-    const createdRole = await roleRepository.saveOne({ name, description })
+  createRole = async ({ name, description }: CreateRoleBodyReq) => {
+    const createdRole = await roleRepository.save({ name, description })
 
     return createdRole
   }
@@ -21,15 +21,15 @@ class RoleService {
     })
     if (!result) {
       return {
-        foundRoles: [],
+        data: [],
         page,
         limit,
         total: 0
       }
     }
-    const { foundRoles, total } = result
+    const { data, total } = result
     return {
-      foundRoles,
+      data,
       page,
       limit,
       total
@@ -37,12 +37,12 @@ class RoleService {
   }
 
   getRoleById = async (id: number) => {
-    const foundRole = await roleRepository.findOne({
-      where: {
-        id
-      },
-      relations: ['permissions']
-    })
+    const foundRole = await roleRepository.findOne(
+      { id },
+      {
+        relations: ['permissions']
+      }
+    )
 
     if (!foundRole) return {}
 
@@ -53,9 +53,7 @@ class RoleService {
 
   isExistRoleId = async (id: number) => {
     const foundRole = roleRepository.findOne({
-      where: {
-        id
-      }
+      id
     })
 
     return foundRole
@@ -63,11 +61,9 @@ class RoleService {
 
   updateRoleById = async ({ id, name, description }: { id: number; name: string; description?: string }) => {
     // find role
-    const foundRole = (await roleRepository.findOne({
-      where: {
-        id
-      }
-    })) as Role | null
+    const foundRole = await roleRepository.findOne({
+      id
+    })
 
     if (!foundRole) throw new BadRequestError(`Role with ${id} not found!`)
 
@@ -76,22 +72,22 @@ class RoleService {
     foundRole.description = description
 
     // save role
-    return await roleRepository.saveOne(foundRole)
+    return await roleRepository.save(foundRole)
   }
 
   deleteRoleById = async ({ id }: { id: number }) => {
     // soft delete
-    const result = await roleRepository.softDelete({ where: { id } })
+    const result = await roleRepository.softDelete({ id })
     return result
   }
 
   findPermissionByRole = async ({ roleId }: { roleId: number }) => {
-    const foundRole = (await roleRepository.findOne({
-      where: {
-        id: roleId
-      },
-      relations: ['permissions']
-    })) as Role | null
+    const foundRole = (await roleRepository.findOne(
+      { id: roleId },
+      {
+        relations: ['permissions']
+      }
+    )) as Role | null
 
     if (!foundRole) return []
     return foundRole.permissions
