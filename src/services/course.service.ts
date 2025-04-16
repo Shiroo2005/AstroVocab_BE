@@ -8,7 +8,7 @@ import { courseQueryReq } from '~/dto/req/course/courseQuery.req'
 import { buildFilterLike } from './query.service'
 import { DataWithPagination } from '~/dto/res/pagination.res'
 import { CourseTopic } from '~/entities/courseTopic.entity'
-import { DatabaseService } from './database.service'
+import { courseTopicRepository } from '~/repositories/courseTopic.repository'
 
 class CourseService {
   createCourse = async (coursesBody: CourseBody[]) => {
@@ -26,7 +26,7 @@ class CourseService {
             const existTopic = await topicService.isExistTopic(topic.id)
 
             if (existTopic) {
-              validTopics.push({ displayOrder: topic.displayOrder, topic: { id: topic.id } as Topic, course: null })
+              validTopics.push({ displayOrder: topic.displayOrder, topic: { id: topic.id } as Topic })
             }
           }
         }
@@ -46,16 +46,16 @@ class CourseService {
     let courseTopics
     if (topics) {
       courseTopics = [] as CourseTopic[]
+
       // delete course topic before insert new
-      const courseTopicRepo = await DatabaseService.getInstance().getRepository(CourseTopic)
-      await courseTopicRepo.delete({ course: { id } })
+      await courseTopicRepository.delete({ where: { course: { id } } })
 
       // create valid courseTopics
       for (const { displayOrder, id: topicId } of topics) {
         const existTopic = await topicService.isExistTopic(topicId)
 
         if (existTopic) {
-          courseTopics.push({ displayOrder: displayOrder, topic: { id: topicId } as Topic, course: { id } as Course })
+          courseTopics.push({ displayOrder: displayOrder, topic: { id: topicId } as Topic })
         }
       }
     }

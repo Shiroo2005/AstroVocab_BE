@@ -3,7 +3,6 @@ import { CourseLevel } from '~/constants/couse'
 import { BadRequestError } from '~/core/error.response'
 import { Course } from '~/entities/course.entity'
 import { CourseTopic } from '~/entities/courseTopic.entity'
-import { Topic } from '~/entities/topic.entity'
 import { unGetData, unGetDataArray } from '~/utils'
 import { validateClass } from '~/utils/validate'
 

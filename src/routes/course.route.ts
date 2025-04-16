@@ -61,7 +61,10 @@ courseRouter.use(accessTokenValidation)
         description: string
         target: string
         level?: CourseLevel
-        topicIds: number[]
+        topics:{
+          id: number
+          displayOrder: number
+        }[]
  * }
     ]
  */
@@ -86,7 +89,10 @@ courseRouter.post(
         description?: string
         target?: string
         level?: CourseLevel
-        topicIds?: number[]
+        topics:{
+          id: number
+          displayOrder: number
+        }[]
  * }
     ]
  */

@@ -23,7 +23,7 @@ export class CourseTopic {
 
   //foreign key
   @ManyToOne(() => Course)
-  course: Course | null
+  course?: Course
 
   @ManyToOne(() => Topic)
   topic: Topic
