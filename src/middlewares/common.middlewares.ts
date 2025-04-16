@@ -1,15 +1,15 @@
 import { Request, Response } from 'express'
-import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
-import { isEmpty } from 'lodash'
+import { NextFunction } from 'express-serve-static-core'
+import { isEmpty, toNumber } from 'lodash'
 import { BadRequestError } from '~/core/error.response'
-import { isValidNumber, toNumber } from '~/utils'
+import { isValidNumber, toNumberWithDefaultValue } from '~/utils'
 
 export const checkIdParamMiddleware = (options?: { id?: string }) => {
   const id = options?.id || 'id'
 
   console.log(id)
 
-  return (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     if (!req.params[id] || !isValidNumber(req.params[id])) {
       throw new BadRequestError('Id invalid!')
     }
@@ -20,11 +20,17 @@ export const checkIdParamMiddleware = (options?: { id?: string }) => {
 
 export const checkQueryMiddleware = ({
   requiredFields,
-  numbericFields
+  numbericFields = ['limit', 'page'],
+  defaultLimit = 10,
+  defaultPage = 1,
+  maxLimit = 30
 }: {
   requiredFields?: string[]
   numbericFields?: string[]
-}) => {
+  defaultLimit?: number
+  defaultPage?: number
+  maxLimit?: number
+} = {}) => {
   return (req: Request, res: Response, next: NextFunction) => {
     // Kiểm tra xem có query nào không nằm trong fields không
     if (requiredFields) {
@@ -39,10 +45,23 @@ export const checkQueryMiddleware = ({
     if (numbericFields) {
       numbericFields.forEach((field) => {
         if (req.query[field] && !isValidNumber(req.query[field] as string)) {
+          console.log(field)
+
           throw new BadRequestError(`${field} must be a numberic string`)
         }
       })
     }
+    //parse limit, page
+    req.parseQueryPagination = {
+      limit: toNumberWithDefaultValue(req.query.limit, defaultLimit),
+      page: toNumberWithDefaultValue(req.query.page, defaultPage)
+    }
+
+    //check max limit & max page
+    if ((req.parseQueryPagination.limit as number) > maxLimit)
+      throw new BadRequestError(`Limit value is not greater than ${maxLimit}`)
+
+    console.log(req.parseQueryPagination)
 
     next()
   }
@@ -103,6 +122,16 @@ export const isString = (fieldName: string) => {
   }
 }
 
+export const isNumber = (fieldName: string) => {
+  return {
+    isNumeric: {
+      errorMessage: `${fieldName} must be a numberic value!`
+    }
+  }
+}
+
+//pagination
+//parse sort
 export const parseSort = ({ allowSortList }: { allowSortList: string[] }) => {
   return (req: Request, res: Response, next: NextFunction) => {
     //convert sort to sort statement in typeorm

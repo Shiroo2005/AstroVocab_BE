@@ -33,7 +33,7 @@ export const getTopicController = async (req: Request<ParamsDictionary, any, any
 export const getAllTopicsController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
   return new SuccessResponse({
     message: 'Get all topics successful!',
-    metaData: await topicService.getAllTopics(req.params)
+    metaData: await topicService.getAllTopics({ ...req.query, ...req.parseQueryPagination, sort: req.sortParsed })
   }).send(res)
 }
 
@@ -46,11 +46,11 @@ export const deleteTopicController = async (req: Request<ParamsDictionary, any, 
   }).send(res)
 }
 
-export const restoreTopicById = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+export const restoreTopicController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
   const id = req.idParams as number
 
   return new SuccessResponse({
     message: 'Restore topic by id successful!',
-    metaData: await topicService.restoreTopicById({ id })
+    metaData: await topicService.restoreTopicController({ id })
   }).send(res)
 }

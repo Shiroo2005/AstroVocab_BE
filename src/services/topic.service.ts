@@ -4,6 +4,9 @@ import { topicRepository } from '~/repositories/topic.repository'
 import { wordService } from './word.service'
 import { UpdateTopicBodyReq } from '~/dto/req/topic/updateTopicBody.req'
 import { Topic } from '~/entities/topic.entity'
+import { topicQueryReq } from '~/dto/req/topic/topicQuery.req'
+import { buildFilterLike } from './query.service'
+import { DataWithPagination } from '~/dto/res/pagination.res'
 
 class TopicService {
   createTopic = async (topicsBody: TopicBody[]) => {
@@ -34,16 +37,16 @@ class TopicService {
   }
 
   updateTopic = async (id: number, { title, description, thumbnail, type, wordIds }: UpdateTopicBodyReq) => {
-    const words = [] as Word[]
-
-    if (wordIds && wordIds.length > 0) {
+    //filter word id valid
+    let words
+    if (wordIds) {
+      words = []
       //filter word id valid
       for (const id of wordIds) {
         const foundWord = await wordService.getWordById({ id })
         if (foundWord && Object.keys(foundWord).length != 0) {
           words.push({ id } as Word)
         }
-        console.log(foundWord, Object.keys(foundWord))
       }
     }
 
@@ -72,27 +75,41 @@ class TopicService {
     return foundTopic
   }
 
-  getAllTopics = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
-    const result = await topicRepository.findAll({
-      limit,
-      page
+  isExistTopic = async (id: number) => {
+    const foundTopic = await topicRepository.findOne({
+      where: {
+        id
+      }
     })
 
-    if (!result) {
-      return {
-        foundWords: [],
-        page,
-        limit,
-        total: 0
+    return foundTopic != null
+  }
+
+  getAllTopics = async ({ page = 1, limit = 10, description, title, type, sort }: topicQueryReq = {}) => {
+    // build where condition
+
+    const where = buildFilterLike({
+      likeFields: {
+        description,
+        title,
+        type
       }
-    }
-    const { foundTopics, total } = result
-    return {
-      foundTopics,
-      page,
+    })
+
+    const result = await topicRepository.findAll({
       limit,
-      total
-    }
+      page,
+      where,
+      sort
+    })
+
+    const { foundTopics, total } = result || { foundTopics: [], total: 0 }
+    return new DataWithPagination({
+      data: foundTopics,
+      limit,
+      page,
+      totalElements: total
+    })
   }
 
   deleteTopicById = async ({ id }: { id: number }) => {
@@ -106,9 +123,9 @@ class TopicService {
     return result
   }
 
-  restoreTopicById = async ({ id }: { id: number }) => {
-    const restoreWord = await topicRepository.restore(id)
-    return restoreWord
+  restoreTopicController = async ({ id }: { id: number }) => {
+    const restoreTopic = await topicRepository.restore(id)
+    return restoreTopic
   }
 }
 

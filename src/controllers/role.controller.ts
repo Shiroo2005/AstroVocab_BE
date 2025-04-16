@@ -4,7 +4,7 @@ import { CreateRoleBodyReq } from '~/dto/req/role/createRoleBody.req'
 import { CREATED, SuccessResponse } from '../core/success.response'
 import { roleService } from '~/services/role.service'
 import { UpdateRoleBodyReq } from '~/dto/req/role/updateRoleBody.req'
-import { toNumber } from '~/utils'
+import { toNumber } from 'lodash'
 
 export const createRole = async (
   req: Request<ParamsDictionary, any, CreateRoleBodyReq>,

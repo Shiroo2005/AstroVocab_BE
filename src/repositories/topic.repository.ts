@@ -1,7 +1,6 @@
-import { FindOptionsWhere, Repository } from 'typeorm'
+import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm'
 import { TopicType } from '~/constants/topic'
 import { BadRequestError } from '~/core/error.response'
-import { Token } from '~/entities/token.entity'
 import { Topic } from '~/entities/topic.entity'
 import { Word } from '~/entities/word.entity'
 import { unGetData, unGetDataArray } from '~/utils'
@@ -77,36 +76,39 @@ class TopicRepository {
     unGetFields = ['deletedAt', 'createdAt', 'updatedAt'],
     relations
   }: {
-    where: FindOptionsWhere<Token> | FindOptionsWhere<Token>[]
+    where: FindOptionsWhere<Topic> | FindOptionsWhere<Topic>[]
     unGetFields?: string[]
     relations?: string[]
   }) {
-    const foundUser = await this.topicRepo.findOne({
+    const foundTopic = await this.topicRepo.findOne({
       where,
       relations
     })
 
-    if (!foundUser) return null
+    if (!foundTopic) return null
 
-    return unGetData({ fields: unGetFields, object: foundUser })
+    return unGetData({ fields: unGetFields, object: foundTopic })
   }
 
   async findAll({
     limit,
     page,
     where,
-    unGetFields
+    unGetFields = ['createdAt', 'updatedAt', 'deletedAt'],
+    sort
   }: {
     limit: number
     page: number
-    where?: FindOptionsWhere<Word>
+    where?: FindOptionsWhere<Topic>
     unGetFields?: string[]
+    sort?: FindOptionsOrder<Topic>
   }) {
     const skip = (page - 1) * limit
     const [foundTopics, total] = await this.topicRepo.findAndCount({
       where,
       skip,
-      take: limit
+      take: limit,
+      order: sort
     })
 
     if (!foundTopics || foundTopics.length === 0) return null

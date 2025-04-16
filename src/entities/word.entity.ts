@@ -135,4 +135,15 @@ export class Word {
 
     return word
   }
+
+  static allowSortList = [
+    'id',
+    'content',
+    'pronunciation',
+    'position',
+    'meaning',
+    'rank',
+    'example',
+    'translateExample'
+  ]
 }

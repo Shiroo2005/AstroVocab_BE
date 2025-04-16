@@ -8,9 +8,10 @@ import {
   restoreWordById,
   updateWordController
 } from '~/controllers/word.controller'
+import { Word } from '~/entities/word.entity'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
-import { checkIdParamMiddleware, checkQueryMiddleware } from '~/middlewares/common.middlewares'
+import { checkIdParamMiddleware, checkQueryMiddleware, parseSort } from '~/middlewares/common.middlewares'
 import { createWordValidation } from '~/middlewares/word/createWord.middlewares'
 import { updateWordValidation } from '~/middlewares/word/updateWord.middlewares'
 import { wrapRequestHandler } from '~/utils/handler'
@@ -33,9 +34,26 @@ wordRouter.get('/:id', checkIdParamMiddleware({}), wrapRequestHandler(getWord))
  * @method : GET
  * @path : /
  * @header : Authorization
- * @query : { page?: number, limit?: number}
+ * @query : 
+ * { 
+ *  page?: number, 
+ *  limit?: number
+*   content?: string
+    pronunciation?: string
+    meaning?: string
+    position?: WordPosition
+    rank?: WordRank
+    example?: string
+    translateExample?: string
+    sort?: FindOptionsOrder<Word>
+ * }
  */
-wordRouter.get('/', checkQueryMiddleware({ numbericFields: ['page', 'limit'] }), wrapRequestHandler(getAllWords))
+wordRouter.get(
+  '/',
+  checkQueryMiddleware(),
+  wrapRequestHandler(parseSort({ allowSortList: Word.allowSortList })),
+  wrapRequestHandler(getAllWords)
+)
 
 // POST
 /**

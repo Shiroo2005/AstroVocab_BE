@@ -1,11 +1,15 @@
+import { Like } from 'typeorm'
 import { BadRequestError } from '~/core/error.response'
-import { CreateWordBodyReq } from '~/dto/req/word/createWordBody.req'
+import { WordBody } from '~/dto/req/word/createWordBody.req'
 import { UpdateWordBodyReq } from '~/dto/req/word/updateWordBody.req'
+import { wordQueryReq } from '~/dto/req/word/wordQuery.req'
+import { DataWithPagination } from '~/dto/res/pagination.res'
 import { Word } from '~/entities/word.entity'
 import { wordRepository } from '~/repositories/word.repository'
+import { buildFilterLike } from './query.service'
 
 class WordService {
-  createWords = async (words: CreateWordBodyReq[]) => {
+  createWords = async (words: WordBody[]) => {
     if (!words || !Array.isArray(words)) throw new BadRequestError('Request body invalid format!')
 
     const _words = words.map((word) => Word.create(word))
@@ -45,27 +49,46 @@ class WordService {
     return foundWord || {}
   }
 
-  getAllWords = async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
-    const result = await wordRepository.findAll({
-      limit,
-      page
+  getAllWords = async ({
+    page = 1,
+    limit = 10,
+    content,
+    example,
+    meaning,
+    position,
+    pronunciation,
+    rank,
+    translateExample,
+    sort
+  }: wordQueryReq) => {
+    //build where condition
+    const where = buildFilterLike({
+      likeFields: {
+        content,
+        example,
+        meaning,
+        position,
+        pronunciation,
+        rank,
+        translateExample
+      }
     })
 
-    if (!result) {
-      return {
-        foundWords: [],
-        page,
-        limit,
-        total: 0
-      }
-    }
-    const { foundWords, total } = result
-    return {
-      foundWords,
-      page,
+    const result = await wordRepository.findAll({
       limit,
-      total
-    }
+      page,
+      where,
+      order: sort,
+      unGetFields: ['createdAt', 'deletedAt', 'updatedAt']
+    })
+
+    const { foundWords, total } = result || { foundWords: [], total: 0 }
+    return new DataWithPagination({
+      data: foundWords,
+      limit,
+      page,
+      totalElements: total
+    })
   }
 
   deleteWordById = async ({ id }: { id: number }) => {

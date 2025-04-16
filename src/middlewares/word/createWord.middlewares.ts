@@ -8,19 +8,20 @@ import { BadRequestError } from '~/core/error.response'
 export const createWordValidation = validateSchema(
   checkSchema(
     {
-      '*.content': {
+      words: {},
+      'words.*.content': {
         trim: true,
         ...isRequired('content'),
         ...isString('content'),
         ...isLength({ fieldName: 'content', min: 1, max: 255 })
       },
-      '*.pronunciation': {
+      'words.*.pronunciation': {
         trim: true,
         ...isRequired('pronunciation'),
         ...isString('pronunciation'),
         ...isLength({ fieldName: 'pronunciation', min: 1, max: 255 })
       },
-      '*.position': {
+      'words.*.position': {
         optional: true,
         custom: {
           options: (value) => {
@@ -30,25 +31,25 @@ export const createWordValidation = validateSchema(
           }
         }
       },
-      '*.meaning': {
+      'words.*.meaning': {
         trim: true,
         ...isRequired('meaning'),
         ...isString('meaning'),
         ...isLength({ fieldName: 'meaning', min: 1, max: 255 })
       },
-      '*.audio': {
+      'words.*.audio': {
         trim: true,
         optional: true,
         ...isString('audio'),
         ...isLength({ fieldName: 'audio', min: 1, max: 255 })
       },
-      '*.image': {
+      'words.*.image': {
         trim: true,
         optional: true,
         ...isString('image'),
         ...isLength({ fieldName: 'image', min: 1, max: 255 })
       },
-      '*.rank': {
+      'words.*.rank': {
         optional: true,
         custom: {
           options: (value) => {
@@ -57,13 +58,13 @@ export const createWordValidation = validateSchema(
           }
         }
       },
-      '*.example': {
+      'words.*.example': {
         trim: true,
         optional: true,
         ...isString('example'),
         ...isLength({ fieldName: 'example', min: 1, max: 255 })
       },
-      '*.translateExample': {
+      'words.*.translateExample': {
         trim: true,
         optional: true,
         ...isString('translate example'),

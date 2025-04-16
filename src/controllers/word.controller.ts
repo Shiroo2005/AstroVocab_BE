@@ -5,10 +5,10 @@ import { CreateWordBodyReq } from '~/dto/req/word/createWordBody.req'
 import { UpdateWordBodyReq } from '~/dto/req/word/updateWordBody.req'
 import { wordService } from '~/services/word.service'
 
-export const createWordController = async (req: Request<ParamsDictionary, any, CreateWordBodyReq[]>, res: Response) => {
+export const createWordController = async (req: Request<ParamsDictionary, any, CreateWordBodyReq>, res: Response) => {
   return new CREATED({
     message: 'Create word successful!',
-    metaData: await wordService.createWords(req.body)
+    metaData: await wordService.createWords(req.body.words)
   }).send(res)
 }
 
@@ -33,7 +33,7 @@ export const getWord = async (req: Request<ParamsDictionary, any, any>, res: Res
 export const getAllWords = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
   return new SuccessResponse({
     message: 'Get word by id successful!',
-    metaData: await wordService.getAllWords(req.query)
+    metaData: await wordService.getAllWords({ ...req.query, ...req.parseQueryPagination, sort: req.sortParsed })
   }).send(res)
 }
 

@@ -2,7 +2,7 @@ import { isEmpty, toNumber } from 'lodash'
 import { Like } from 'typeorm'
 import { UserStatus } from '~/constants/userStatus'
 import { CreateUserBodyReq } from '~/dto/req/user/createUserBody.req'
-import { findUserQueryReq } from '~/dto/req/user/findUserQuery.req'
+import { userQueryReq } from '~/dto/req/user/userQuery.req'
 import { UpdateUserBodyReq } from '~/dto/req/user/updateUserBody.req'
 import { DataWithPagination } from '~/dto/res/pagination.res'
 import { Role } from '~/entities/role.entity'
@@ -52,16 +52,7 @@ class UserService {
     return foundUser
   }
 
-  getAllUsers = async ({
-    page = 1,
-    limit = 10,
-    email,
-    fullName,
-    roleName,
-    sort,
-    status,
-    username
-  }: findUserQueryReq) => {
+  getAllUsers = async ({ page = 1, limit = 10, email, fullName, roleName, sort, status, username }: userQueryReq) => {
     //parse page
     page = toNumber(page)
     limit = toNumber(limit)
@@ -92,13 +83,7 @@ class UserService {
     return restoreUser
   }
 
-  buildUserFilters = ({
-    email = '',
-    fullName = '',
-    username = '',
-    roleName = '',
-    status = UserStatus.NOT_VERIFIED
-  }: findUserQueryReq) => {
+  buildUserFilters = ({ email, fullName, username, roleName, status }: userQueryReq) => {
     const filters: any = {}
 
     if (email) filters.email = Like(`%${email}%`)
