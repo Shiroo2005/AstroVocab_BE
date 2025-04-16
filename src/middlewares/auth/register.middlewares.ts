@@ -21,8 +21,7 @@ export const registerValidation = validateSchema(
         ...isEmail,
         custom: {
           options: async (value, { req }) => {
-            const foundUser = (await userRepository.findOne({
-              where: [{ email: value }, { username: req.body.username }],
+            const foundUser = (await userRepository.findOne([{ email: value }, { username: req.body.username }], {
               withDeleted: true
             })) as User | null
 

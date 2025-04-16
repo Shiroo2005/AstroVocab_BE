@@ -25,7 +25,7 @@ class AuthService {
     const token = new Token()
     token.refreshToken = refreshToken
     token.user = { id: userId } as User
-    await tokenRepository.saveOne(token)
+    await tokenRepository.save(token)
 
     return {
       accessToken,
@@ -34,10 +34,10 @@ class AuthService {
   }
 
   register = async ({ email, username, fullName, password }: RegisterBodyReq) => {
-    const userRole = (await roleRepository.findOne({ where: { name: RoleName.USER } })) as Role | null
+    const userRole = (await roleRepository.findOne({ name: RoleName.USER })) as Role | null
 
     if (!userRole) throw new BadRequestError('Role user not exist!')
-    const createdUser = await userRepository.saveOne({
+    const createdUser = await userRepository.save({
       email,
       username,
       password,
@@ -50,7 +50,7 @@ class AuthService {
 
   logout = async ({ refreshToken }: LogoutBodyReq) => {
     // delete refresh token in db
-    const result = await tokenRepository.hardDelete({ conditions: { refreshToken } })
+    const result = await tokenRepository.delete({ refreshToken })
 
     return result
   }
@@ -63,17 +63,28 @@ class AuthService {
     ])
 
     // save refreshToken
-    await tokenRepository.saveOne({ user: { id: userId } as User, refreshToken })
+    await tokenRepository.save({ user: { id: userId } as User, refreshToken })
 
     return { accessToken, refreshToken }
   }
 
   getAccount = async ({ userId }: TokenPayload) => {
-    const foundUser = await userRepository.findOne({
-      where: { id: userId },
-      relations: ['role'],
-      unGetFields: ['password']
-    })
+    const foundUser = await userRepository.findOne(
+      { id: userId },
+      {
+        relations: ['role'],
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+          email: true,
+          fullName: true,
+          role: {
+            name: true
+          }
+        }
+      }
+    )
 
     if (!foundUser) return {}
     return foundUser

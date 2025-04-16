@@ -16,8 +16,7 @@ export const loginValidation = validateSchema(
         ...isRequired('Username'),
         custom: {
           options: async (value, { req }) => {
-            const foundUser = (await userRepository.findOne({
-              where: [{ email: value }, { username: value }],
+            const foundUser = (await userRepository.findOne([{ email: value }, { username: value }], {
               relations: ['role']
             })) as User
 

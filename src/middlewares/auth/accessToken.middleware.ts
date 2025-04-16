@@ -23,12 +23,12 @@ export const accessTokenValidation = validateSchema(
 
               // set User
               const { userId } = decodedAuthorization
-              const foundUser = await userRepository.findOne({
-                where: {
-                  id: userId
-                },
-                relations: ['role', 'role.permissions']
-              })
+              const foundUser = await userRepository.findOne(
+                { id: userId },
+                {
+                  relations: ['role', 'role.permissions']
+                }
+              )
 
               if (foundUser) {
                 ;(req as Request).user = foundUser as User

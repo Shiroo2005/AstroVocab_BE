@@ -6,9 +6,6 @@ import { isValidNumber, toNumberWithDefaultValue } from '~/utils'
 
 export const checkIdParamMiddleware = (options?: { id?: string }) => {
   const id = options?.id || 'id'
-
-  console.log(id)
-
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.params[id] || !isValidNumber(req.params[id])) {
       throw new BadRequestError('Id invalid!')
@@ -45,8 +42,6 @@ export const checkQueryMiddleware = ({
     if (numbericFields) {
       numbericFields.forEach((field) => {
         if (req.query[field] && !isValidNumber(req.query[field] as string)) {
-          console.log(field)
-
           throw new BadRequestError(`${field} must be a numberic string`)
         }
       })
@@ -58,12 +53,7 @@ export const checkQueryMiddleware = ({
     }
 
     //check max limit & max page
-    if ((req.parseQueryPagination.limit as number) > maxLimit)
-      throw new BadRequestError(`Limit value is not greater than ${maxLimit}`)
-
-    console.log(req.parseQueryPagination)
-
-    next()
+    if ((req.parseQueryPagination.limit as number) > maxLimit) next()
   }
 }
 

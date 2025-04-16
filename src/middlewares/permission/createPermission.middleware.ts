@@ -61,10 +61,8 @@ export const createPermissionValidation = validateSchema(
               throw new BadRequestError('Field action or resource not exist in Enum Action, Resource!')
 
             const foundPermission = await permissionRepository.findOne({
-              where: {
-                resource,
-                action
-              }
+              resource,
+              action
             })
 
             if (foundPermission) throw new BadRequestError('Permission with this action and resource already existing!')

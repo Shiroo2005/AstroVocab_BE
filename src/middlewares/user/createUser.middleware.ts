@@ -21,9 +21,7 @@ export const createUserValidation = validateSchema(
         ...isEmail,
         custom: {
           options: async (value, { req }) => {
-            const foundUser = await userRepository.findOne({
-              where: [{ email: value }, { username: req.body.username }]
-            })
+            const foundUser = await userRepository.findOne([{ email: value }, { username: req.body.username }])
 
             if (foundUser) {
               throw new BadRequestError('Email or username already taken!')

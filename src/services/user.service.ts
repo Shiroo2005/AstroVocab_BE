@@ -6,7 +6,6 @@ import { userQueryReq } from '~/dto/req/user/userQuery.req'
 import { UpdateUserBodyReq } from '~/dto/req/user/updateUserBody.req'
 import { DataWithPagination } from '~/dto/res/pagination.res'
 import { Role } from '~/entities/role.entity'
-import { User } from '~/entities/user.entity'
 import { userRepository } from '~/repositories/user.repository'
 import { unGetData } from '~/utils'
 
@@ -15,7 +14,7 @@ class UserService {
     //save user in db
     const role = { id: roleId } as Role
 
-    const createdUser = await userRepository.saveOne({
+    const createdUser = await userRepository.save({
       email,
       username,
       avatar,
@@ -28,24 +27,34 @@ class UserService {
   }
 
   updateUser = async (id: number, { email, username, fullName, roleId, avatar, status }: UpdateUserBodyReq) => {
-    const updatedUser = await userRepository.updateOne({
-      id,
+    const updatedUser = await userRepository.update(id, {
       email,
       username,
       fullName,
       avatar,
       status,
-      roleId
+      role: { id: roleId } as Role
     })
 
     return unGetData({ fields: ['password'], object: updatedUser })
   }
 
   getUserById = async (id: number) => {
-    const foundUser = await userRepository.findOne({
-      where: { id },
-      unGetFields: ['password', 'deletedAt', 'createdAt', 'updatedAt']
-    })
+    const foundUser = await userRepository.findOne(
+      { id },
+      {
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+          email: true,
+          fullName: true,
+          role: {
+            name: true
+          }
+        }
+      }
+    )
 
     if (!foundUser) return {}
 
@@ -68,18 +77,18 @@ class UserService {
       relations: ['role'],
       order: sort
     })
-    const { foundUsers, total } = result || { foundUsers: [], total: 0 }
-    return new DataWithPagination({ data: foundUsers, limit, page, totalElements: total })
+    const { data, total } = result || { data: [], total: 0 }
+    return new DataWithPagination({ data, limit, page, totalElements: total })
   }
 
   deleteUserById = async ({ id }: { id: number }) => {
     //soft delete
-    const deletedUser = await userRepository.softDelete(id)
+    const deletedUser = await userRepository.softDelete({ id })
     return deletedUser
   }
 
   restoreUserById = async ({ id }: { id: number }) => {
-    const restoreUser = await userRepository.restore(id)
+    const restoreUser = await userRepository.restore({ id })
     return restoreUser
   }
 

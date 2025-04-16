@@ -19,10 +19,8 @@ export const updatePermissionValidation = validateSchema(
         custom: {
           options: async (value, { req }) => {
             const foundPermission = (await permissionRepository.findOne({
-              where: {
-                action: (value as Permission).action,
-                resource: (value as Permission).resource
-              }
+              action: (value as Permission).action,
+              resource: (value as Permission).resource
             })) as Permission | null
 
             const id = (req as Request).idParams

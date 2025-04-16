@@ -1,4 +1,3 @@
-import { Like } from 'typeorm'
 import { BadRequestError } from '~/core/error.response'
 import { WordBody } from '~/dto/req/word/createWordBody.req'
 import { UpdateWordBodyReq } from '~/dto/req/word/updateWordBody.req'
@@ -14,7 +13,7 @@ class WordService {
 
     const _words = words.map((word) => Word.create(word))
 
-    const result = await wordRepository.saveAll(_words)
+    const result = await wordRepository.save(_words)
 
     return result
   }
@@ -23,8 +22,7 @@ class WordService {
     id: number,
     { content, meaning, pronunciation, audio, example, image, position, rank, translateExample }: UpdateWordBodyReq
   ) => {
-    const updateWord = await wordRepository.updateOne({
-      id,
+    const updateWord = await wordRepository.update(id, {
       content,
       meaning,
       pronunciation,
@@ -41,9 +39,7 @@ class WordService {
 
   getWordById = async ({ id }: { id: number }) => {
     const foundWord = await wordRepository.findOne({
-      where: {
-        id
-      }
+      id
     })
 
     return foundWord || {}
@@ -79,12 +75,23 @@ class WordService {
       page,
       where,
       order: sort,
-      unGetFields: ['createdAt', 'deletedAt', 'updatedAt']
+      select: {
+        id: true,
+        audio: true,
+        content: true,
+        example: true,
+        image: true,
+        meaning: true,
+        position: true,
+        pronunciation: true,
+        rank: true,
+        translateExample: true
+      }
     })
 
-    const { foundWords, total } = result || { foundWords: [], total: 0 }
+    const { data, total } = result || { data: [], total: 0 }
     return new DataWithPagination({
-      data: foundWords,
+      data,
       limit,
       page,
       totalElements: total
@@ -94,16 +101,14 @@ class WordService {
   deleteWordById = async ({ id }: { id: number }) => {
     //soft delete
     const result = await wordRepository.softDelete({
-      where: {
-        id
-      }
+      id
     })
 
     return result
   }
 
   restoreWordById = async ({ id }: { id: number }) => {
-    const restoreWord = await wordRepository.restore(id)
+    const restoreWord = await wordRepository.restore({ id })
     return restoreWord
   }
 }

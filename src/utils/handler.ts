@@ -39,7 +39,6 @@ export const errorHandler: ErrorRequestHandler = (
 
   const statusCode = err instanceof ErrorResponse ? err.statusCode : status.INTERNAL_SERVER_ERROR
   const message = err.message || 'Internal Server Error'
-  console.log(err.message)
   res.status(statusCode).json({
     status: 'Error',
     code: statusCode,

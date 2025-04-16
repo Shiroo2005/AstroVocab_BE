@@ -7,7 +7,7 @@ import { permissionRepository } from '~/repositories/permission.repository'
 class PermissionService {
   createPermission = async (permission: CreatePermissionBodyReq) => {
     // create permission
-    const createdPermission = await permissionRepository.saveOne({
+    const createdPermission = await permissionRepository.save({
       action: permission.action as Action,
       resource: permission.resource as Resource
     })
@@ -16,18 +16,18 @@ class PermissionService {
   }
 
   updatePermission = async ({ id, action, resource }: { id: number; resource: Resource; action: Action }) => {
-    const foundPermission = (await permissionRepository.findOne({ where: { id } })) as Permission | null
+    const foundPermission = (await permissionRepository.findOne({ id })) as Permission | null
     if (!foundPermission) throw new BadRequestError('Permission not found!')
 
     // set data
     foundPermission.resource = resource
     foundPermission.action = action
 
-    return await permissionRepository.saveOne(foundPermission)
+    return await permissionRepository.save(foundPermission)
   }
 
   deletePermission = async (id: number) => {
-    return await permissionRepository.softDelete({ where: { id } })
+    return await permissionRepository.softDelete({ id })
   }
 }
 

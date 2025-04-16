@@ -13,9 +13,9 @@ import { topicSeedData } from './data/topic.data'
 import { courseSeedData } from './data/course.data'
 
 async function seedUsers() {
-  const [users, count] = await userRepository.count({}) // Kiểm tra xem có dữ liệu chưa
+  const count = await userRepository.count({}) // Kiểm tra xem có dữ liệu chưa
 
-  const adminRole = (await roleRepository.findOne({ where: { name: 'admin' } })) as Role
+  const adminRole = (await roleRepository.findOne({ name: 'admin' })) as Role
 
   if (count === 0) {
     const data = [
@@ -36,7 +36,7 @@ async function seedUsers() {
       ...createRandomUser()
     ]
 
-    await userRepository.userRepo.save(data)
+    await userRepository.save(data)
 
     console.log('✅ Seeded Users successfully!')
   } else {
@@ -45,35 +45,35 @@ async function seedUsers() {
 }
 
 async function seedWords() {
-  const count = await wordRepository.wordRepo.count()
+  const count = await wordRepository.count()
   if (count > 0) {
     console.log('ℹ️ Words already exist, skipping seed...')
     return
   }
 
-  await wordRepository.saveAll(wordSeedData)
+  await wordRepository.save(wordSeedData)
   console.log('✅ Seeded Words successfully!')
 }
 
 async function seedTopics() {
-  const count = await topicRepository.topicRepo.count()
+  const count = await topicRepository.count()
   if (count > 0) {
     console.log('ℹ️ Topics already exist, skipping seed...')
     return
   }
 
-  await topicRepository.saveAll(topicSeedData)
+  await topicRepository.save(topicSeedData)
   console.log('✅ Seeded Topics successfully!')
 }
 
 async function seedCourses() {
-  const count = await courseRepository.courseRepo.count()
+  const count = await courseRepository.count()
   if (count > 0) {
     console.log('ℹ️ Courses already exist, skipping seed...')
     return
   }
 
-  await courseRepository.saveAll(courseSeedData)
+  await courseRepository.save(courseSeedData)
   console.log('✅ Seeded Courses successfully!')
 }
 
@@ -84,7 +84,7 @@ const seedAccessControl = async (
     action: string
   }[]
 ) => {
-  const [role, count] = await roleRepository.count({})
+  const count = await roleRepository.count({})
   if (count === 0) {
     const roleNames = Array.from(new Set(grantList.map(({ role }) => role)))
     const permissions = grantList.map(({ resource, action }) => {
@@ -102,7 +102,7 @@ const seedAccessControl = async (
     })
 
     // Lưu Role vào DB
-    await roleRepository.roleRepo.save(roles)
+    await roleRepository.save(roles)
 
     console.log('✅ Seeded Access control successfully!')
   } else {
