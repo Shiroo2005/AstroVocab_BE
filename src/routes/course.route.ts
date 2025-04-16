@@ -37,6 +37,11 @@ courseRouter.get(
  * @query : {
  *  page?: number
  *  limit?: number
+    title?: string
+    description?: string
+    target?: string
+    level?: string
+    sort?: FindOptionsOrder<Course>
  *  }
  */
 courseRouter.get(

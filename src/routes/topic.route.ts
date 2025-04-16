@@ -39,6 +39,10 @@ topicRouter.get('/:id', checkIdParamMiddleware({}), wrapRequestHandler(getTopicC
  * @query : {
  *        page?:number,
  *        limit?:number
+          title?: string
+          description?: string
+          type?: TopicType
+          sort?: FindOptionsOrder<Topic>
  * }
  */
 topicRouter.get(

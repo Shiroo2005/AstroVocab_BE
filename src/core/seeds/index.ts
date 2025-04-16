@@ -1,26 +1,19 @@
 import { getGrantList } from '~/config/access.config'
 import { Action, Resource, RoleName } from '~/constants/access'
+import { CourseLevel } from '~/constants/couse'
+import { TopicType } from '~/constants/topic'
+import { WordPosition, WordRank } from '~/constants/word'
+import { Course } from '~/entities/course.entity'
+import { CourseTopic } from '~/entities/courseTopic.entity'
 import { Permission } from '~/entities/permission.entity'
 import { Role } from '~/entities/role.entity'
+import { Topic } from '~/entities/topic.entity'
+import { Word } from '~/entities/word.entity'
+import { courseRepository } from '~/repositories/course.repository'
 import { roleRepository } from '~/repositories/role.repository'
+import { topicRepository } from '~/repositories/topic.repository'
 import { userRepository } from '~/repositories/user.repository'
-import { roleService } from '~/services/role.service'
-
-async function seedRoles() {
-  const [roles, count] = await roleRepository.count({}) // Kiểm tra xem có dữ liệu chưa
-  if (count === 0) {
-    const createRoleBody = [
-      { name: RoleName.ADMIN, description: 'Administrator role', permissionIds: [1, 2, 3, 4] },
-      { name: RoleName.USER, description: 'Default user role', permissionIds: [1, 2] }
-    ]
-    for (const data of createRoleBody) {
-      await roleService.createRole(data)
-    }
-    console.log('✅ Seeded Roles successfully!')
-  } else {
-    console.log('ℹ️ Roles already exist, skipping seed...')
-  }
-}
+import { wordRepository } from '~/repositories/word.repository'
 
 async function seedUsers() {
   const [users, count] = await userRepository.count({}) // Kiểm tra xem có dữ liệu chưa
@@ -54,6 +47,89 @@ async function seedUsers() {
   } else {
     console.log('ℹ️ Users already exist, skipping seed...')
   }
+}
+
+async function seedWords() {
+  const count = await wordRepository.wordRepo.count()
+  if (count > 0) {
+    console.log('ℹ️ Words already exist, skipping seed...')
+    return
+  }
+
+  const sampleWords = Array.from({ length: 10 }, (_, i) =>
+    Word.create({
+      content: `word${i + 1}`,
+      pronunciation: `/wɜːd${i + 1}/`,
+      meaning: `Nghĩa của từ word${i + 1}`,
+      position: WordPosition.NOUN,
+      rank: WordRank.A1,
+      example: `This is word${i + 1} in a sentence.`,
+      translateExample: `Đây là ví dụ với word${i + 1}.`
+    })
+  )
+
+  await wordRepository.saveAll(sampleWords)
+  console.log('✅ Seeded 10 Words successfully!')
+}
+
+async function seedTopics() {
+  const count = await topicRepository.topicRepo.count()
+  if (count > 0) {
+    console.log('ℹ️ Topics already exist, skipping seed...')
+    return
+  }
+
+  const allWords = await wordRepository.wordRepo.find()
+  const topics = Array.from({ length: 10 }, (_, i) => {
+    // Gán ngẫu nhiên 2–3 từ cho mỗi topic
+    const randomWords = allWords.slice(i % 5, (i % 5) + 3)
+
+    return Topic.create({
+      title: `Topic ${i + 1}`,
+      description: `Mô tả của chủ đề ${i + 1}`,
+      type: TopicType.FREE,
+      words: randomWords
+    })
+  })
+
+  await topicRepository.saveAll(topics)
+  console.log('✅ Seeded 10 Topics successfully!')
+}
+
+async function seedCourses() {
+  const count = await courseRepository.courseRepo.count()
+  if (count > 0) {
+    console.log('ℹ️ Courses already exist, skipping seed...')
+    return
+  }
+
+  const topics = await topicRepository.topicRepo.find()
+
+  const courses: Course[] = []
+
+  for (let i = 0; i < 10; i++) {
+    const selectedTopics = topics.slice(i % 5, (i % 5) + 2)
+
+    const courseTopics: CourseTopic[] = selectedTopics.map((topic, idx) => {
+      const ct = new CourseTopic()
+      ct.topic = topic
+      ct.displayOrder = idx + 1
+      return ct
+    })
+
+    const course = Course.create({
+      title: `Course ${i + 1}`,
+      description: `Mô tả khoá học số ${i + 1}`,
+      target: 'Beginner learners',
+      level: CourseLevel.BEGINNER,
+      courseTopics
+    })
+
+    courses.push(course)
+  }
+
+  await courseRepository.saveAll(courses)
+  console.log('✅ Seeded 10 Courses successfully!')
 }
 
 const seedAccessControl = async (
@@ -93,4 +169,10 @@ export async function seedData() {
   await seedAccessControl(getGrantList())
   // await seedRoles()
   await seedUsers()
+
+  await seedWords()
+
+  await seedTopics()
+
+  await seedCourses()
 }

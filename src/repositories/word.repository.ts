@@ -14,6 +14,7 @@ class WordRepository {
   }
 
   private async init() {
+    const { DatabaseService } = await import('~/services/database.service.js')
     this.wordRepo = await DatabaseService.getInstance().getRepository(Word)
   }
 

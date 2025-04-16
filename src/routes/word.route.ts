@@ -34,7 +34,19 @@ wordRouter.get('/:id', checkIdParamMiddleware({}), wrapRequestHandler(getWord))
  * @method : GET
  * @path : /
  * @header : Authorization
- * @query : { page?: number, limit?: number}
+ * @query : 
+ * { 
+ *  page?: number, 
+ *  limit?: number
+*   content?: string
+    pronunciation?: string
+    meaning?: string
+    position?: WordPosition
+    rank?: WordRank
+    example?: string
+    translateExample?: string
+    sort?: FindOptionsOrder<Word>
+ * }
  */
 wordRouter.get(
   '/',
