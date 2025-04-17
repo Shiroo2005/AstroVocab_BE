@@ -1,3 +1,4 @@
+import { error } from 'console'
 import _, { toNumber } from 'lodash'
 
 export const isValidNumber = (num: string) => {
@@ -11,7 +12,8 @@ export const isValidNumber = (num: string) => {
 export const toNumberWithDefaultValue = (num: any, defaultValue: number) => {
   if (!num) return defaultValue
   try {
-    return toNumber(num)
+    const value = toNumber(num)
+    if (isNaN(value)) throw new Error('Fail to convert')
   } catch (error) {
     return defaultValue
   }

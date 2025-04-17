@@ -17,9 +17,6 @@ export class Token {
   @CreateDateColumn()
   createdAt?: Date
 
-  @UpdateDateColumn()
-  updatedAt?: Date
-
   static create = ({ refreshToken, user }: Token) => {
     const newToken = new Token()
     newToken.refreshToken = refreshToken

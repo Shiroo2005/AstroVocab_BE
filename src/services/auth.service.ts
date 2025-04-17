@@ -12,6 +12,7 @@ import { BadRequestError } from '~/core/error.response'
 import { tokenRepository } from '~/repositories/token.repository'
 import { roleRepository } from '~/repositories/role.repository'
 import { userRepository } from '~/repositories/user.repository'
+import { sendVerifyEmail } from './email.service'
 
 class AuthService {
   login = async ({ userId, status, role }: { userId: number; status: UserStatus; role: Role }) => {
@@ -27,23 +28,36 @@ class AuthService {
     token.user = { id: userId } as User
     await tokenRepository.save(token)
 
-    return {
-      accessToken,
-      refreshToken
-    }
+    return { accessToken, refreshToken }
   }
 
   register = async ({ email, username, fullName, password }: RegisterBodyReq) => {
+    /**
+     * @Process Register
+     * @B1 : Create user and save in db
+     * @B2 : Send verify email by resend with email service
+     */
+
+    //B1 create user with role USER
     const userRole = (await roleRepository.findOne({ name: RoleName.USER })) as Role | null
 
     if (!userRole) throw new BadRequestError('Role user not exist!')
-    const createdUser = await userRepository.save({
-      email,
-      username,
-      password,
-      fullName,
-      role: { id: userRole.id } as Role
+    const createdUser = (
+      await userRepository.save({ email, username, password, fullName, role: { id: userRole.id } as Role })
+    )[0]
+
+    //B2 send verify email
+    void sendVerifyEmail({
+      to: 'hmegxva@gmail.com',
+      template: 'welcome',
+      body: { name: createdUser.fullName, userId: createdUser.id as number }
     })
+      .catch((err) => {
+        console.error('Gửi email xác minh thất bại:', err)
+      })
+      .then(() => {
+        console.log(`Send verify email to userID: ${createdUser.id} successful `)
+      })
 
     return unGetData({ fields: ['password'], object: createdUser })
   }
@@ -73,16 +87,7 @@ class AuthService {
       { id: userId },
       {
         relations: ['role'],
-        select: {
-          id: true,
-          username: true,
-          avatar: true,
-          email: true,
-          fullName: true,
-          role: {
-            name: true
-          }
-        }
+        select: { id: true, username: true, avatar: true, email: true, fullName: true, role: { name: true } }
       }
     )
 
