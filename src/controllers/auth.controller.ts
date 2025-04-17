@@ -11,10 +11,16 @@ import { User } from '~/entities/user.entity'
 import { authService } from '~/services/auth.service'
 
 export const registerController = async (req: Request<ParamsDictionary, any, RegisterBodyReq>, res: Response) => {
-  return new CREATED({
-    message: 'Register successful!',
-    metaData: await authService.register(req.body)
-  }).send(res)
+  return new CREATED({ message: 'Register successful!', metaData: await authService.register(req.body) }).send(res)
+}
+
+export const sendVerificationEmailController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const user = req.user as User
+  await authService
+    .sendVerifyEmail({ email: user.email, name: user.fullName, userId: user.id as number })
+    .catch((err) => console.error('Error when send verify email', err))
+
+  return new SuccessResponse({ message: 'Send verification email successful!' }).send(res)
 }
 
 export const loginController = async (req: Request<ParamsDictionary, any, LoginBodyReq>, res: Response) => {

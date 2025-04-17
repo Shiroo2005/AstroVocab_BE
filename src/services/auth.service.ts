@@ -6,13 +6,16 @@ import { RegisterBodyReq } from '~/dto/req/auth/registerBody.req'
 import { Role } from '~/entities/role.entity'
 import { Token } from '~/entities/token.entity'
 import { User } from '~/entities/user.entity'
-import { unGetData } from '~/utils'
+import { toNumberWithDefaultValue, unGetData } from '~/utils'
 import { signAccessToken, signRefreshToken } from '~/utils/jwt'
 import { BadRequestError } from '~/core/error.response'
 import { tokenRepository } from '~/repositories/token.repository'
 import { roleRepository } from '~/repositories/role.repository'
 import { userRepository } from '~/repositories/user.repository'
 import { sendVerifyEmail } from './email.service'
+import { emailVerificationTokenRepository } from '~/repositories/emailVerificationToken.repository'
+import { EmailVerificationToken } from '~/entities/emailVerificationToken.entity'
+import { env } from 'process'
 
 class AuthService {
   login = async ({ userId, status, role }: { userId: number; status: UserStatus; role: Role }) => {
@@ -47,19 +50,16 @@ class AuthService {
     )[0]
 
     //B2 send verify email
-    void sendVerifyEmail({
-      to: 'hmegxva@gmail.com',
-      template: 'welcome',
-      body: { name: createdUser.fullName, userId: createdUser.id as number }
-    })
-      .catch((err) => {
-        console.error('Gửi email xác minh thất bại:', err)
-      })
-      .then(() => {
-        console.log(`Send verify email to userID: ${createdUser.id} successful `)
-      })
+    void this.sendVerifyEmail({ email, name: createdUser.fullName, userId: createdUser.id as number })
 
     return unGetData({ fields: ['password'], object: createdUser })
+  }
+
+  sendVerifyEmail = async ({ email, userId, name }: { email: string; userId: number; name: string }) => {
+    const token = await sendVerifyEmail({ to: email, template: 'welcome', body: { name, userId } })
+
+    const emailToken = { token, user: { id: userId } } as EmailVerificationToken
+    await emailVerificationTokenRepository.save(emailToken)
   }
 
   logout = async ({ refreshToken }: LogoutBodyReq) => {

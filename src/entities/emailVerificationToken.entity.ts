@@ -4,18 +4,15 @@ import { User } from './user.entity'
 @Entity()
 export class EmailVerificationToken {
   @PrimaryGeneratedColumn()
-  id: number
+  id?: number
 
-  @Column()
+  @Column({ type: 'varchar' })
   @Index({ unique: true })
   token: string
 
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User
 
-  @Column({ type: 'timestamp' })
-  expiresAt: Date
-
   @CreateDateColumn()
-  createdAt: Date
+  createdAt?: Date
 }

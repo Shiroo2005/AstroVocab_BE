@@ -7,9 +7,12 @@ import { userRouter } from './user.route'
 import { wordRouter } from './word.route'
 import { topicRouter } from './topic.route'
 import { courseRouter } from './course.route'
+import { emailRouter } from './email.route'
 const router = express.Router()
 
 router.use('/auth', authRouter)
+
+router.use('/email', emailRouter)
 
 router.use('/roles', roleRouter)
 

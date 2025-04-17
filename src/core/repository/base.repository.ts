@@ -5,11 +5,7 @@ export class BaseRepository<T extends ObjectLiteral> {
 
   async findOne(
     where: FindOptionsWhere<T> | FindOptionsWhere<T>[],
-    options?: {
-      relations?: string[]
-      withDeleted?: boolean
-      select?: FindOptionsSelect<T>
-    }
+    options?: { relations?: string[]; withDeleted?: boolean; select?: FindOptionsSelect<T> }
   ): Promise<T | null> {
     return await this.repo.findOne({
       where,
@@ -30,14 +26,7 @@ export class BaseRepository<T extends ObjectLiteral> {
     const { page = 1, limit = 10, where, order, relations, select } = options
     const skip = (page - 1) * limit
 
-    const [data, total] = await this.repo.findAndCount({
-      where,
-      order,
-      skip,
-      take: limit,
-      relations,
-      select
-    })
+    const [data, total] = await this.repo.findAndCount({ where, order, skip, take: limit, relations, select })
 
     return { data, total }
   }
@@ -63,7 +52,7 @@ export class BaseRepository<T extends ObjectLiteral> {
     return await this.repo.restore(where)
   }
 
-  async count(where?: FindOptionsWhere<T>) {
-    return await this.repo.count({ where })
+  async count(where?: FindOptionsWhere<T>, { withDeleted = false }: { withDeleted?: boolean } = {}) {
+    return await this.repo.count({ where, withDeleted })
   }
 }

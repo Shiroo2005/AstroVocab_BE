@@ -9,8 +9,9 @@ const resend = new Resend(env.RESEND_API_KEY)
 
 export const sendEmail = async ({ to, subject, template, variables = {} }: SendMailOptions) => {
   const html = await renderEmailTemplate(template, variables)
+  const fromEmail = `Vocab App <${process.env.FROM_EMAIL}>`
 
-  const { error } = await resend.emails.send({ from: 'Vocab App <onboarding@resend.dev>', to, subject, html })
+  const { error } = await resend.emails.send({ from: fromEmail, to, subject, html })
 
   if (error) throw error
 }
@@ -27,5 +28,6 @@ export const sendVerifyEmail = async ({
   // create link verify email
   const fe_url = env.FE_URL
   const verifyUrl = `${fe_url}/verify-email?token=${token}`
-  sendEmail({ to, subject, template, variables: { verifyUrl, name: body.name } })
+  await sendEmail({ to, subject, template, variables: { verifyUrl, name: body.name } })
+  return token
 }

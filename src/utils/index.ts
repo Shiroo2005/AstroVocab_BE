@@ -14,6 +14,7 @@ export const toNumberWithDefaultValue = (num: any, defaultValue: number) => {
   try {
     const value = toNumber(num)
     if (isNaN(value)) throw new Error('Fail to convert')
+    return value
   } catch (error) {
     return defaultValue
   }
