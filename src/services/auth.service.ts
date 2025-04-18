@@ -72,8 +72,8 @@ class AuthService {
   newToken = async ({ userId, exp, status, roleId }: TokenPayload) => {
     // recreate token
     const [accessToken, refreshToken] = await Promise.all([
-      signAccessToken({ userId: userId, status, roleId }),
-      signRefreshToken({ userId: userId, status, exp, roleId })
+      signAccessToken({ userId: userId, status: status as UserStatus, roleId: roleId as number }),
+      signRefreshToken({ userId: userId, status: status as UserStatus, exp, roleId: roleId as number })
     ])
 
     // save refreshToken
@@ -87,7 +87,15 @@ class AuthService {
       { id: userId },
       {
         relations: ['role'],
-        select: { id: true, username: true, avatar: true, email: true, fullName: true, role: { name: true } }
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+          email: true,
+          fullName: true,
+          role: { name: true },
+          status: true
+        }
       }
     )
 

@@ -14,14 +14,7 @@ class UserService {
     //save user in db
     const role = { id: roleId } as Role
 
-    const createdUser = await userRepository.save({
-      email,
-      username,
-      avatar,
-      fullName,
-      password,
-      role
-    })
+    const createdUser = await userRepository.save({ email, username, avatar, fullName, password, role })
 
     return unGetData({ fields: ['password'], object: createdUser })
   }
@@ -42,18 +35,7 @@ class UserService {
   getUserById = async (id: number) => {
     const foundUser = await userRepository.findOne(
       { id },
-      {
-        select: {
-          id: true,
-          username: true,
-          avatar: true,
-          email: true,
-          fullName: true,
-          role: {
-            name: true
-          }
-        }
-      }
+      { select: { id: true, username: true, avatar: true, email: true, fullName: true, role: { name: true } } }
     )
 
     if (!foundUser) return {}
@@ -70,13 +52,7 @@ class UserService {
     const where = this.buildUserFilters({ email, fullName, roleName, status, username })
 
     //find user with condition
-    const result = await userRepository.findAll({
-      limit,
-      page,
-      where,
-      relations: ['role'],
-      order: sort
-    })
+    const result = await userRepository.findAll({ limit, page, where, relations: ['role'], order: sort })
     const { data, total } = result || { data: [], total: 0 }
     return new DataWithPagination({ data, limit, page, totalElements: total })
   }
@@ -98,7 +74,7 @@ class UserService {
     if (email) filters.email = Like(`%${email}%`)
     if (fullName) filters.fullName = Like(`%${fullName}%`)
     if (username) filters.username = Like(`%${username}%`)
-    if (status) filters.status = Like(`%${status}%` as UserStatus)
+    if (status) filters.status = status
 
     if (roleName) {
       filters.role = { name: Like(`%${roleName}%`) }

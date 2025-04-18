@@ -62,3 +62,12 @@ export const accountController = async (req: Request<ParamsDictionary, any, any>
     metaData: await authService.getAccount(decodedAuthorization as TokenPayload)
   }).send(res)
 }
+
+export const verifyEmailTokenController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const { decodedEmailToken } = req as Request
+
+  return new SuccessResponse({
+    message: 'Verify email!',
+    metaData: await authService.getAccount(decodedEmailToken as TokenPayload)
+  }).send(res)
+}

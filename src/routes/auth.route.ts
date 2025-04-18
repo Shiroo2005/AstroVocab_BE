@@ -4,12 +4,14 @@ import {
   loginController,
   logoutController,
   refreshTokenController,
-  registerController
+  registerController,
+  verifyEmailTokenController
 } from '~/controllers/auth.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { loginValidation } from '~/middlewares/auth/login.middlewares'
 import { refreshTokenValidation } from '~/middlewares/auth/refreshToken.middleware'
 import { registerValidation } from '~/middlewares/auth/register.middlewares'
+import { verifyEmailTokenValidation } from '~/middlewares/auth/verifyEmailToken.middleware'
 import { wrapRequestHandler } from '~/utils/handler'
 const authRouter = express.Router()
 
@@ -55,6 +57,14 @@ authRouter.post('/login', loginValidation, wrapRequestHandler(loginController))
  * @header : Authorization
  */
 authRouter.post('/logout', accessTokenValidation, refreshTokenValidation, wrapRequestHandler(logoutController))
+
+/**
+ * @description : Verify email token
+ * @method : POST
+ * @path : /verify-email
+ * @body : {token}
+ */
+authRouter.post('/verify-email', verifyEmailTokenValidation, wrapRequestHandler(verifyEmailTokenController))
 
 // PUT
 

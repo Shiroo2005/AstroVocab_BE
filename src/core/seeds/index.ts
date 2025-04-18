@@ -11,6 +11,7 @@ import { createRandomUser } from './data/user.data'
 import { wordSeedData } from './data/word.data'
 import { topicSeedData } from './data/topic.data'
 import { courseSeedData } from './data/course.data'
+import { permissionRepository } from '~/repositories/permission.repository'
 
 async function seedUsers() {
   const count = await userRepository.count({}) // Kiểm tra xem có dữ liệu chưa
@@ -77,37 +78,45 @@ async function seedCourses() {
   console.log('✅ Seeded Courses successfully!')
 }
 
-const seedAccessControl = async (
-  grantList: {
-    role: string
-    resource: string
-    action: string
-  }[]
-) => {
-  const count = await roleRepository.count({})
-  if (count === 0) {
-    const roleNames = Array.from(new Set(grantList.map(({ role }) => role)))
-    const permissions = grantList.map(({ resource, action }) => {
-      return Permission.create({ resource: resource as Resource, action: action as Action })
-    })
-    const roles = roleNames.map((roleName) => {
-      const rolePermissions = permissions.filter((permission) =>
-        grantList.some(
-          (grant) =>
-            grant.role === roleName && grant.resource === permission.resource && grant.action === permission.action
-        )
-      )
-
-      return Role.create({ name: roleName, permissions: rolePermissions })
-    })
-
-    // Lưu Role vào DB
-    await roleRepository.save(roles)
-
-    console.log('✅ Seeded Access control successfully!')
-  } else {
+const seedAccessControl = async (grantList: { role: string; resource: string; action: string }[]) => {
+  const count = await roleRepository.count()
+  if (count > 0) {
     console.log('ℹ️ Access control already exist, skipping seed...')
+    return
   }
+
+  const roleNames = Array.from(new Set(grantList.map(({ role }) => role)))
+
+  // 1. Load all existing permissions
+  const existingPermissions = (await permissionRepository.findAll({})).data
+  const permissionMap = new Map<string, Permission>()
+
+  for (const p of existingPermissions) {
+    const key = `${p.resource}:${p.action}`
+    permissionMap.set(key, p)
+  }
+
+  // 2. Ensure all permissions in grantList exist in DB
+  for (const grant of grantList) {
+    const key = `${grant.resource}:${grant.action}`
+    if (!permissionMap.has(key)) {
+      const newPermission = Permission.create({ resource: grant.resource as Resource, action: grant.action as Action })
+      const createdPermission = await permissionRepository.save(newPermission)
+      permissionMap.set(key, createdPermission[0])
+    }
+  }
+
+  // 3. Create roles with permissions
+  const roles = roleNames.map((roleName) => {
+    const rolePermissions = grantList
+      .filter((g) => g.role === roleName)
+      .map((g) => permissionMap.get(`${g.resource}:${g.action}`)!)
+
+    return Role.create({ name: roleName, permissions: rolePermissions })
+  })
+
+  await roleRepository.save(roles)
+  console.log('✅ Seeded Access control successfully!')
 }
 
 export async function seedData() {
