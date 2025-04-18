@@ -1,3 +1,4 @@
+import { validate } from 'class-validator'
 import { FindOptionsWhere, FindOptionsOrder, FindOptionsSelect, ObjectLiteral, Repository, DeepPartial } from 'typeorm'
 
 export class BaseRepository<T extends ObjectLiteral> {
@@ -33,6 +34,10 @@ export class BaseRepository<T extends ObjectLiteral> {
 
   async save(entity: DeepPartial<T>[] | DeepPartial<T>) {
     const instance = Array.isArray(entity) ? this.repo.create(entity) : this.repo.create([entity])
+
+    //class validate
+    await validate(entity)
+
     return await this.repo.save(instance)
   }
 

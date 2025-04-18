@@ -1,6 +1,5 @@
-import { isEmpty, toNumber } from 'lodash'
+import { toNumber } from 'lodash'
 import { Like } from 'typeorm'
-import { UserStatus } from '~/constants/userStatus'
 import { CreateUserBodyReq } from '~/dto/req/user/createUserBody.req'
 import { userQueryReq } from '~/dto/req/user/userQuery.req'
 import { UpdateUserBodyReq } from '~/dto/req/user/updateUserBody.req'
@@ -35,7 +34,17 @@ class UserService {
   getUserById = async (id: number) => {
     const foundUser = await userRepository.findOne(
       { id },
-      { select: { id: true, username: true, avatar: true, email: true, fullName: true, role: { name: true } } }
+      {
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+          email: true,
+          fullName: true,
+          role: { name: true },
+          status: true
+        }
+      }
     )
 
     if (!foundUser) return {}
@@ -52,7 +61,23 @@ class UserService {
     const where = this.buildUserFilters({ email, fullName, roleName, status, username })
 
     //find user with condition
-    const result = await userRepository.findAll({ limit, page, where, relations: ['role'], order: sort })
+    const result = await userRepository.findAll({
+      limit,
+      page,
+      where,
+      relations: ['role'],
+      order: sort,
+      select: {
+        id: true,
+        username: true,
+        avatar: true,
+        email: true,
+        fullName: true,
+        role: { name: true },
+        status: true
+      }
+    })
+
     const { data, total } = result || { data: [], total: 0 }
     return new DataWithPagination({ data, limit, page, totalElements: total })
   }

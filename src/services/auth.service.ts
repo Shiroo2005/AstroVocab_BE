@@ -60,6 +60,8 @@ class AuthService {
 
     const emailToken = { token, user: { id: userId } } as EmailVerificationToken
     await emailVerificationTokenRepository.save(emailToken)
+
+    return token
   }
 
   logout = async ({ refreshToken }: LogoutBodyReq) => {
@@ -82,7 +84,7 @@ class AuthService {
     return { accessToken, refreshToken }
   }
 
-  getAccount = async ({ userId }: TokenPayload) => {
+  getAccount = async ({ userId }: { userId: number }) => {
     const foundUser = await userRepository.findOne(
       { id: userId },
       {
@@ -101,6 +103,14 @@ class AuthService {
 
     if (!foundUser) return {}
     return foundUser
+  }
+
+  verifyEmail = async ({ userId }: { userId: number }) => {
+    //set status user in db
+    await userRepository.update(userId, { status: UserStatus.VERIFIED })
+
+    //return info user before update
+    return this.getAccount({ userId: userId })
   }
 }
 

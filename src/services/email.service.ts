@@ -28,8 +28,7 @@ export const sendVerifyEmail = async ({
   // create link verify email
   const fe_url = env.FE_URL
   const verifyUrl = `${fe_url}/verify-email?token=${token}`
-  console.log(verifyUrl)
 
   await sendEmail({ to, subject, template, variables: { verifyUrl, name: body.name } })
-  return token
+  return verifyUrl
 }

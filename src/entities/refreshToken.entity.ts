@@ -7,7 +7,7 @@ export class RefreshToken {
   @PrimaryGeneratedColumn()
   id?: number
 
-  @Column({ type: 'varchar', length: 1024 })
+  @Column({ type: 'varchar', length: 512 })
   @IsNotEmpty()
   refreshToken!: string
 

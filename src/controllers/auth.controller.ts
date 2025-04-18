@@ -19,6 +19,10 @@ export const sendVerificationEmailController = async (req: Request<ParamsDiction
   await authService
     .sendVerifyEmail({ email: user.email, name: user.fullName, userId: user.id as number })
     .catch((err) => console.error('Error when send verify email', err))
+    .then((res) => {
+      console.log(`Send verification email successful with url = ${res}`)
+      return
+    })
 
   return new SuccessResponse({ message: 'Send verification email successful!' }).send(res)
 }
@@ -68,6 +72,6 @@ export const verifyEmailTokenController = async (req: Request<ParamsDictionary, 
 
   return new SuccessResponse({
     message: 'Verify email!',
-    metaData: await authService.getAccount(decodedEmailToken as TokenPayload)
+    metaData: await authService.verifyEmail(decodedEmailToken as TokenPayload)
   }).send(res)
 }
