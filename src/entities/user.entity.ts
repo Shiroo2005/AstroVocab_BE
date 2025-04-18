@@ -13,7 +13,7 @@ import {
 } from 'typeorm'
 import { UserStatus } from '~/constants/userStatus'
 import { Role } from './role.entity'
-import { Token } from './token.entity'
+import { RefreshToken } from './refreshToken.entity'
 import { hashData } from '~/utils/jwt'
 
 @Entity()
@@ -53,8 +53,8 @@ export class User {
   @ManyToOne(() => Role, (role) => role.users)
   role: Role
 
-  @OneToMany(() => Token, (token) => token.user)
-  tokens?: Token[]
+  @OneToMany(() => RefreshToken, (token) => token.user)
+  tokens?: RefreshToken[]
 
   @DeleteDateColumn()
   deletedAt?: Date
@@ -104,7 +104,7 @@ export class User {
       status?: UserStatus
       roleId?: number
       role?: Role
-      tokens?: Token[]
+      tokens?: RefreshToken[]
     }
   ) => {
     if (email) user.email = email

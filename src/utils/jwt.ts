@@ -68,10 +68,10 @@ export const signRefreshToken = async ({
 }
 
 export const signEmailVerificationToken = async ({ userId }: { userId: number }) => {
-  const DEFAULT_VERIFY_TOKEN_EXPIRE = 15 // 15m
-  const verifyTokenExpire = toNumberWithDefaultValue(env.VERIFICATION_EMAIL_EXPIRE_TIME, DEFAULT_VERIFY_TOKEN_EXPIRE)
-
-  const token = await signToken({ payload: { userId }, optional: { expiresIn: verifyTokenExpire } })
+  const token = await signToken({
+    payload: { userId },
+    optional: { expiresIn: process.env.VERIFICATION_EMAIL_EXPIRE_TIME }
+  })
   return token
 }
 

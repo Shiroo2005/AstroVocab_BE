@@ -4,7 +4,7 @@ import { TokenPayload } from '~/dto/common.dto'
 import { LogoutBodyReq } from '~/dto/req/auth/logoutBody.req'
 import { RegisterBodyReq } from '~/dto/req/auth/registerBody.req'
 import { Role } from '~/entities/role.entity'
-import { Token } from '~/entities/token.entity'
+import { RefreshToken } from '~/entities/refreshToken.entity'
 import { User } from '~/entities/user.entity'
 import { toNumberWithDefaultValue, unGetData } from '~/utils'
 import { signAccessToken, signRefreshToken } from '~/utils/jwt'
@@ -26,7 +26,7 @@ class AuthService {
     ])
 
     // save refreshToken
-    const token = new Token()
+    const token = new RefreshToken()
     token.refreshToken = refreshToken
     token.user = { id: userId } as User
     await tokenRepository.save(token)

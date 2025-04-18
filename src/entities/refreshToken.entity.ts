@@ -3,7 +3,7 @@ import { User } from './user.entity'
 import { IsNotEmpty } from 'class-validator'
 
 @Entity()
-export class Token {
+export class RefreshToken {
   @PrimaryGeneratedColumn()
   id?: number
 
@@ -17,8 +17,8 @@ export class Token {
   @CreateDateColumn()
   createdAt?: Date
 
-  static create = ({ refreshToken, user }: Token) => {
-    const newToken = new Token()
+  static create = ({ refreshToken, user }: RefreshToken) => {
+    const newToken = new RefreshToken()
     newToken.refreshToken = refreshToken
     newToken.user = user
 
