@@ -1,7 +1,7 @@
 import { BaseRepository } from '~/core/repository/base.repository'
-import { Token } from '~/entities/token.entity'
+import { RefreshToken } from '~/entities/refreshToken.entity'
 import { getRepository } from '~/services/database.service'
 
-class TokenRepository extends BaseRepository<Token> {}
+class TokenRepository extends BaseRepository<RefreshToken> {}
 
-export const tokenRepository = new TokenRepository(getRepository(Token))
+export const tokenRepository = new TokenRepository(getRepository(RefreshToken))

@@ -1,6 +1,5 @@
-import { isEmpty, toNumber } from 'lodash'
+import { toNumber } from 'lodash'
 import { Like } from 'typeorm'
-import { UserStatus } from '~/constants/userStatus'
 import { CreateUserBodyReq } from '~/dto/req/user/createUserBody.req'
 import { userQueryReq } from '~/dto/req/user/userQuery.req'
 import { UpdateUserBodyReq } from '~/dto/req/user/updateUserBody.req'
@@ -14,14 +13,7 @@ class UserService {
     //save user in db
     const role = { id: roleId } as Role
 
-    const createdUser = await userRepository.save({
-      email,
-      username,
-      avatar,
-      fullName,
-      password,
-      role
-    })
+    const createdUser = await userRepository.save({ email, username, avatar, fullName, password, role })
 
     return unGetData({ fields: ['password'], object: createdUser })
   }
@@ -49,9 +41,8 @@ class UserService {
           avatar: true,
           email: true,
           fullName: true,
-          role: {
-            name: true
-          }
+          role: { name: true },
+          status: true
         }
       }
     )
@@ -75,8 +66,18 @@ class UserService {
       page,
       where,
       relations: ['role'],
-      order: sort
+      order: sort,
+      select: {
+        id: true,
+        username: true,
+        avatar: true,
+        email: true,
+        fullName: true,
+        role: { name: true },
+        status: true
+      }
     })
+
     const { data, total } = result || { data: [], total: 0 }
     return new DataWithPagination({ data, limit, page, totalElements: total })
   }
@@ -98,7 +99,7 @@ class UserService {
     if (email) filters.email = Like(`%${email}%`)
     if (fullName) filters.fullName = Like(`%${fullName}%`)
     if (username) filters.username = Like(`%${username}%`)
-    if (status) filters.status = Like(`%${status}%` as UserStatus)
+    if (status) filters.status = status
 
     if (roleName) {
       filters.role = { name: Like(`%${roleName}%`) }

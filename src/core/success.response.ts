@@ -13,7 +13,7 @@ export class SuccessResponse {
   }: {
     message?: string
     statusCode?: number
-    metaData?: object
+    metaData?: object | void
   }) {
     this.message = message
     this.statusCode = statusCode
@@ -34,10 +34,6 @@ export class CREATED extends SuccessResponse {
     metaData?: object
     options?: object
   }) {
-    super({
-      message,
-      statusCode: status.CREATED,
-      metaData
-    })
+    super({ message, statusCode: status.CREATED, metaData })
   }
 }

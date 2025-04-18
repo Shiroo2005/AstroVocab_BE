@@ -16,6 +16,7 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   entities: [__dirname + '/../entities/**/*.entity.{ts,js}'],
+  timezone: 'Z',
   logging: false,
   logger: customLogger
 })

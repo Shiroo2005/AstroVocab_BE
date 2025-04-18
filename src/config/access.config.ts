@@ -62,10 +62,7 @@ export const grantList = async (role: Role) => {
 
   if (permissions)
     permissions.forEach((permission) => {
-      ac.grant({
-        role: role.name,
-        ...permission
-      })
+      ac.grant({ role: role.name, ...permission })
     })
 
   return ac

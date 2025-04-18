@@ -1,6 +1,6 @@
 export enum UserStatus {
-  NOT_VERIFIED = 'NOT VERIFIED',
-  VERIFIED = 'VERIFIED'
+  NOT_VERIFIED,
+  VERIFIED
   // BAN,
   // DELETED
 }

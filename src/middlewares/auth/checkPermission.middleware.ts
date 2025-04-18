@@ -17,7 +17,7 @@ const checkPermission = (action: keyof Query, resource: string) => {
       throw new ForbiddenRequestError('Forbidden!')
     }
 
-    next()
+    return next()
   }
 }
 
