@@ -11,6 +11,7 @@ import {
 import { Word } from '~/entities/word.entity'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { checkPermission } from '~/middlewares/auth/checkPermission.middleware'
+import { verifyAccountValidation } from '~/middlewares/auth/verifyAccount.middleware'
 import { checkIdParamMiddleware, checkQueryMiddleware, parseSort } from '~/middlewares/common.middlewares'
 import { createWordValidation } from '~/middlewares/word/createWord.middlewares'
 import { updateWordValidation } from '~/middlewares/word/updateWord.middlewares'
@@ -19,6 +20,9 @@ export const wordRouter = express.Router()
 
 // authenticate....
 wordRouter.use(accessTokenValidation)
+
+// is account verified
+wordRouter.use(verifyAccountValidation)
 
 // GET
 /**

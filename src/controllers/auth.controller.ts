@@ -16,7 +16,7 @@ export const registerController = async (req: Request<ParamsDictionary, any, Reg
 
 export const sendVerificationEmailController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
   const user = req.user as User
-  await authService
+  authService
     .sendVerifyEmail({ email: user.email, name: user.fullName, userId: user.id as number })
     .catch((err) => console.error('Error when send verify email', err))
     .then((res) => {
