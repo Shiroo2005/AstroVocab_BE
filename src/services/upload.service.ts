@@ -23,11 +23,11 @@ const storage = multer.diskStorage({
   }
 })
 
-export const uploadImages = async (files: Record<string, Express.Multer.File[]>, type: string) => {
+export const uploadImages = async (files: Record<string, Express.Multer.File[]>) => {
   // convert to array
   const fileArray: Express.Multer.File[] = Object.values(files).flat()
 
-  const _files = await Promise.all(fileArray.map((file) => processAndSaveImage(file, type)))
+  const _files = await Promise.all(fileArray.map((file) => processAndSaveImage(file)))
 
   // delete temp files
   fileArray.map((file) => {
@@ -38,13 +38,13 @@ export const uploadImages = async (files: Record<string, Express.Multer.File[]>,
 }
 
 // resize, tojpeg and save
-export const processAndSaveImage = async (file: Express.Multer.File, type: string) => {
+export const processAndSaveImage = async (file: Express.Multer.File) => {
   // find folder for type images
-  const fileType = type
+  const fileType = file.fieldname
   let folder = 'others'
 
-  const foundFolder = Object.values(FolderUpload).filter((type) => type == fileType)
-  if (foundFolder && foundFolder.length == 1) folder = foundFolder[0]
+  const foundFolder = Object.keys(FolderUpload).filter((type) => type == fileType)
+  if (foundFolder && foundFolder.length == 1) folder = FolderUpload[foundFolder[0] as keyof typeof FolderUpload]
 
   // create folder if not exist
   ensureFolderExists(`uploads/${folder}`)

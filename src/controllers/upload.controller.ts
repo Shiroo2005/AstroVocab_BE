@@ -10,6 +10,6 @@ export const uploadImagesController = async (
 ) => {
   return new CREATED({
     message: 'Upload images successful!',
-    metaData: await uploadImages(req.files as Record<string, Express.Multer.File[]>, req.body.type)
+    metaData: await uploadImages(req.files as Record<string, Express.Multer.File[]>)
   }).send(res)
 }
