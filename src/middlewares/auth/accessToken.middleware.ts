@@ -32,14 +32,11 @@ export const accessTokenValidation = validateSchema(
 
               if (foundUser) {
                 ;(req as Request).user = foundUser as User
-              }
+              } else throw new AuthRequestError('Please log in again!')
             } catch (error) {
               if (error === 'jwt expired') throw new AuthRequestError('Access token expired!')
               throw error
             }
-
-            const user = (req as Request).user
-            if (!user) throw new AuthRequestError('Please log in again!')
             return true
           }
         }
