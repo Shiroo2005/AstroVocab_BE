@@ -1,4 +1,3 @@
-import { IsEnum, IsNotEmpty, IsOptional, Length } from 'class-validator'
 import {
   Column,
   CreateDateColumn,
@@ -17,23 +16,15 @@ export class Course {
   id?: number
 
   @Column('varchar')
-  @IsNotEmpty({ message: 'Title must be a not empty string!' })
-  @Length(1, 255, { message: 'Title must be between 1 and 255 chars long!' })
   title!: string
 
   @Column('varchar')
-  @IsNotEmpty({ message: 'Description must be a not empty string!' })
-  @Length(1, 255, { message: 'Description must be between 1 and 255 chars long!' })
   description!: string
 
   @Column('varchar')
-  @IsNotEmpty({ message: 'Target must be a not empty string!' })
-  @Length(1, 255, { message: 'Target must be between 1 and 255 chars long!' })
   target!: string
 
   @Column('varchar', { default: CourseLevel.INTERMEDIATE })
-  @IsEnum(CourseLevel, { message: 'level must be in enum CourseLevel' })
-  @IsOptional()
   level?: CourseLevel
 
   //foreign key

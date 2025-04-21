@@ -8,7 +8,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
-import { IsNotEmpty } from 'class-validator'
 import { Role } from './role.entity'
 
 @Entity()
@@ -17,11 +16,9 @@ export class Permission {
   id?: number
 
   @Column('text')
-  @IsNotEmpty()
   resource!: Resource
 
   @Column('text')
-  @IsNotEmpty()
   action!: Action
 
   @ManyToMany(() => Role, (role) => role.permissions)

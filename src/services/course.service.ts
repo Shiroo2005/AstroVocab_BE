@@ -9,6 +9,7 @@ import { buildFilterLike } from './query.service'
 import { DataWithPagination } from '~/dto/res/pagination.res'
 import { CourseTopic } from '~/entities/courseTopic.entity'
 import { courseTopicRepository } from '~/repositories/courseTopic.repository'
+import { EntityManager } from 'typeorm'
 
 class CourseService {
   createCourse = async (coursesBody: CourseBody[]) => {
@@ -119,6 +120,80 @@ class CourseService {
   restoreCourseById = async ({ id }: { id: number }) => {
     const restoreCourse = await courseRepository.restore({ id })
     return restoreCourse
+  }
+
+  // updateCourseProgress = async ({ courseId, userId }: { courseId: number; userId: number }, manager: EntityManager) => {
+  //   const courseProgressRepo = manager.getRepository(CourseProgress)
+
+  //   //check if course progress for this user was create before ?
+  //   const courseProgress = await courseProgressRepo.findOne({
+  //     where: { user: { id: userId }, course: { id: courseId } }
+  //   })
+
+  //   let topicDone: number
+  //   let courseSize: number
+
+  //   //was not created
+  //   if (!courseProgress) {
+  //     //get course size
+  //     //newProgress = topicDone = 1 / courseSize
+  //     //create new courseProgress
+
+  //     topicDone = 1
+  //     //get courseSize
+  //     courseSize = await this.getCourseSize({ courseId })
+
+  //     //calculate newProgress
+  //     const newProgress = parseFloat(((topicDone / courseSize) * 100).toFixed(1))
+
+  //     //create new courseProgress
+  //     const newCourseProgress = courseProgressRepo.create({
+  //       course: { id: courseId },
+  //       user: { id: userId },
+  //       courseSize,
+  //       progress: newProgress,
+  //       topicDone
+  //     })
+
+  //     //save
+  //     return await courseProgressRepo.save(newCourseProgress)
+  //   }
+  //   //was created before
+  //   else {
+  //     //increase topicDone
+  //     topicDone = courseProgress.topicDone + 1
+  //     courseSize = courseProgress.courseSize
+
+  //     //newProgress
+  //     const newProgress = parseFloat(((topicDone / courseSize) * 100).toFixed(1))
+  //     courseProgress.topicDone = topicDone
+  //     courseProgress.progress = newProgress
+
+  //     //update
+  //     return await courseProgressRepo.save(courseProgress)
+  //   }
+  // }
+
+  getCourseSize = async ({ courseId }: { courseId: number }) => {
+    //get all topic in course
+    const course = (await courseRepository.findOne({ id: courseId }, { relations: ['courseTopics'] })) as Course
+    console.log(course)
+
+    const numberOfTopics = (course.courseTopics as CourseTopic[]).length
+    return numberOfTopics
+  }
+
+  isTopicInCourse = async ({ topicId, courseId }: { topicId: number; courseId: number }) => {
+    return (
+      (await courseTopicRepository.findOne({
+        topic: {
+          id: topicId
+        },
+        course: {
+          id: courseId
+        }
+      })) != null
+    )
   }
 }
 

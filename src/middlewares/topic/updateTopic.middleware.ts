@@ -1,6 +1,6 @@
 import { checkSchema } from 'express-validator'
 import { validateSchema } from '~/utils/validate'
-import { isLength, isRequired } from '../common.middlewares'
+import { isLength } from '../common.middlewares'
 import { BadRequestError } from '~/core/error.response'
 import { isValidEnumValue } from '~/utils'
 import { TopicType } from '~/constants/topic'

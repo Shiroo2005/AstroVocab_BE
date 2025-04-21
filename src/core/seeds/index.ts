@@ -12,6 +12,8 @@ import { wordSeedData } from './data/word.data'
 import { topicSeedData } from './data/topic.data'
 import { courseSeedData } from './data/course.data'
 import { permissionRepository } from '~/repositories/permission.repository'
+import { topicService } from '~/services/topic.service'
+import { User } from '~/entities/user.entity'
 
 async function seedUsers() {
   const count = await userRepository.count({}) // Kiểm tra xem có dữ liệu chưa
@@ -22,18 +24,18 @@ async function seedUsers() {
     const data = [
       {
         email: 'Admin001@gmail.com',
-        fullName: 'Admin001',
         password: 'Admin123',
         role: adminRole,
-        username: 'Admin001'
-      },
+        username: 'Admin001',
+        fullName: 'ADMIN001'
+      } as User,
       {
         email: 'Admin002@gmail.com',
-        fullName: 'Admin002',
         password: 'Admin123',
         role: adminRole,
-        username: 'Admin002'
-      },
+        username: 'Admin002',
+        fullName: 'ADMIN002'
+      } as User,
       ...createRandomUser()
     ]
 
@@ -51,9 +53,9 @@ async function seedWords() {
     console.log('ℹ️ Words already exist, skipping seed...')
     return
   }
-
-  await wordRepository.save(wordSeedData)
   console.log('✅ Seeded Words successfully!')
+
+  return await wordRepository.save(wordSeedData)
 }
 
 async function seedTopics() {
@@ -62,9 +64,11 @@ async function seedTopics() {
     console.log('ℹ️ Topics already exist, skipping seed...')
     return
   }
-
-  await topicRepository.save(topicSeedData)
+  const words = await seedWords()
+  if (!words) return
   console.log('✅ Seeded Topics successfully!')
+
+  return await topicService.createTopic(topicSeedData(words))
 }
 
 async function seedCourses() {
@@ -74,8 +78,11 @@ async function seedCourses() {
     return
   }
 
-  await courseRepository.save(courseSeedData)
+  const topics = await seedTopics()
+  if (!topics) return
   console.log('✅ Seeded Courses successfully!')
+
+  return await courseRepository.save(courseSeedData(topics))
 }
 
 const seedAccessControl = async (grantList: { role: string; resource: string; action: string }[]) => {
@@ -123,10 +130,6 @@ export async function seedData() {
   await seedAccessControl(getGrantList())
   // await seedRoles()
   await seedUsers()
-
-  await seedWords()
-
-  await seedTopics()
 
   await seedCourses()
 }

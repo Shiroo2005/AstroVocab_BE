@@ -1,4 +1,3 @@
-import { Matches } from 'class-validator'
 import {
   Column,
   CreateDateColumn,
@@ -19,9 +18,6 @@ export class Role {
   id?: number
 
   @Column('nvarchar')
-  @Matches(/^(?=.*[a-zA-Z])[a-zA-Z0-9 ]{3,}$/, {
-    message: 'Name must contain at least 3 chars, 1 letter and only letter, number'
-  })
   name!: string
 
   @Column({ default: 'N/A', type: 'nvarchar' })

@@ -1,16 +1,14 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsUrl, Length } from 'class-validator'
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
 import { TopicType } from '~/constants/topic'
-import { Word } from './word.entity'
+import { WordTopic } from './wordTopic.entity'
 
 @Entity()
 export class Topic {
@@ -18,28 +16,20 @@ export class Topic {
   id?: number
 
   @Column('varchar')
-  @IsNotEmpty({ message: 'Title must be a not empty string!' })
-  @Length(1, 255, { message: 'Title must be between 1 and 255 chars long!' })
   title!: string
 
   @Column('varchar')
-  @IsNotEmpty({ message: 'Description must be a not empty string!' })
-  @Length(1, 255, { message: 'Description must be between 1 and 255 chars long!' })
   description!: string
 
   @Column('varchar', { default: 'N/A' })
-  @IsOptional()
   thumbnail?: string
 
   @Column('varchar', { default: TopicType.FREE })
-  @IsEnum(TopicType, { message: 'topic must be in enum TopicType' })
-  @IsOptional()
   type?: TopicType
 
   //foreign key
-  @ManyToMany(() => Word, { cascade: true })
-  @JoinTable({ name: 'word_topic' })
-  words?: Word[]
+  @OneToMany(() => WordTopic, (wordTopic) => wordTopic.topic, { cascade: true })
+  wordTopics?: WordTopic[]
 
   @DeleteDateColumn()
   deletedAt?: Date
@@ -50,15 +40,14 @@ export class Topic {
   @UpdateDateColumn()
   updatedAt?: Date
 
-  static create = ({ title, description, thumbnail, type, words, id }: Topic) => {
+  static create = ({ title, description, thumbnail, type, wordTopics, id }: Topic) => {
     const newTopic = new Topic()
     newTopic.id = id
     newTopic.title = title
     newTopic.thumbnail = thumbnail
     newTopic.description = description
     newTopic.type = type
-    newTopic.words = words
-
+    newTopic.wordTopics = wordTopics
     return newTopic
   }
 
@@ -69,20 +58,20 @@ export class Topic {
       description,
       thumbnail,
       type,
-      words
+      wordTopics
     }: {
       title?: string
       description?: string
       thumbnail?: string
       type?: TopicType
-      words?: Word[]
+      wordTopics?: WordTopic[]
     }
   ) => {
     if (title) topic.title = title
     if (description) topic.description = description
     if (thumbnail) topic.thumbnail = thumbnail
     if (type) topic.type = type
-    if (words) topic.words = words
+    if (wordTopics) topic.wordTopics = wordTopics
 
     return topic
   }

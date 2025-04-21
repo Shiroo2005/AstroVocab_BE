@@ -1,15 +1,14 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsUrl, Length } from 'class-validator'
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
 import { WordPosition, WordRank } from '~/constants/word'
-import { Topic } from './topic.entity'
+import { WordTopic } from './wordTopic.entity'
 
 @Entity()
 export class Word {
@@ -17,50 +16,35 @@ export class Word {
   id?: number
 
   @Column('varchar')
-  @IsNotEmpty({ message: 'Content must be a not empty string!' })
-  @Length(1, 255, { message: 'Content must be between 1 and 255 chars long!' })
   content!: string
 
   @Column('varchar')
-  @IsNotEmpty({ message: 'Pronunciation must be a not empty string!' })
-  @Length(1, 255, { message: 'Pronunciation must be between 1 and 255 chars long!' })
   pronunciation!: string
 
   @Column('varchar', { default: WordPosition.OTHERS })
-  @IsEnum(WordPosition, { message: 'position must be in enum WordPosition' })
   position?: WordPosition
 
   @Column('nvarchar')
-  @IsNotEmpty({ message: 'Meaning must be a not empty string!' })
-  @Length(1, 255, { message: 'Content must be between 1 and 255 chars long!' })
   meaning!: string
 
   @Column('varchar', { default: 'N/A' })
-  @IsOptional()
   audio?: string
 
   @Column('varchar', { default: 'N/A' })
-  @IsOptional()
   image?: string
 
   @Column('varchar', { default: WordRank.A1 })
-  @IsEnum(WordRank, { message: 'position must be in enum WordPosition' })
-  @IsOptional()
   rank?: WordRank
 
   @Column('varchar', { default: 'N/A' })
-  @IsOptional()
-  @Length(1, 255, { message: 'Example must be between 1 and 255 chars long.' })
   example?: string
 
   @Column('nvarchar', { default: 'N/A' })
-  @IsOptional()
-  @Length(1, 255, { message: 'Translate example must be between 1 and 255 characters long.' })
   translateExample?: string
 
   //foreign key
-  @ManyToMany(() => Topic, (topic) => topic.words)
-  topics?: Topic[]
+  @OneToMany(() => WordTopic, (wordTopic) => wordTopic.word)
+  wordTopics?: WordTopic[]
 
   @DeleteDateColumn()
   deletedAt?: Date

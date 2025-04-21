@@ -1,4 +1,3 @@
-import { validate } from 'class-validator'
 import { FindOptionsWhere, FindOptionsOrder, FindOptionsSelect, ObjectLiteral, Repository, DeepPartial } from 'typeorm'
 
 export class BaseRepository<T extends ObjectLiteral> {
@@ -24,8 +23,11 @@ export class BaseRepository<T extends ObjectLiteral> {
     relations?: string[]
     select?: FindOptionsSelect<T>
   }) {
-    const { page = 1, limit = 10, where, order, relations, select } = options
-    const skip = (page - 1) * limit
+    const { page, limit, where, order, relations, select } = options
+    let skip
+    if (page && limit) {
+      skip = (page - 1) * limit
+    }
 
     const [data, total] = await this.repo.findAndCount({ where, order, skip, take: limit, relations, select })
 
@@ -35,13 +37,10 @@ export class BaseRepository<T extends ObjectLiteral> {
   async save(entity: DeepPartial<T>[] | DeepPartial<T>) {
     const instance = Array.isArray(entity) ? this.repo.create(entity) : this.repo.create([entity])
 
-    //class validate
-    await validate(entity)
-
     return await this.repo.save(instance)
   }
 
-  async update(id: any, partial: Partial<T>) {
+  async update(id: number, partial: Partial<T>) {
     return await this.repo.update(id, partial)
   }
 

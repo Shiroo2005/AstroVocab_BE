@@ -6,6 +6,7 @@ import { DataWithPagination } from '~/dto/res/pagination.res'
 import { Word } from '~/entities/word.entity'
 import { wordRepository } from '~/repositories/word.repository'
 import { buildFilterLike } from './query.service'
+import { WordTopic } from '~/entities/wordTopic.entity'
 
 class WordService {
   createWords = async (words: WordBody[]) => {
@@ -110,6 +111,21 @@ class WordService {
   restoreWordById = async ({ id }: { id: number }) => {
     const restoreWord = await wordRepository.restore({ id })
     return restoreWord
+  }
+
+  getAllWordInTopic = async ({ topicId }: { topicId: number }) => {
+    const wordTopics = await WordTopic.find({
+      where: {
+        topic: {
+          id: topicId
+        }
+      },
+      relations: ['word']
+    })
+
+    if (wordTopics.length == 0) return []
+
+    return wordTopics.map((item) => item.word as Word)
   }
 }
 

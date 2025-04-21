@@ -3,28 +3,31 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  Index,
   ManyToOne,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
 } from 'typeorm'
 import { Topic } from './topic.entity'
-import { User } from './user.entity'
+import { Word } from './word.entity'
 
 @Entity()
-@Index(['user', 'topic'], { unique: true })
-export class CompletedTopic extends BaseEntity {
+export class WordTopic extends BaseEntity {
   @PrimaryGeneratedColumn()
   id?: number
 
-  @ManyToOne(() => User, (user) => user)
-  user: User
+  //foreign key
+  @ManyToOne(() => Word)
+  word?: Word
 
   @ManyToOne(() => Topic)
   topic: Topic
 
+  @DeleteDateColumn()
+  deletedAt?: Date
+
   @CreateDateColumn()
   createdAt?: Date
 
-  @DeleteDateColumn()
-  deletedAt?: Date
+  @UpdateDateColumn()
+  updatedAt?: Date
 }

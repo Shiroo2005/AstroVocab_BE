@@ -1,38 +1,31 @@
-import { IsDate } from 'class-validator'
-import {
-  BaseEntity,
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from 'typeorm'
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import { User } from './user.entity'
 import { Word } from './word.entity'
-import { WORD_MASTERY_LEVEL } from '~/constants/userProgress'
+import {
+  DEFAULT_EASE_FACTOR,
+  DEFAULT_MASTERY_LEVEL,
+  DEFAULT_REVIEW_COUNT,
+  INTERVAL_BASE,
+  MULTI_BASE,
+  WORD_MASTERY_LEVEL
+} from '~/constants/userProgress'
+import { now } from 'lodash'
 
 @Entity()
-export class WordProgress extends BaseEntity {
+export class WordProgress {
   @PrimaryGeneratedColumn()
   id?: number
 
   @Column('varchar', { default: WORD_MASTERY_LEVEL.NEW })
   masteryLevel: WORD_MASTERY_LEVEL
 
-  @Column('int')
-  interval: number
-
   @Column('int', { default: 0 })
   easeFactor: number
 
-  @Column('date')
-  reviewCount!: Date
+  @Column('int')
+  reviewCount!: number
 
   @Column('datetime')
-  @IsDate({ message: 'Invalid next review date' })
   nextReviewDate!: Date
 
   @ManyToOne(() => User)
@@ -49,32 +42,44 @@ export class WordProgress extends BaseEntity {
 
   static createWordProgress = ({
     masteryLevel,
-    user,
-    word,
+    userId,
+    wordId,
     easeFactor,
-    interval,
-    nextReviewDate,
+    reviewedDate = new Date(now()),
     reviewCount
-  }: WordProgress) => {
+  }: {
+    masteryLevel?: WORD_MASTERY_LEVEL
+    userId: number
+    wordId: number
+    easeFactor?: number
+    reviewedDate?: Date
+    reviewCount?: number
+  }) => {
     const newWordProgress = new WordProgress()
 
-    newWordProgress.user = user
-    newWordProgress.word = word
-    newWordProgress.masteryLevel = masteryLevel
-    newWordProgress.easeFactor = easeFactor
-    newWordProgress.interval = interval
-    newWordProgress.nextReviewDate = nextReviewDate
-    newWordProgress.reviewCount = reviewCount
+    newWordProgress.user = { id: userId } as User
+    newWordProgress.word = { id: wordId } as Word
+    newWordProgress.masteryLevel = masteryLevel || DEFAULT_MASTERY_LEVEL
+    newWordProgress.easeFactor = easeFactor || DEFAULT_EASE_FACTOR
+    newWordProgress.nextReviewDate = WordProgress.calculateReviewDate(newWordProgress.easeFactor, reviewedDate)
+    newWordProgress.reviewCount = reviewCount || DEFAULT_REVIEW_COUNT
 
     return newWordProgress
   }
 
+  static calculateReviewDate = (easeFactor: number, reviewedDate: Date) => {
+    const OneHour = 60 * 60 * 1000
+    const spaceReview = INTERVAL_BASE * Math.pow(MULTI_BASE, easeFactor) * OneHour // Convert days to milliseconds
+    const newDate = new Date(reviewedDate)
+    newDate.setTime(newDate.getTime() + spaceReview)
+    return newDate
+  }
+
   static updateWordProgress = (
     wordProgress: WordProgress,
-    { easeFactor, interval, masteryLevel, nextReviewDate, reviewCount }: WordProgress
+    { easeFactor, masteryLevel, nextReviewDate, reviewCount }: WordProgress
   ) => {
     if (easeFactor) wordProgress.easeFactor = easeFactor
-    if (interval) wordProgress.interval = interval
     if (masteryLevel) wordProgress.masteryLevel = masteryLevel
     if (nextReviewDate) wordProgress.nextReviewDate = nextReviewDate
     if (reviewCount) wordProgress.reviewCount = reviewCount
