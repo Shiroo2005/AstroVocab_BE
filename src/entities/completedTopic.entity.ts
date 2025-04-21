@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -21,6 +22,9 @@ export class CompletedTopic extends BaseEntity {
 
   @ManyToOne(() => Topic)
   topic: Topic
+
+  @Column({ type: 'int' })
+  wordVersionAtCompletion: number
 
   @CreateDateColumn()
   createdAt?: Date

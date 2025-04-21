@@ -27,6 +27,9 @@ export class Topic {
   @Column('varchar', { default: TopicType.FREE })
   type?: TopicType
 
+  @Column({ type: 'int', default: 1 })
+  wordVersion: number
+
   //foreign key
   @OneToMany(() => WordTopic, (wordTopic) => wordTopic.topic, { cascade: true })
   wordTopics?: WordTopic[]

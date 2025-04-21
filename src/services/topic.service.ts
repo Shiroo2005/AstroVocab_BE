@@ -13,6 +13,7 @@ import { AppDataSource } from './database.service'
 import { BadRequestError } from '~/core/error.response'
 import { WordTopic } from '~/entities/wordTopic.entity'
 import { Word } from '~/entities/word.entity'
+import { In } from 'typeorm'
 
 class TopicService {
   createTopic = async (topicsBody: TopicBody[]) => {
@@ -32,7 +33,7 @@ class TopicService {
             }
           }
         }
-        topics.push({ ...topic, wordTopics } as Topic)
+        topics.push({ ...topic, wordTopics, wordVersion: 1 } as Topic)
         console.log(wordTopics)
       })
     )
@@ -43,28 +44,53 @@ class TopicService {
   }
 
   updateTopic = async (id: number, { title, description, thumbnail, type, wordIds }: UpdateTopicBodyReq) => {
-    // Xoá word_topic cũ
-    await WordTopic.getRepository().softDelete({ topic: { id } })
+    const topic = await topicRepository.findOne({ id }, { relations: ['wordTopics', 'wordTopics.word'] })
+    if (!topic) return {}
 
-    //filter word id valid
-    let wordTopics
     if (wordIds) {
-      wordTopics = []
-      //filter word id valid
-      for (const wordId of wordIds) {
-        const foundWord = await wordService.getWordById({ id: wordId })
-        if (foundWord && Object.keys(foundWord).length != 0) {
-          wordTopics.push({ word: { id: wordId }, topic: { id } } as WordTopic)
-        }
+      //get old word list
+      const oldWordIds = topic.wordTopics?.map((wt) => wt.word?.id) as number[]
+
+      //new word list
+      const newWordIds = wordIds ?? []
+
+      const toDelete = oldWordIds.filter((id) => !newWordIds.includes(id))
+      const toInsert = newWordIds.filter((id) => !oldWordIds.includes(id))
+
+      console.log(oldWordIds, toDelete, toInsert)
+
+      // Xoá wordTopic cũ
+      if (toDelete.length > 0) {
+        await WordTopic.delete({
+          topic: { id },
+          word: In(toDelete)
+        })
       }
 
-      await WordTopic.save(wordTopics as WordTopic[])
+      // Thêm mới
+      const newWordTopics = toInsert.map((wordId) => ({
+        topic: { id },
+        word: { id: wordId }
+      }))
+
+      //save if new
+      if (newWordTopics.length > 0) {
+        topic.wordTopics = WordTopic.create(newWordTopics)
+      }
+
+      // Increase version if has change in word list
+      if (toDelete.length > 0 || toInsert.length > 0) {
+        topic.wordVersion++
+      }
     }
 
-    const foundTopic = (await topicRepository.findOne({ id })) as Topic
-    const updateTopic = Topic.update(foundTopic, { title, description, thumbnail, type, wordTopics })
+    // Update topic info
+    if (title) topic.title = title
+    if (description) topic.description = description
+    if (thumbnail) topic.thumbnail = thumbnail
+    if (type) topic.type = type
 
-    return await topicRepository.save(updateTopic)
+    return await topicRepository.save(topic)
   }
 
   getTopicById = async ({ id }: { id: number }) => {
