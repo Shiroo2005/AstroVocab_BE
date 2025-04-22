@@ -20,6 +20,10 @@ export const toNumberWithDefaultValue = (num: any, defaultValue: number) => {
   }
 }
 
+export const isArrayEqual = (arr1: number[], arr2: number[]) => {
+  return _.isEqual(_.sortBy(arr1), _.sortBy(arr2))
+}
+
 export const getInfoData = ({ fields = [], object = {} }: { fields: Array<string>; object: object }) => {
   return _.pick(object, fields)
 }

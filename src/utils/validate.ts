@@ -1,4 +1,3 @@
-import { validate } from 'class-validator'
 import { NextFunction, Request, Response } from 'express'
 import { ValidationChain, validationResult } from 'express-validator'
 import { RunnableValidationChains } from 'express-validator/lib/middlewares/schema'
@@ -22,13 +21,5 @@ export const validateSchema = (validation: RunnableValidationChains<ValidationCh
     }
 
     next()
-  }
-}
-
-export const validateClass = async (obj: object) => {
-  const err = await validate(obj)
-
-  if (err && err.length > 0) {
-    throw new BadRequestError(`Validate ${obj.constructor.name} in DB error!`)
   }
 }

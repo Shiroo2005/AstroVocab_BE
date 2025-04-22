@@ -1,28 +1,23 @@
 import {
-  Column,
+  BaseEntity,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
 import { Topic } from './topic.entity'
-import { Course } from './course.entity'
+import { Word } from './word.entity'
 
 @Entity()
-@Index(['course', 'displayOrder'], { unique: true })
-export class CourseTopic {
+export class WordTopic extends BaseEntity {
   @PrimaryGeneratedColumn()
   id?: number
 
-  @Column('int')
-  displayOrder: number
-
   //foreign key
-  @ManyToOne(() => Course)
-  course?: Course
+  @ManyToOne(() => Word)
+  word?: Word
 
   @ManyToOne(() => Topic)
   topic: Topic

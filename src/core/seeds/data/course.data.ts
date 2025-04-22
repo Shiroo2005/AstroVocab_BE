@@ -25,4 +25,6 @@ const randomCourse = (topics: Topic[]): Course => {
   } as Course
 }
 
-export const courseSeedData = faker.helpers.multiple(() => randomCourse(topicSeedData), { count: COURSE_COUNT })
+export const courseSeedData = (topic: Topic[]) => {
+  return faker.helpers.multiple(() => randomCourse(topic), { count: COURSE_COUNT })
+}
