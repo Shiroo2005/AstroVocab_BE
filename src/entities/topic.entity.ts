@@ -28,7 +28,7 @@ export class Topic {
   type?: TopicType
 
   @Column({ type: 'int', default: 1 })
-  wordVersion: number
+  version: number
 
   //foreign key
   @OneToMany(() => WordTopic, (wordTopic) => wordTopic.topic, { cascade: true })

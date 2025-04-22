@@ -1,4 +1,6 @@
+import { Topic } from '~/entities/topic.entity'
+
 export interface CompleteTopicBodyReq {
-  topicId: number
   userId: number
+  topic: Topic
 }

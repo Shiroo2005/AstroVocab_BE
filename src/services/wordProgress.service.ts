@@ -13,6 +13,8 @@ class WordProgressService {
 
     return await repo.save(items)
   }
+
+  // updateWordProgress =
 }
 
 export const wordProgressService = new WordProgressService()

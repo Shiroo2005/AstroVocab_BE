@@ -33,7 +33,7 @@ class TopicService {
             }
           }
         }
-        topics.push({ ...topic, wordTopics, wordVersion: 1 } as Topic)
+        topics.push({ ...topic, wordTopics, version: 1 } as Topic)
         console.log(wordTopics)
       })
     )
@@ -57,8 +57,6 @@ class TopicService {
       const toDelete = oldWordIds.filter((id) => !newWordIds.includes(id))
       const toInsert = newWordIds.filter((id) => !oldWordIds.includes(id))
 
-      console.log(oldWordIds, toDelete, toInsert)
-
       // Xoá wordTopic cũ
       if (toDelete.length > 0) {
         await WordTopic.delete({
@@ -80,7 +78,7 @@ class TopicService {
 
       // Increase version if has change in word list
       if (toDelete.length > 0 || toInsert.length > 0) {
-        topic.wordVersion++
+        topic.version++
       }
     }
 
@@ -97,7 +95,7 @@ class TopicService {
     const foundTopic = await topicRepository.findOne(
       { id },
       {
-        relations: ['words']
+        relations: ['wordTopics', 'wordTopics.word']
       }
     )
 
@@ -155,7 +153,7 @@ class TopicService {
     return restoreTopic
   }
 
-  completedTopic = async ({ topicId, userId }: CompleteTopicBodyReq) => {
+  completedTopic = async ({ topic, userId }: CompleteTopicBodyReq) => {
     //save complete topic into db
     //create word progress
 
@@ -164,8 +162,11 @@ class TopicService {
     await queryRunner.startTransaction()
     //start transaction
     try {
+      const topicId = topic.id as number
       // save complete topic into db
-      await queryRunner.manager.getRepository(CompletedTopic).save({ user: { id: userId }, topic: { id: topicId } })
+      await queryRunner.manager
+        .getRepository(CompletedTopic)
+        .save({ user: { id: userId }, topic: { id: topicId }, topicVersionAtCompletion: topic.version })
 
       //create or update word progress record
       const wordsInTopic = await wordService.getAllWordInTopic({ topicId })

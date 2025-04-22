@@ -24,7 +24,7 @@ export class CompletedTopic extends BaseEntity {
   topic: Topic
 
   @Column({ type: 'int' })
-  wordVersionAtCompletion: number
+  topicVersionAtCompletion: number
 
   @CreateDateColumn()
   createdAt?: Date
