@@ -4,7 +4,7 @@ import { TopicType } from '~/constants/topic'
 import { Word } from '~/entities/word.entity'
 import { wordSeedData } from './word.data'
 
-const TOPIC_COUNT = 50
+const TOPIC_COUNT = 500
 
 const randomTopic = (words: Word[]): Topic => {
   return {
