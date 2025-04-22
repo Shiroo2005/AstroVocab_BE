@@ -16,7 +16,7 @@ export class WordProgress {
   @PrimaryGeneratedColumn()
   id?: number
 
-  @Column('varchar', { default: WORD_MASTERY_LEVEL.NEW })
+  @Column('int', { default: WORD_MASTERY_LEVEL.NEW })
   masteryLevel: WORD_MASTERY_LEVEL
 
   @Column('int', { default: 0 })
@@ -67,7 +67,7 @@ export class WordProgress {
     return newWordProgress
   }
 
-  static calculateReviewDate = (easeFactor: number, reviewedDate: Date) => {
+  static calculateReviewDate = (easeFactor: number, reviewedDate: Date, masteryLevel?: WORD_MASTERY_LEVEL) => {
     const OneHour = 60 * 60 * 1000
     const spaceReview = INTERVAL_BASE * Math.pow(MULTI_BASE, easeFactor) * OneHour // Convert days to milliseconds
     const newDate = new Date(reviewedDate)
