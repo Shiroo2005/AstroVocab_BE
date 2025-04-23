@@ -38,6 +38,15 @@ export class User {
   @Column({ default: UserStatus.NOT_VERIFIED, type: 'varchar' })
   status?: UserStatus
 
+  @Column('int', { default: 0 })
+  streak?: number
+
+  @Column('timestamp', { default: null })
+  lastStudyDate?: Date
+
+  @Column('int', { default: 0 })
+  totalStudyDay?: number
+
   @ManyToOne(() => Role, (role) => role.users)
   role: Role
 
@@ -58,7 +67,20 @@ export class User {
   async hashPassword?() {
     this.password = hashData(this.password)
   }
-  static create = ({ id, email, username, fullName, password, avatar, status, role, tokens }: User) => {
+  static create = ({
+    id,
+    email,
+    username,
+    fullName,
+    password,
+    avatar,
+    status,
+    role,
+    tokens,
+    lastStudyDate,
+    streak,
+    totalStudyDay
+  }: User) => {
     const newUser = new User()
 
     newUser.id = id
@@ -70,6 +92,9 @@ export class User {
     newUser.status = status
     newUser.role = role
     newUser.tokens = tokens
+    newUser.lastStudyDate = lastStudyDate
+    newUser.totalStudyDay = totalStudyDay
+    newUser.streak = streak
 
     return newUser
   }
@@ -83,16 +108,21 @@ export class User {
       avatar,
       status,
       role,
-      tokens
+      tokens,
+      lastStudyDate,
+      streak,
+      totalStudyDay
     }: {
       email?: string
       username?: string
       fullName?: string
       avatar?: string
       status?: UserStatus
-      roleId?: number
       role?: Role
       tokens?: RefreshToken[]
+      totalStudyDay?: number
+      lastStudyDate?: Date
+      streak?: number
     }
   ) => {
     if (email) user.email = email
@@ -102,6 +132,9 @@ export class User {
     if (status) user.status = status
     if (role && role.id) user.role = role
     if (tokens && tokens.length == 0) user.tokens = tokens
+    if (totalStudyDay) user.totalStudyDay = totalStudyDay
+    if (lastStudyDate) user.lastStudyDate = lastStudyDate
+    if (streak) user.streak = streak
 
     return user
   }

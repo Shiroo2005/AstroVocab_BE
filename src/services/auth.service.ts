@@ -114,6 +114,10 @@ class AuthService {
           avatar: true,
           email: true,
           fullName: true,
+          status: true,
+          streak: true,
+          lastStudyDate: true,
+          totalStudyDay: true
           role: { id: true, name: true },
           status: true
         }

@@ -5,7 +5,7 @@ export interface UpdateWordProgressBodyReq {
 }
 
 export interface UpdateWordProgressData {
-  wrongCount: number
+  wrongCount?: number
   word: WordProgress
   reviewedDate: Date
 }
