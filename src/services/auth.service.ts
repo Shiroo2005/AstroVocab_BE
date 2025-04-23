@@ -6,7 +6,6 @@ import { RegisterBodyReq } from '~/dto/req/auth/registerBody.req'
 import { Role } from '~/entities/role.entity'
 import { RefreshToken } from '~/entities/refreshToken.entity'
 import { User } from '~/entities/user.entity'
-import { toNumberWithDefaultValue, unGetData } from '~/utils'
 import { signAccessToken, signRefreshToken } from '~/utils/jwt'
 import { BadRequestError } from '~/core/error.response'
 import { tokenRepository } from '~/repositories/token.repository'
@@ -15,10 +14,13 @@ import { userRepository } from '~/repositories/user.repository'
 import { sendVerifyEmail } from './email.service'
 import { emailVerificationTokenRepository } from '~/repositories/emailVerificationToken.repository'
 import { EmailVerificationToken } from '~/entities/emailVerificationToken.entity'
-import { env } from 'process'
+import { RegisterRes } from '~/dto/res/auth/register.res'
+import { LoginRes } from '~/dto/res/auth/login.res'
+import { NewTokenRes } from '~/dto/res/auth/newToken.res'
+import { getAccountRes } from '~/dto/res/auth/getAccount.res'
 
 class AuthService {
-  login = async ({ userId, status, role }: { userId: number; status: UserStatus; role: Role }) => {
+  login = async ({ userId, status, role }: { userId: number; status: UserStatus; role: Role }): Promise<LoginRes> => {
     // create access, refresh token
     const [accessToken, refreshToken] = await Promise.all([
       signAccessToken({ userId, status, roleId: role.id as number }),
@@ -34,7 +36,7 @@ class AuthService {
     return { accessToken, refreshToken }
   }
 
-  register = async ({ email, username, fullName, password }: RegisterBodyReq) => {
+  register = async ({ email, username, fullName, password }: RegisterBodyReq): Promise<RegisterRes> => {
     /**
      * @Process Register
      * @B1 : Create user and save in db
@@ -46,13 +48,30 @@ class AuthService {
 
     if (!userRole) throw new BadRequestError('Role user not exist!')
     const createdUser = (
-      await userRepository.save({ email, username, password, fullName, role: { id: userRole.id } as Role })
+      await userRepository.save({
+        email,
+        username,
+        password,
+        fullName,
+        role: { id: userRole.id, name: userRole.name } as Role
+      })
     )[0]
 
     //B2 send verify email
     void this.sendVerifyEmail({ email, name: createdUser.fullName, userId: createdUser.id as number })
 
-    return unGetData({ fields: ['password'], object: createdUser })
+    // create access, refresh token
+    const userId = createdUser.id as number
+    const status = createdUser.status as UserStatus
+    const [accessToken, refreshToken] = await Promise.all([
+      signAccessToken({ userId, status, roleId: userRole.id as number }),
+      signRefreshToken({ userId, status, roleId: userRole.id as number })
+    ])
+
+    return {
+      accessToken,
+      refreshToken
+    }
   }
 
   sendVerifyEmail = async ({ email, userId, name }: { email: string; userId: number; name: string }) => {
@@ -61,7 +80,7 @@ class AuthService {
     const emailToken = { token, user: { id: userId } } as EmailVerificationToken
     await emailVerificationTokenRepository.save(emailToken)
 
-    return token
+    return {}
   }
 
   logout = async ({ refreshToken }: LogoutBodyReq) => {
@@ -71,7 +90,7 @@ class AuthService {
     return result
   }
 
-  newToken = async ({ userId, exp, status, roleId }: TokenPayload) => {
+  newToken = async ({ userId, exp, status, roleId }: TokenPayload): Promise<NewTokenRes> => {
     // recreate token
     const [accessToken, refreshToken] = await Promise.all([
       signAccessToken({ userId: userId, status: status as UserStatus, roleId: roleId as number }),
@@ -84,7 +103,7 @@ class AuthService {
     return { accessToken, refreshToken }
   }
 
-  getAccount = async ({ userId }: { userId: number }) => {
+  getAccount = async ({ userId }: { userId: number }): Promise<getAccountRes | object> => {
     const foundUser = await userRepository.findOne(
       { id: userId },
       {
@@ -95,17 +114,18 @@ class AuthService {
           avatar: true,
           email: true,
           fullName: true,
-          role: { name: true },
           status: true,
           streak: true,
           lastStudyDate: true,
           totalStudyDay: true
+          role: { id: true, name: true },
+          status: true
         }
       }
     )
 
     if (!foundUser) return {}
-    return foundUser
+    return { foundUser } as getAccountRes
   }
 
   verifyEmail = async ({ userId }: { userId: number }) => {
@@ -113,7 +133,7 @@ class AuthService {
     await userRepository.update(userId, { status: UserStatus.VERIFIED })
 
     //return info user before update
-    return this.getAccount({ userId: userId })
+    return {}
   }
 }
 

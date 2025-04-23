@@ -18,5 +18,12 @@ export const sendVerificationEmailValidation = async (req: Request, res: Respons
     throw new Error('Number of quest was more than MAX_REQUEST_ALLOW')
   }
 
+  //delete token with that email previously
+  await emailVerificationTokenRepository.delete({
+    user: {
+      id
+    }
+  })
+
   return next()
 }

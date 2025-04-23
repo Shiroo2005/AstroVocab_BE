@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker'
 import { UserStatus } from '~/constants/userStatus'
 import { Role } from '~/entities/role.entity'
 
-const COUNT = 20
+const COUNT = 1000
 
 const randomUser = () => {
   return {

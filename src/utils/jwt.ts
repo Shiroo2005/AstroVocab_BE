@@ -7,6 +7,7 @@ import { UserStatus } from '~/constants/userStatus'
 import { TokenPayload } from '~/dto/common.dto'
 import { v4 as uuidv4 } from 'uuid'
 import { toNumberWithDefaultValue } from '.'
+import { toNumber } from 'lodash'
 config()
 
 const secretKey = env.JWT_SECRET_KEY as string
@@ -42,7 +43,7 @@ export const signAccessToken = async ({
 }) => {
   return await signToken({
     payload: { userId, status, roleId, tokenType: TokenType.accessToken },
-    optional: { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME as string }
+    optional: { expiresIn: toNumber(process.env.ACCESS_TOKEN_EXPIRE_TIME) }
   })
 }
 
@@ -63,14 +64,14 @@ export const signRefreshToken = async ({
 
   return await signToken({
     payload: { userId, status, roleId, tokenType: TokenType.refreshToken },
-    optional: { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME as string }
+    optional: { expiresIn: toNumber(process.env.REFRESH_TOKEN_EXPIRE_TIME) }
   })
 }
 
 export const signEmailVerificationToken = async ({ userId }: { userId: number }) => {
   const token = await signToken({
     payload: { userId, tokenType: TokenType.emailVerifyToken },
-    optional: { expiresIn: process.env.VERIFICATION_EMAIL_EXPIRE_TIME }
+    optional: { expiresIn: toNumber(process.env.VERIFICATION_EMAIL_EXPIRE_TIME) }
   })
   return token
 }
