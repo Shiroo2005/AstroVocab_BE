@@ -124,7 +124,7 @@ class AuthService {
     )
 
     if (!foundUser) return {}
-    return { foundUser } as getAccountRes
+    return foundUser as getAccountRes
   }
 
   verifyEmail = async ({ userId }: { userId: number }) => {
