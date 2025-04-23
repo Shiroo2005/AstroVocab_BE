@@ -1,5 +1,9 @@
 import express from 'express'
-import { completeTopicController, updateWordProgressController } from '~/controllers/userProgress.controller'
+import {
+  completeTopicController,
+  getWordReviewController,
+  updateWordProgressController
+} from '~/controllers/userProgress.controller'
 import { accessTokenValidation } from '~/middlewares/auth/accessToken.middleware'
 import { completeTopicValidation } from '~/middlewares/userProgress/completeTopic.middleware'
 import { updateWordProgressValidation } from '~/middlewares/userProgress/updateWordProgress.middleware'
@@ -9,6 +13,16 @@ export const userProgressRouter = express.Router()
 
 userProgressRouter.use(accessTokenValidation)
 
+//GET
+/**
+ * @description : Get word review
+ * @method : GET
+ * @path : /
+ * @header : Authorization
+ */
+userProgressRouter.get('/word-review', wrapRequestHandler(getWordReviewController))
+
+//POST
 /**
  * @description : Complete topic
  * @method : POST

@@ -1,4 +1,5 @@
-import { EntityManager } from 'typeorm'
+import { now } from 'lodash'
+import { EntityManager, LessThan } from 'typeorm'
 import {
   DEFAULT_EASE_FACTOR,
   LEVEL_UP_FOR_EACH_LEVEL,
@@ -6,7 +7,7 @@ import {
   WORD_MASTERY_LEVEL
 } from '~/constants/userProgress'
 import { CreateWordProgressBodyReq } from '~/dto/req/wordProgress/createWordProgressBody.req'
-import { UpdateWordProgressBodyReq, UpdateWordProgressData } from '~/dto/req/wordProgress/updateWordProgressBody.req'
+import { UpdateWordProgressData } from '~/dto/req/wordProgress/updateWordProgressBody.req'
 import { WordProgress } from '~/entities/wordProgress.entity'
 import { wordProgressRepository } from '~/repositories/wordProgress.repository'
 
@@ -106,6 +107,34 @@ class WordProgressService {
       newEaseFactor,
       newLevel
     }
+  }
+
+  getWordReview = async ({ userId }: { userId: number }) => {
+    const wordReview = await wordProgressRepository.findAll({
+      where: {
+        user: {
+          id: userId
+        },
+        nextReviewDate: LessThan(new Date(now()))
+      },
+      relations: ['word'],
+      select: {
+        word: {
+          id: true,
+          content: true,
+          position: true,
+          meaning: true,
+          audio: true,
+          image: true,
+          pronunciation: true,
+          example: true,
+          translateExample: true,
+          rank: true
+        }
+      }
+    })
+
+    return wordReview
   }
 }
 
