@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   completeTopicController,
+  getUserProgressSummary,
   getWordReviewController,
   updateWordProgressController
 } from '~/controllers/userProgress.controller'
@@ -21,6 +22,14 @@ userProgressRouter.use(accessTokenValidation)
  * @header : Authorization
  */
 userProgressRouter.get('/word-review', wrapRequestHandler(getWordReviewController))
+
+/**
+ * @description : Get user progress summary
+ * @method : GET
+ * @path : /summary
+ * @header : Authorization
+ */
+userProgressRouter.get('/summary', wrapRequestHandler(getUserProgressSummary))
 
 //POST
 /**

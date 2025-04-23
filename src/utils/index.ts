@@ -48,6 +48,10 @@ export const objectToArray = <T>(obj: Record<string, T>): T[] => {
   return Object.values(obj)
 }
 
+export function getEnumLabels<T extends object>(enumObj: T): (keyof T)[] {
+  return Object.keys(enumObj).filter((key) => isNaN(Number(key))) as (keyof T)[]
+}
+
 // export const getSelectData = (select = []) => {
 //   return Object.fromEntries(select.map((el) => [el, 1]))
 // }

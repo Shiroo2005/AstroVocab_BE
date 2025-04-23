@@ -8,8 +8,10 @@ import {
 } from '~/constants/userProgress'
 import { CreateWordProgressBodyReq } from '~/dto/req/wordProgress/createWordProgressBody.req'
 import { UpdateWordProgressData } from '~/dto/req/wordProgress/updateWordProgressBody.req'
+import { SummaryUserRes } from '~/dto/res/wordProgress/summaryUser'
 import { WordProgress } from '~/entities/wordProgress.entity'
 import { wordProgressRepository } from '~/repositories/wordProgress.repository'
+import { getEnumLabels } from '~/utils'
 
 class WordProgressService {
   createWordProgress = async (wordProgressData: CreateWordProgressBodyReq, manager?: EntityManager) => {
@@ -170,6 +172,26 @@ class WordProgressService {
     })
 
     return wordReview
+  }
+
+  getSummary = async ({ userId }: { userId: number }) => {
+    const rawResult = await wordProgressRepository.getWordProgressAndGroupByMasteryLevel({ userId })
+    const totalLearnWord = rawResult.reduce((sum, item) => sum + Number(item.count), 0)
+
+    //mapping raw to {masteryLevel, count}
+    const countWordWithEachLevel = getEnumLabels(WORD_MASTERY_LEVEL).map((level) => {
+      return {
+        level: level,
+        wordCount:
+          rawResult.find((r) => r.masteryLevel === WORD_MASTERY_LEVEL[level as keyof typeof WORD_MASTERY_LEVEL])
+            ?.count ?? 0
+      }
+    })
+
+    return {
+      statistics: countWordWithEachLevel,
+      totalLearnWord
+    } as SummaryUserRes
   }
 }
 

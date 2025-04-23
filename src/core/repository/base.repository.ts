@@ -59,4 +59,7 @@ export class BaseRepository<T extends ObjectLiteral> {
   async count(where?: FindOptionsWhere<T>, { withDeleted = false }: { withDeleted?: boolean } = {}) {
     return await this.repo.count({ where, withDeleted })
   }
+  getRepo() {
+    return this.repo
+  }
 }

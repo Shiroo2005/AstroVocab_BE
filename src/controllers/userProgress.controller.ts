@@ -36,3 +36,12 @@ export const getWordReviewController = async (req: Request, res: Response) => {
     metaData: await wordProgressService.getWordReview({ userId: user.id as number })
   }).send(res)
 }
+
+export const getUserProgressSummary = async (req: Request, res: Response) => {
+  const user = (req as Request).user as User
+
+  return new SuccessResponse({
+    message: 'Get user progress summary successful!',
+    metaData: await wordProgressService.getSummary({ userId: user.id as number })
+  }).send(res)
+}

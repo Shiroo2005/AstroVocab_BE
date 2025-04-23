@@ -1,8 +1,8 @@
 export enum WORD_MASTERY_LEVEL {
-  NEW, // easeFactor  = 0
-  LEARNING, // 1 <= easeFactor <= 5
-  REVIEWING, // 6 < easeFactor <= 7
-  MASTERED //  8 <= easeFactor
+  NEW = 0, // easeFactor  = 0
+  LEARNING = 1, // 1 <= easeFactor <= 5
+  REVIEWING = 2, // 6 < easeFactor <= 7
+  MASTERED = 3 //  8 <= easeFactor
 }
 
 export const MAX_EASE_FACTOR = 20
