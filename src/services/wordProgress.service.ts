@@ -28,10 +28,8 @@ class WordProgressService {
         const { newEaseFactor, newLevel } = this.calculateProgressByWrongCount(
           wordBody.word.masteryLevel,
           wordBody.word.easeFactor,
-          wordBody.wrongCount
+          wordBody.wrongCount || 0
         )
-
-        console.log(wordBody)
 
         //mapping data
         const wordProgress = wordBody.word
@@ -45,6 +43,43 @@ class WordProgressService {
       .filter((wordBody) => wordBody.easeFactor < MAX_EASE_FACTOR)
 
     return await wordProgressRepository.save(_wordProgress)
+  }
+
+  createOrUpdateWordProgress = async (wordProgressData: CreateWordProgressBodyReq, manager?: EntityManager) => {
+    const nowTime = new Date(now())
+    const items = await Promise.all(
+      wordProgressData.wordProgress.map(async (word) => {
+        // check if word is already learn by user
+        const foundWordProgress = await wordProgressRepository.findOne({
+          word: {
+            id: word.id
+          },
+          user: {
+            id: wordProgressData.userId
+          }
+        })
+
+        if (foundWordProgress) {
+          const { newEaseFactor, newLevel } = this.calculateProgressByWrongCount(
+            foundWordProgress.masteryLevel,
+            foundWordProgress.easeFactor,
+            0
+          )
+          //mapping data
+          foundWordProgress.easeFactor = newEaseFactor
+          foundWordProgress.masteryLevel = newLevel
+          foundWordProgress.nextReviewDate = WordProgress.calculateReviewDate(foundWordProgress.easeFactor, nowTime)
+          foundWordProgress.reviewCount += 1
+
+          return foundWordProgress
+        } else {
+          return WordProgress.createWordProgress({ userId: wordProgressData.userId, wordId: word.id as number })
+        }
+      })
+    )
+    const repo = manager?.getRepository(WordProgress) ?? wordProgressRepository
+
+    return await repo.save(items)
   }
 
   calculateProgressByWrongCount = (

@@ -156,6 +156,7 @@ class TopicService {
   completedTopic = async ({ topic, userId }: CompleteTopicBodyReq) => {
     //save complete topic into db
     //create word progress
+    //
 
     const queryRunner = AppDataSource.createQueryRunner()
 
@@ -171,7 +172,7 @@ class TopicService {
       //create or update word progress record
       const wordsInTopic = await wordService.getAllWordInTopic({ topicId })
 
-      const wordProgress = await wordProgressService.createWordProgress(
+      const wordProgress = await wordProgressService.createOrUpdateWordProgress(
         { wordProgress: wordsInTopic, userId },
         queryRunner.manager
       )
