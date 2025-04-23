@@ -9,9 +9,13 @@ import {
 import { CreateWordProgressBodyReq } from '~/dto/req/wordProgress/createWordProgressBody.req'
 import { UpdateWordProgressData } from '~/dto/req/wordProgress/updateWordProgressBody.req'
 import { SummaryUserRes } from '~/dto/res/wordProgress/summaryUser'
+import { User } from '~/entities/user.entity'
 import { WordProgress } from '~/entities/wordProgress.entity'
+import { userRepository } from '~/repositories/user.repository'
 import { wordProgressRepository } from '~/repositories/wordProgress.repository'
 import { getEnumLabels } from '~/utils'
+import { AppDataSource } from './database.service'
+import { BadRequestError } from '~/core/error.response'
 
 class WordProgressService {
   createWordProgress = async (wordProgressData: CreateWordProgressBodyReq, manager?: EntityManager) => {
@@ -24,27 +28,48 @@ class WordProgressService {
     return await repo.save(items)
   }
 
-  updateWordProgress = async ({ words }: { words: UpdateWordProgressData[] }) => {
-    const _wordProgress: WordProgress[] = words
-      .map((wordBody) => {
-        const { newEaseFactor, newLevel } = this.calculateProgressByWrongCount(
-          wordBody.word.masteryLevel,
-          wordBody.word.easeFactor,
-          wordBody.wrongCount || 0
-        )
+  updateWordProgress = async ({ words, userId }: { words: UpdateWordProgressData[]; userId: number }) => {
+    const queryRunner = AppDataSource.createQueryRunner()
 
-        //mapping data
-        const wordProgress = wordBody.word
-        wordProgress.easeFactor = newEaseFactor
-        wordProgress.masteryLevel = newLevel
-        wordProgress.nextReviewDate = WordProgress.calculateReviewDate(wordProgress.easeFactor, wordBody.reviewedDate)
-        wordProgress.reviewCount += 1
+    await queryRunner.startTransaction()
+    //start transaction
+    try {
+      const _wordProgress: WordProgress[] = words
+        .map((wordBody) => {
+          const { newEaseFactor, newLevel } = this.calculateProgressByWrongCount(
+            wordBody.word.masteryLevel,
+            wordBody.word.easeFactor,
+            wordBody.wrongCount || 0
+          )
 
-        return wordProgress
-      })
-      .filter((wordBody) => wordBody.easeFactor < MAX_EASE_FACTOR)
+          //mapping data
+          const wordProgress = wordBody.word
+          wordProgress.easeFactor = newEaseFactor
+          wordProgress.masteryLevel = newLevel
+          wordProgress.nextReviewDate = WordProgress.calculateReviewDate(wordProgress.easeFactor, wordBody.reviewedDate)
+          wordProgress.reviewCount += 1
 
-    return await wordProgressRepository.save(_wordProgress)
+          return wordProgress
+        })
+        .filter((wordBody) => wordBody.easeFactor < MAX_EASE_FACTOR)
+
+      const result = await wordProgressRepository.save(_wordProgress)
+
+      await this.updateUserProgress({ userId, manager: queryRunner.manager })
+
+      // commit transaction now:
+      await queryRunner.commitTransaction()
+
+      return result
+    } catch (err) {
+      await queryRunner.rollbackTransaction()
+      console.log(`Error when handle update word progress: ${err}`)
+      throw new BadRequestError(`${err}`)
+    } finally {
+      // you need to release query runner which is manually created:
+      await queryRunner.release()
+    }
+    //end transaction
   }
 
   createOrUpdateWordProgress = async (wordProgressData: CreateWordProgressBodyReq, manager?: EntityManager) => {
@@ -192,6 +217,28 @@ class WordProgressService {
       statistics: countWordWithEachLevel,
       totalLearnWord
     } as SummaryUserRes
+  }
+
+  updateUserProgress = async ({ userId, manager }: { userId: number; manager?: EntityManager }) => {
+    const foundUser = (await userRepository.findOne({
+      id: userId
+    })) as User
+
+    //update progress for this user
+    //streak, last study date, total study day
+    const now = new Date()
+    const lastStudyDate = foundUser?.lastStudyDate
+
+    //increase streak value if consecutive
+    if (!lastStudyDate || now.getDay() - lastStudyDate.getDay() == 1) {
+      ;(foundUser.streak as number) += 1
+      foundUser.totalStudyDay = (foundUser.totalStudyDay ?? 0) + 1
+    }
+    foundUser.lastStudyDate = now
+
+    //save user into db
+    const repo = manager?.getRepository(User) ?? userRepository
+    return await repo.save(foundUser)
   }
 }
 

@@ -22,9 +22,10 @@ export const updateWordProgressController = async (
   req: Request<ParamsDictionary, any, UpdateWordProgressBodyReq>,
   res: Response
 ) => {
+  const user = req.user as User
   return new SuccessResponse({
     message: 'Update word progress successful!',
-    metaData: await wordProgressService.updateWordProgress({ words: req.body.wordProgress })
+    metaData: await wordProgressService.updateWordProgress({ words: req.body.wordProgress, userId: user.id as number })
   }).send(res)
 }
 

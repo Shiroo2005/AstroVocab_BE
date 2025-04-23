@@ -96,7 +96,10 @@ class AuthService {
           email: true,
           fullName: true,
           role: { name: true },
-          status: true
+          status: true,
+          streak: true,
+          lastStudyDate: true,
+          totalStudyDay: true
         }
       }
     )
