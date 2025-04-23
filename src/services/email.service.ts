@@ -30,5 +30,5 @@ export const sendVerifyEmail = async ({
   const verifyUrl = `${fe_url}/verify-email?token=${token}`
 
   await sendEmail({ to, subject, template, variables: { verifyUrl, name: body.name } })
-  return verifyUrl
+  return token
 }

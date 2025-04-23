@@ -3,7 +3,7 @@ import { TopicType } from '~/constants/topic'
 import { Word } from '~/entities/word.entity'
 import { TopicBody } from '~/dto/req/topic/createTopicBody.req'
 
-const TOPIC_COUNT = 50
+const TOPIC_COUNT = 500
 
 const randomTopic = (words: Word[]): TopicBody => {
   return {
