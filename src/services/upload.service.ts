@@ -33,7 +33,10 @@ export const uploadImages = async (files: Record<string, Express.Multer.File[]>)
   for (const file of fileArray) {
     try {
       if (fs.existsSync(file.path)) {
-        await unlinkAsync(file.path)
+        fs.closeSync(fs.openSync(file.path, 'r')) // Đóng file
+        sharp.cache(false)
+
+        fs.unlinkSync(file.path)
       }
     } catch (error) {
       console.log(`Error checking/deleting temp file ${file.path}: ${error}`)
