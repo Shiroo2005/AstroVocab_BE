@@ -24,7 +24,11 @@ async function initApp() {
   app.use(morganMiddleware)
 
   // protected by helmet
-  app.use(helmet())
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: false
+    })
+  )
 
   // optimize by compression request
   app.use(compression())
