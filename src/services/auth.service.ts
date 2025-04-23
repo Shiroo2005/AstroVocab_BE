@@ -117,9 +117,8 @@ class AuthService {
           status: true,
           streak: true,
           lastStudyDate: true,
-          totalStudyDay: true
-          role: { id: true, name: true },
-          status: true
+          totalStudyDay: true,
+          role: { id: true, name: true }
         }
       }
     )
