@@ -3,6 +3,7 @@ import * as mysql2 from 'mysql2'
 import { DataSource, EntityTarget, ObjectLiteral, Repository } from 'typeorm'
 import { customLogger } from '~/utils/log'
 import { seedData } from '~/core/seeds'
+import redisClient from './redis.service'
 
 config()
 
@@ -21,10 +22,7 @@ export const AppDataSource = new DataSource({
   logger: customLogger,
   cache: {
     type: 'redis',
-    options: {
-      host: 'localhost',
-      port: 6379
-    },
+    options: redisClient,
     duration: 60000
   },
   extra: {
