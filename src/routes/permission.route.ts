@@ -18,7 +18,7 @@ export const permissionRouter = express.Router()
 
 // authenticate....
 
-permissionRouter.use(accessTokenValidation({}))
+permissionRouter.use(accessTokenValidation)
 
 /**
  * @description : Get permissions by roleId

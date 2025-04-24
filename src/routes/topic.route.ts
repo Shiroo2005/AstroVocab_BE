@@ -20,7 +20,7 @@ export const topicRouter = express.Router()
 // GET
 
 // authenticate....
-topicRouter.use(accessTokenValidation({}))
+topicRouter.use(accessTokenValidation)
 
 /**
  * @description : Get topic by id

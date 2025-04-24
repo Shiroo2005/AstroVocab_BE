@@ -27,7 +27,7 @@ export const userRouter = express.Router()
 userRouter.get('/:id', checkIdParamMiddleware(), wrapRequestHandler(getUser))
 
 // authentication
-userRouter.use(accessTokenValidation({}))
+userRouter.use(accessTokenValidation)
 
 // GET
 /**

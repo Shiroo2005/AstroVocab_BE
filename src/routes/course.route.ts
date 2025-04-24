@@ -52,7 +52,7 @@ courseRouter.get(
 )
 
 // authenticate....
-courseRouter.use(accessTokenValidation({}))
+courseRouter.use(accessTokenValidation)
 
 // POST
 /**

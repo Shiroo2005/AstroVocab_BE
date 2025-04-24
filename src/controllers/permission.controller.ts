@@ -22,7 +22,7 @@ export const findPermissonController = async (req: Request<ParamsDictionary, any
 
   return new SuccessResponse({
     message: 'Find permissions by role successful!',
-    metaData: await roleService.findPermissionByRole({ roleId })
+    metaData: await permissionService.findPermissionByRole({ roleId })
   }).send(res)
 }
 

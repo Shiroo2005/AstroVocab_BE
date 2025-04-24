@@ -22,7 +22,7 @@ const authRouter = express.Router()
  * @path : /account
  * @header : Authorization
  */
-authRouter.get('/account', accessTokenValidation({ relations: ['role'] }), wrapRequestHandler(accountController))
+authRouter.get('/account', accessTokenValidation, wrapRequestHandler(accountController))
 
 // POST
 /**

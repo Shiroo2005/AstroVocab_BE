@@ -12,7 +12,7 @@ import { wrapRequestHandler } from '~/utils/handler'
 
 export const userProgressRouter = express.Router()
 
-userProgressRouter.use(accessTokenValidation({ relations: ['role'] }))
+userProgressRouter.use(accessTokenValidation)
 
 //GET
 /**
