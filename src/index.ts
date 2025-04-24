@@ -1,3 +1,5 @@
+config()
+
 import 'reflect-metadata'
 import express from 'express'
 import { config } from 'dotenv'
@@ -14,8 +16,6 @@ import './services/redis.service'
 import { redisConnect } from './services/redis.service'
 const app = express()
 const port = process.env.PORT || 8081
-
-config()
 
 async function initApp() {
   //MIDDLE_WARES
@@ -43,6 +43,7 @@ async function initApp() {
   // DATABASE
 
   //redis
+  await redisConnect()
 
   // init db
   await syncDatabase()
@@ -69,7 +70,6 @@ async function initApp() {
 
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
-    redisConnect()
   })
 }
 

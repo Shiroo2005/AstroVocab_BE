@@ -4,9 +4,11 @@ const redisClient = createClient({
   url: process.env.REDIS_URL
 })
 
-export const redisConnect = () => {
+export const redisConnect = async () => {
   redisClient.on('error', (err) => console.error('Redis error:', err))
 
-  redisClient.connect().then(() => console.log(`Redis connect successful with url = ${process.env.REDIS_URL}`))
+  await redisClient.connect()
+  console.log(`✅ Redis connected: ${process.env.REDIS_URL}`)
 }
+
 export default redisClient
