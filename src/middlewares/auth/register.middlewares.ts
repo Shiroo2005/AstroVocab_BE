@@ -21,9 +21,15 @@ export const registerValidation = validateSchema(
         ...isEmail,
         custom: {
           options: async (value, { req }) => {
-            const foundUser = (await userRepository.findOne([{ email: value }, { username: req.body.username }], {
-              withDeleted: true
-            })) as User | null
+            const foundUser = await userRepository
+              .getQueryBuilder('user')
+              .where('email = :email', { email: value })
+              .orWhere('username = :username', { username: req.body.username })
+              .withDeleted()
+              .getCount()
+            // const foundUser = (await userRepository.findOne([{ email: value }, { username: req.body.username }], {
+            //   withDeleted: true
+            // })) as User | null
 
             if (foundUser) {
               throw new BadRequestError('Email or username already taken!')

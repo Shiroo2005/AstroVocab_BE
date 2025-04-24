@@ -33,11 +33,11 @@ export const signToken = ({ payload, optional }: { payload: string | Buffer | ob
 
 export const signAccessToken = async ({
   userId,
-  status,
+  status = UserStatus.NOT_VERIFIED,
   roleId
 }: {
   userId: number
-  status: UserStatus
+  status?: UserStatus
   roleId: number
 }) => {
   return await signToken({
@@ -48,12 +48,12 @@ export const signAccessToken = async ({
 
 export const signRefreshToken = async ({
   userId,
-  status,
+  status = UserStatus.NOT_VERIFIED,
   exp,
   roleId
 }: {
   userId: number
-  status: UserStatus
+  status?: UserStatus
   exp?: number
   roleId: number
 }) => {

@@ -73,4 +73,8 @@ export class BaseRepository<T extends ObjectLiteral> {
   getRepo() {
     return this.repo
   }
+
+  getQueryBuilder(alias?: string) {
+    return AppDataSource.getRepository(this.repo.metadata.target).createQueryBuilder(alias)
+  }
 }

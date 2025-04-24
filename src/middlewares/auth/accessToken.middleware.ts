@@ -25,12 +25,10 @@ export const accessTokenValidation = ({ relations = ['role, role.permisisons'] }
                 // set User
                 const { userId } = decodedAuthorization
 
-                const foundUser = await userRepository.findOne(
-                  { id: userId },
-                  {
-                    relations
-                  }
-                )
+                const foundUser = await userRepository
+                  .findUserAndJoinRole()
+                  .where('user.id = :id', { id: userId })
+                  .getOne()
 
                 if (foundUser) {
                   ;(req as Request).user = foundUser as User

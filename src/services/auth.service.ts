@@ -48,25 +48,22 @@ class AuthService {
     const userRole = (await roleRepository.findOne({ name: RoleName.USER })) as Role | null
 
     if (!userRole) throw new BadRequestError('Role user not exist!')
-    const createdUser = (
-      await userRepository.save({
-        email,
-        username,
-        password,
-        fullName,
-        role: { id: userRole.id, name: userRole.name } as Role
-      })
-    )[0]
+    const createdUser = await userRepository.save({
+      email,
+      username,
+      password,
+      fullName,
+      role: { id: userRole.id } as Role
+    })
 
     //B2 send verify email
-    void this.sendVerifyEmail({ email, name: createdUser.fullName, userId: createdUser.id as number })
+    void this.sendVerifyEmail({ email, name: fullName, userId: createdUser[0].id as number })
 
     // create access, refresh token
-    const userId = createdUser.id as number
-    const status = createdUser.status as UserStatus
+    const userId = createdUser[0].id as number
     const [accessToken, refreshToken] = await Promise.all([
-      signAccessToken({ userId, status, roleId: userRole.id as number }),
-      signRefreshToken({ userId, status, roleId: userRole.id as number })
+      signAccessToken({ userId, roleId: userRole.id as number }),
+      signRefreshToken({ userId, roleId: userRole.id as number })
     ])
 
     return {
@@ -114,7 +111,7 @@ class AuthService {
     ])
 
     // save refreshToken
-    await tokenRepository.save({ user: { id: userId } as User, refreshToken })
+    await tokenRepository.insert({ refreshToken, user: { id: userId } })
 
     return { accessToken, refreshToken }
   }
