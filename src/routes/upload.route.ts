@@ -9,7 +9,7 @@ const uploadRouter = express.Router()
 // GET
 
 // authenticate....
-uploadRouter.use(accessTokenValidation)
+uploadRouter.use(accessTokenValidation({ relations: ['role'] }))
 
 /**
  * @description : Upload image

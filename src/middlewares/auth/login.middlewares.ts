@@ -16,11 +16,11 @@ export const loginValidation = validateSchema(
         ...isRequired('Username'),
         custom: {
           options: async (value, { req }) => {
-            const foundUser = (await userRepository.findOne([{ email: value }, { username: value }], {
-              relations: ['role']
-            })) as User
-
-            console.log(foundUser, compareBcrypt(req.body?.password, foundUser.password))
+            const foundUser = (await userRepository
+              .findUserAndJoinRole({ selectFields: ['user.id', 'user.status', 'user.password', 'role.id'] })
+              .where('user.email = :email', { email: value })
+              .orWhere('user.username = :username', { username: value })
+              .getOne()) as User
 
             if (!foundUser || !compareBcrypt(req.body?.password, foundUser.password)) {
               throw new BadRequestError('Username or password incorrect!')

@@ -1,4 +1,5 @@
 import { FindOptionsWhere, FindOptionsOrder, FindOptionsSelect, ObjectLiteral, Repository, DeepPartial } from 'typeorm'
+import { AppDataSource } from '~/services/database.service'
 
 export class BaseRepository<T extends ObjectLiteral> {
   constructor(protected readonly repo: Repository<T>) {}
@@ -11,7 +12,8 @@ export class BaseRepository<T extends ObjectLiteral> {
       where,
       relations: options?.relations,
       withDeleted: options?.withDeleted,
-      select: options?.select
+      select: options?.select,
+      cache: true
     })
   }
 
@@ -38,6 +40,15 @@ export class BaseRepository<T extends ObjectLiteral> {
     const instance = Array.isArray(entity) ? this.repo.create(entity) : this.repo.create([entity])
 
     return await this.repo.save(instance)
+  }
+
+  async insert(entity: DeepPartial<T>) {
+    await AppDataSource.createQueryBuilder()
+      .insert()
+      .into(this.repo.metadata.target)
+      .values(entity)
+      .updateEntity(false)
+      .execute()
   }
 
   async update(id: number, partial: Partial<T>) {

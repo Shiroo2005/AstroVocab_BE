@@ -18,7 +18,19 @@ export const AppDataSource = new DataSource({
   entities: [__dirname + '/../entities/**/*.entity.{ts,js}'],
   timezone: 'Z',
   logging: false,
-  logger: customLogger
+  logger: customLogger,
+  cache: {
+    type: 'redis',
+    options: {
+      host: 'localhost',
+      port: 6379
+    },
+    duration: 60000
+  },
+  extra: {
+    connectionLimit: 10, // ← số lượng kết nối trong pool
+    queueLimit: 0 // ← unlimited queue,
+  }
 })
 
 // 🚀 Kết nối DB (nên gọi 1 lần ở main.ts)

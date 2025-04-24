@@ -10,7 +10,7 @@ const roleRouter = express.Router()
 // GET
 
 // authenticate....
-roleRouter.use(accessTokenValidation)
+roleRouter.use(accessTokenValidation({}))
 
 /**
  * @description : Get all roles

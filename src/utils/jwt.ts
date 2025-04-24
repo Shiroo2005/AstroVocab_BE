@@ -6,14 +6,13 @@ import { TokenType } from '~/constants/token'
 import { UserStatus } from '~/constants/userStatus'
 import { TokenPayload } from '~/dto/common.dto'
 import { v4 as uuidv4 } from 'uuid'
-import { toNumberWithDefaultValue } from '.'
 import { toNumber } from 'lodash'
 config()
 
 const secretKey = env.JWT_SECRET_KEY as string
 
 export const hashData = (data: string) => {
-  return bcrypt.hashSync(data, 10)
+  return bcrypt.hashSync(data, 5)
 }
 
 export const compareBcrypt = (data: string, hashData: string) => {

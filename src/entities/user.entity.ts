@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -16,6 +17,7 @@ import { RefreshToken } from './refreshToken.entity'
 import { hashData } from '~/utils/jwt'
 
 @Entity()
+@Index(['email', 'username'])
 export class User {
   @PrimaryGeneratedColumn()
   id?: number

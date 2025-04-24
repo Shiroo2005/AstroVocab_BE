@@ -6,7 +6,7 @@ import { wrapRequestHandler } from '~/utils/handler'
 
 export const emailRouter = express.Router()
 
-emailRouter.use(accessTokenValidation)
+emailRouter.use(accessTokenValidation({ relations: ['role'] }))
 
 //GET
 

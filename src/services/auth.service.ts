@@ -32,7 +32,7 @@ class AuthService {
     const token = new RefreshToken()
     token.refreshToken = refreshToken
     token.user = { id: userId } as User
-    await tokenRepository.save(token)
+    await tokenRepository.insert(token)
 
     return { accessToken, refreshToken }
   }
