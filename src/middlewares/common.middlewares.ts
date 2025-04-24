@@ -53,7 +53,7 @@ export const checkQueryMiddleware = ({
     }
 
     //check max limit & max page
-    if ((req.parseQueryPagination.limit as number) > maxLimit) req.parseQueryPagination.limit = defaultLimit
+    if ((req.parseQueryPagination.limit as number) > maxLimit) req.parseQueryPagination.limit = maxLimit
     next()
   }
 }
