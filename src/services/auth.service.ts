@@ -129,7 +129,10 @@ class AuthService {
       signAccessToken({ userId, status: UserStatus.VERIFIED, roleId }),
       signRefreshToken({ userId, status: UserStatus.VERIFIED, roleId })
     ])
-    return {}
+    return {
+      accessToken,
+      refreshToken
+    }
   }
 }
 

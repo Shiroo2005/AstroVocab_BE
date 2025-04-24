@@ -71,7 +71,7 @@ export const verifyEmailTokenController = async (req: Request<ParamsDictionary, 
   const { decodedEmailToken } = req as Request
 
   return new SuccessResponse({
-    message: 'Verify email!',
+    message: 'Verify email successful!',
     metaData: await authService.verifyEmail(decodedEmailToken as TokenPayload)
   }).send(res)
 }

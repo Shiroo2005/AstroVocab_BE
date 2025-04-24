@@ -1,3 +1,4 @@
+import { In } from 'typeorm'
 import { Action, Resource } from '~/constants/access'
 import { BadRequestError } from '~/core/error.response'
 import { CreatePermissionBodyReq } from '~/dto/req/permission/createPermissionBody.req'
@@ -28,6 +29,10 @@ class PermissionService {
 
   deletePermission = async (id: number) => {
     return await permissionRepository.softDelete({ id })
+  }
+
+  findPermissionByRole = async ({ roleId }: { roleId: number }) => {
+    return await permissionRepository.findByRole({ roleId }).getMany()
   }
 }
 

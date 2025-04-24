@@ -88,18 +88,6 @@ class RoleService {
     const result = await roleRepository.softDelete({ id })
     return result
   }
-
-  findPermissionByRole = async ({ roleId }: { roleId: number }) => {
-    const foundRole = (await roleRepository.findOne(
-      { id: roleId },
-      {
-        relations: ['permissions']
-      }
-    )) as Role | null
-
-    if (!foundRole) return []
-    return foundRole.permissions
-  }
 }
 
 export const roleService = new RoleService()

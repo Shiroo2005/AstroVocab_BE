@@ -1,7 +1,8 @@
 import { AccessControl } from 'accesscontrol'
 import { Action, Resource, RoleName } from '~/constants/access'
+import { Permission } from '~/entities/permission.entity'
 import { Role } from '~/entities/role.entity'
-import { roleService } from '~/services/role.service'
+import { permissionService } from '~/services/permission.service'
 
 const ac = new AccessControl()
 
@@ -57,7 +58,7 @@ export const grantList = async (role: Role) => {
   let permissions = role.permissions
 
   if (!permissions) {
-    permissions = await roleService.findPermissionByRole({ roleId: role.id as number })
+    permissions = (await permissionService.findPermissionByRole({ roleId: role.id as number })) as Permission[]
   }
 
   if (permissions)
