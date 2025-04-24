@@ -3,7 +3,9 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { CREATED, SuccessResponse } from '~/core/success.response'
 import { CreateCourseBodyReq } from '~/dto/req/course/createCourseBody.req'
 import { UpdateCourseBodyReq } from '~/dto/req/course/updateCourseBody.req'
+import { getOrSetCache } from '~/middlewares/redis/redis.middleware'
 import { courseService } from '~/services/course.service'
+import { buildCacheKey } from '~/utils/redis'
 
 export const createCourseController = async (
   req: Request<ParamsDictionary, any, CreateCourseBodyReq>,
@@ -28,18 +30,26 @@ export const updateCourseController = async (
 }
 
 export const getAllCoursesController = async (req: Request, res: Response) => {
+  //build key for redis
+  const key = buildCacheKey(req.baseUrl + req.path, { ...req.params, ...req.query })
+
   return new SuccessResponse({
     message: 'Get all courses successful!',
-    metaData: await courseService.getAllCourses({ ...req.query, ...req.parseQueryPagination, sort: req.sortParsed })
+    metaData: await getOrSetCache(key, () =>
+      courseService.getAllCourses({ ...req.query, ...req.parseQueryPagination, sort: req.sortParsed })
+    )
   }).send(res)
 }
 
 export const getCourseController = async (req: Request, res: Response) => {
   const id = req.idParams as number
 
+  //build key for redis
+  const key = buildCacheKey(req.baseUrl + req.path, {})
+
   return new SuccessResponse({
     message: 'Get course by id successful!',
-    metaData: await courseService.getCourseById({ id })
+    metaData: await getOrSetCache(key, () => courseService.getCourseById({ id }))
   }).send(res)
 }
 

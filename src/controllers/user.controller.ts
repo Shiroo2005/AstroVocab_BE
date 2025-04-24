@@ -3,7 +3,9 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { CREATED, SuccessResponse } from '~/core/success.response'
 import { CreateUserBodyReq } from '~/dto/req/user/createUserBody.req'
 import { UpdateUserBodyReq } from '~/dto/req/user/updateUserBody.req'
+import { getOrSetCache } from '~/middlewares/redis/redis.middleware'
 import { userService } from '~/services/user.service'
+import { buildCacheKey } from '~/utils/redis'
 
 export const createUserController = async (req: Request<ParamsDictionary, any, CreateUserBodyReq>, res: Response) => {
   return new CREATED({
@@ -24,16 +26,24 @@ export const updateUserController = async (req: Request<ParamsDictionary, any, U
 export const getUser = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
   const id = (req as Request).idParams as number
 
+  //build key for redis
+  const key = buildCacheKey(req.baseUrl + req.path, {})
+
   return new SuccessResponse({
     message: 'Get user by id successful!',
-    metaData: await userService.getUserById(id)
+    metaData: await getOrSetCache(key, () => userService.getUserById(id))
   }).send(res)
 }
 
 export const getAllUsers = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  //build key for redis
+  const key = buildCacheKey(req.baseUrl + req.path, { ...req.params, ...req.query })
+
   return new SuccessResponse({
     message: 'Get all users successful!',
-    metaData: await userService.getAllUsers({ ...req.query, ...req.parseQueryPagination, sort: req.sortParsed })
+    metaData: await getOrSetCache(key, () =>
+      userService.getAllUsers({ ...req.query, ...req.parseQueryPagination, sort: req.sortParsed })
+    )
   }).send(res)
 }
 

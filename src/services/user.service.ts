@@ -7,7 +7,6 @@ import { DataWithPagination } from '~/dto/res/pagination.res'
 import { Role } from '~/entities/role.entity'
 import { userRepository } from '~/repositories/user.repository'
 import { unGetData } from '~/utils'
-
 class UserService {
   createUser = async ({ email, username, avatar, fullName, password, roleId }: CreateUserBodyReq) => {
     //save user in db
@@ -53,10 +52,6 @@ class UserService {
   }
 
   getAllUsers = async ({ page = 1, limit = 10, email, fullName, roleName, sort, status, username }: userQueryReq) => {
-    //parse page
-    page = toNumber(page)
-    limit = toNumber(limit)
-
     //build filter to where condition
     const where = this.buildUserFilters({ email, fullName, roleName, status, username })
 
@@ -79,7 +74,9 @@ class UserService {
     })
 
     const { data, total } = result || { data: [], total: 0 }
-    return new DataWithPagination({ data, limit, page, totalElements: total })
+    const responseData = new DataWithPagination({ data, limit, page, totalElements: total })
+
+    return responseData
   }
 
   deleteUserById = async ({ id }: { id: number }) => {

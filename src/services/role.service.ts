@@ -2,6 +2,8 @@ import { CreateRoleBodyReq } from '~/dto/req/role/createRoleBody.req'
 import { Role } from '~/entities/role.entity'
 import { roleRepository } from '~/repositories/role.repository'
 import { BadRequestError } from '~/core/error.response'
+import { buildCacheKey } from '~/utils/redis'
+import { getOrSetCache } from '~/middlewares/redis/redis.middleware'
 
 class RoleService {
   createRole = async ({ name, description }: CreateRoleBodyReq) => {
@@ -49,6 +51,12 @@ class RoleService {
     return {
       foundRole
     }
+  }
+
+  getRoleByName = async (name: string) => {
+    const key = buildCacheKey('roles', { name })
+
+    return (await getOrSetCache<Role>(key, () => roleRepository.findOne({ name }))) as Role
   }
 
   isExistRoleId = async (id: number) => {

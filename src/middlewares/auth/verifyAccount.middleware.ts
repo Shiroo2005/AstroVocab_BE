@@ -9,6 +9,7 @@ const verifyAccount = async (req: Request, res: Response, next: NextFunction) =>
 
   if (status == UserStatus.NOT_VERIFIED)
     throw new BadRequestError('User was not verified, Please check verify in email!')
+
   next()
 }
 

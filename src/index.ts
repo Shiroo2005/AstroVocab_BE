@@ -10,14 +10,12 @@ import { corsConfig } from './config/cors.config'
 import { servingStaticConfig } from './config/static.config'
 import { syncDatabase } from './services/database.service'
 import { seedData } from './core/seeds'
-import { envConfig } from './config/env.config'
+import './services/redis.service'
+import { redisConnect } from './services/redis.service'
 const app = express()
 const port = process.env.PORT || 8081
 
 config()
-
-//config env
-envConfig()
 
 async function initApp() {
   //MIDDLE_WARES
@@ -43,6 +41,9 @@ async function initApp() {
   //////////////////////////////
 
   // DATABASE
+
+  //redis
+
   // init db
   await syncDatabase()
   await seedData()
@@ -68,8 +69,7 @@ async function initApp() {
 
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
-    const env = process.env.NODE_ENV || 'development'
-    console.log(`This run in ${env} environment!`)
+    redisConnect()
   })
 }
 

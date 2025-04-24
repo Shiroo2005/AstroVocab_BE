@@ -18,6 +18,7 @@ import { RegisterRes } from '~/dto/res/auth/register.res'
 import { LoginRes } from '~/dto/res/auth/login.res'
 import { NewTokenRes } from '~/dto/res/auth/newToken.res'
 import { getAccountRes } from '~/dto/res/auth/getAccount.res'
+import { roleService } from './role.service'
 
 class AuthService {
   login = async ({ userId, status, role }: { userId: number; status: UserStatus; role: Role }): Promise<LoginRes> => {
@@ -75,9 +76,24 @@ class AuthService {
   }
 
   sendVerifyEmail = async ({ email, userId, name }: { email: string; userId: number; name: string }) => {
-    const token = await sendVerifyEmail({ to: email, template: 'welcome', body: { name, userId } })
+    //found role USER
+    const role = await roleService.getRoleByName(RoleName.USER)
 
-    const emailToken = { token, user: { id: userId } } as EmailVerificationToken
+    const token = await sendVerifyEmail({
+      to: email,
+      template: 'welcome',
+      body: { name, userId, roleId: role.id as number }
+    })
+
+    const emailToken = {
+      token,
+      user: {
+        id: userId,
+        role: {
+          id: role.id
+        }
+      }
+    } as EmailVerificationToken
     await emailVerificationTokenRepository.save(emailToken)
 
     return {}
@@ -107,11 +123,15 @@ class AuthService {
     return user
   }
 
-  verifyEmail = async ({ userId }: { userId: number }) => {
+  verifyEmail = async ({ userId, roleId }: { userId: number; roleId: number }) => {
     //set status user in db
     await userRepository.update(userId, { status: UserStatus.VERIFIED })
 
-    //return info user before update
+    // create access, refresh token
+    const [accessToken, refreshToken] = await Promise.all([
+      signAccessToken({ userId, status: UserStatus.VERIFIED, roleId }),
+      signRefreshToken({ userId, status: UserStatus.VERIFIED, roleId })
+    ])
     return {}
   }
 }

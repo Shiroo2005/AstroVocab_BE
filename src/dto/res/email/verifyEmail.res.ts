@@ -2,5 +2,5 @@ export interface SendVerifyMailOptions {
   to: string
   subject?: string
   template: string
-  body: { userId: number; name: string }
+  body: { userId: number; name: string; roleId: number }
 }

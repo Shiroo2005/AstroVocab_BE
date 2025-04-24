@@ -3,6 +3,7 @@ import { NextFunction } from 'express-serve-static-core'
 import { isEmpty, toNumber } from 'lodash'
 import { BadRequestError } from '~/core/error.response'
 import { isValidNumber, toNumberWithDefaultValue } from '~/utils'
+import { buildCacheKey } from '~/utils/redis'
 
 export const checkIdParamMiddleware = (options?: { id?: string }) => {
   const id = options?.id || 'id'

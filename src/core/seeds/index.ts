@@ -14,6 +14,7 @@ import { courseSeedData } from './data/course.data'
 import { permissionRepository } from '~/repositories/permission.repository'
 import { topicService } from '~/services/topic.service'
 import { User } from '~/entities/user.entity'
+import { UserStatus } from '~/constants/userStatus'
 
 async function seedUsers() {
   const count = await userRepository.count({}) // Kiểm tra xem có dữ liệu chưa
@@ -27,14 +28,16 @@ async function seedUsers() {
         password: 'Admin123',
         role: adminRole,
         username: 'Admin001',
-        fullName: 'ADMIN001'
+        fullName: 'ADMIN001',
+        status: UserStatus.VERIFIED
       } as User,
       {
         email: 'Admin002@gmail.com',
         password: 'Admin123',
         role: adminRole,
         username: 'Admin002',
-        fullName: 'ADMIN002'
+        fullName: 'ADMIN002',
+        status: UserStatus.VERIFIED
       } as User,
       ...createRandomUser()
     ]

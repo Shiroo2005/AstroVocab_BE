@@ -4,8 +4,10 @@ import { CREATED, SuccessResponse } from '~/core/success.response'
 import { CompleteTopicBodyReq } from '~/dto/req/topic/completeTopicBody.req'
 import { UpdateWordProgressBodyReq } from '~/dto/req/wordProgress/updateWordProgressBody.req'
 import { User } from '~/entities/user.entity'
+import { getOrSetCache } from '~/middlewares/redis/redis.middleware'
 import { topicService } from '~/services/topic.service'
 import { wordProgressService } from '~/services/wordProgress.service'
+import { buildCacheKey } from '~/utils/redis'
 
 export const completeTopicController = async (
   req: Request<ParamsDictionary, any, CompleteTopicBodyReq>,
@@ -41,8 +43,11 @@ export const getWordReviewController = async (req: Request, res: Response) => {
 export const getUserProgressSummary = async (req: Request, res: Response) => {
   const user = (req as Request).user as User
 
+  //build key for redis
+  const key = buildCacheKey(req.baseUrl + req.path, { id: user.id })
+
   return new SuccessResponse({
     message: 'Get user progress summary successful!',
-    metaData: await wordProgressService.getSummary({ userId: user.id as number })
+    metaData: await getOrSetCache(key, () => wordProgressService.getSummary({ userId: user.id as number }))
   }).send(res)
 }
