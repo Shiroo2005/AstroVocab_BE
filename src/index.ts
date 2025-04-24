@@ -1,8 +1,9 @@
-config()
-
 import 'reflect-metadata'
 import express from 'express'
 import { config } from 'dotenv'
+
+config()
+
 import { errorHandler, notFoundHandler } from './utils/handler'
 import { morganMiddleware } from './middlewares/morgan.middlewares'
 import helmet from 'helmet'
