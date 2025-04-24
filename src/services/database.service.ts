@@ -2,8 +2,6 @@ import { config } from 'dotenv'
 import * as mysql2 from 'mysql2'
 import { DataSource, EntityTarget, ObjectLiteral, Repository } from 'typeorm'
 import { customLogger } from '~/utils/log'
-import { seedData } from '~/core/seeds'
-import redisClient from './redis.service'
 
 config()
 
@@ -22,7 +20,9 @@ export const AppDataSource = new DataSource({
   logger: customLogger,
   cache: {
     type: 'redis',
-    options: redisClient,
+    options: {
+      url: process.env.REDIS_URL
+    },
     duration: 60000
   },
   extra: {
