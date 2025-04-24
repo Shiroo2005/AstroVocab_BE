@@ -195,8 +195,8 @@ class TopicService {
     //end transaction
   }
 
-  isTopicAlreadyCompleted = async ({ topicId }: { topicId: number }) => {
-    return await CompletedTopic.exists({ where: { topic: { id: topicId } } })
+  isTopicAlreadyCompleted = async ({ topicId, userId }: { topicId: number; userId: number }) => {
+    return await CompletedTopic.exists({ where: { topic: { id: topicId }, user: { id: userId } } })
   }
 }
 

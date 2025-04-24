@@ -103,28 +103,8 @@ class AuthService {
     return { accessToken, refreshToken }
   }
 
-  getAccount = async ({ userId }: { userId: number }): Promise<getAccountRes | object> => {
-    const foundUser = await userRepository.findOne(
-      { id: userId },
-      {
-        relations: ['role'],
-        select: {
-          id: true,
-          username: true,
-          avatar: true,
-          email: true,
-          fullName: true,
-          status: true,
-          streak: true,
-          lastStudyDate: true,
-          totalStudyDay: true,
-          role: { id: true, name: true }
-        }
-      }
-    )
-
-    if (!foundUser) return {}
-    return foundUser as getAccountRes
+  getAccount = async ({ user }: { user: User }): Promise<getAccountRes | object> => {
+    return user
   }
 
   verifyEmail = async ({ userId }: { userId: number }) => {

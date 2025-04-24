@@ -59,11 +59,11 @@ export const refreshTokenController = async (req: Request<ParamsDictionary, any,
 }
 
 export const accountController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
-  const { decodedAuthorization } = req as Request
+  const { user } = req as Request
 
   return new SuccessResponse({
     message: 'Get account successful!',
-    metaData: await authService.getAccount(decodedAuthorization as TokenPayload)
+    metaData: await authService.getAccount({ user: user as User })
   }).send(res)
 }
 

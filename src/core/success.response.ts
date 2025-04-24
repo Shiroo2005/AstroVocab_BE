@@ -8,7 +8,7 @@ export class SuccessResponse {
 
   constructor({
     message = getReasonPhrase(200),
-    statusCode = StatusCodes.ACCEPTED,
+    statusCode = StatusCodes.OK,
     metaData = {}
   }: {
     message?: string
