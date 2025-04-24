@@ -11,7 +11,8 @@ import { servingStaticConfig } from './config/static.config'
 import { syncDatabase } from './services/database.service'
 import { seedData } from './core/seeds'
 const app = express()
-const port = 8081
+const port = process.env.PORT || 8081
+
 config()
 
 async function initApp() {
