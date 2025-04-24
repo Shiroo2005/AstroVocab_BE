@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { status } from 'http-status'
+import { getReasonPhrase, StatusCodes } from 'http-status-codes'
 
 export class SuccessResponse {
   message: string
@@ -7,8 +7,8 @@ export class SuccessResponse {
   metaData: object
 
   constructor({
-    message = status['200_NAME'],
-    statusCode = status.OK,
+    message = getReasonPhrase(200),
+    statusCode = StatusCodes.ACCEPTED,
     metaData = {}
   }: {
     message?: string
@@ -27,13 +27,13 @@ export class SuccessResponse {
 
 export class CREATED extends SuccessResponse {
   constructor({
-    message = status['201_NAME'],
+    message = getReasonPhrase(201),
     metaData = {}
   }: {
     message?: string
     metaData?: object
     options?: object
   }) {
-    super({ message, statusCode: status.CREATED, metaData })
+    super({ message, statusCode: StatusCodes.CREATED, metaData })
   }
 }

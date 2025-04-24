@@ -1,5 +1,5 @@
 import { RequestHandler, Request, Response, NextFunction, ErrorRequestHandler } from 'express'
-import { status } from 'http-status'
+import { StatusCodes } from 'http-status-codes'
 import { EntityError, ErrorResponse, NotFoundRequestError } from '~/core/error.response'
 
 // Transform to async await for controller
@@ -20,7 +20,7 @@ export const errorHandler: ErrorRequestHandler = (
     const statusCode = err.statusCode
     res.status(statusCode).json({
       message: 'Middleware error',
-      statusCode: status.BAD_REQUEST,
+      statusCode: StatusCodes.BAD_REQUEST,
       err: err.errors
     })
     return
@@ -37,7 +37,7 @@ export const errorHandler: ErrorRequestHandler = (
   //   return
   // }
 
-  const statusCode = err instanceof ErrorResponse ? err.statusCode : status.INTERNAL_SERVER_ERROR
+  const statusCode = err instanceof ErrorResponse ? err.statusCode : StatusCodes.INTERNAL_SERVER_ERROR
   const message = err.message || 'Internal Server Error'
   res.status(statusCode).json({
     status: 'Error',

@@ -1,4 +1,4 @@
-import { status } from 'http-status'
+import { StatusCodes, getReasonPhrase } from 'http-status-codes'
 
 export class ErrorResponse extends Error {
   public statusCode: number
@@ -9,25 +9,25 @@ export class ErrorResponse extends Error {
 }
 
 export class BadRequestError extends ErrorResponse {
-  constructor(message: string = status[400], statusCode: number = status.BAD_REQUEST) {
+  constructor(message: string = getReasonPhrase(400), statusCode: number = StatusCodes.BAD_REQUEST) {
     super(message, statusCode)
   }
 }
 
 export class AuthRequestError extends ErrorResponse {
-  constructor(message: string = status[401], statusCode: number = status.UNAUTHORIZED) {
+  constructor(message: string = getReasonPhrase(401), statusCode: number = StatusCodes.UNAUTHORIZED) {
     super(message, statusCode)
   }
 }
 
 export class NotFoundRequestError extends ErrorResponse {
-  constructor(message: string = status[404], statusCode: number = status.NOT_FOUND) {
+  constructor(message: string = getReasonPhrase(404), statusCode: number = StatusCodes.NOT_FOUND) {
     super(message, statusCode)
   }
 }
 
 export class ForbiddenRequestError extends ErrorResponse {
-  constructor(message: string = status[403], statusCode: number = status.FORBIDDEN) {
+  constructor(message: string = getReasonPhrase(403), statusCode: number = StatusCodes.FORBIDDEN) {
     super(message, statusCode)
   }
 }
@@ -36,7 +36,7 @@ export class EntityError extends ErrorResponse {
   errors: object[]
   constructor({
     message = 'Validate error',
-    statusCode = status.BAD_REQUEST,
+    statusCode = StatusCodes.BAD_REQUEST,
     errors
   }: {
     message?: string
