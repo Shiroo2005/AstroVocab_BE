@@ -1,6 +1,5 @@
 import { RoleName } from '~/constants/access'
 import { UserStatus } from '~/constants/userStatus'
-import { TokenPayload } from '~/dto/common.dto'
 import { LogoutBodyReq } from '~/dto/req/auth/logoutBody.req'
 import { RegisterBodyReq } from '~/dto/req/auth/registerBody.req'
 import { Role } from '~/entities/role.entity'
@@ -62,25 +61,29 @@ class AuthService {
   }
 
   sendVerifyEmail = async ({ email, userId, name }: { email: string; userId: number; name: string }) => {
-    //found role USER
-    const role = await roleService.getRoleByName(RoleName.USER)
+    try {
+      const role = await roleService.getRoleByName(RoleName.USER)
 
-    const token = await sendVerifyEmail({
-      to: email,
-      template: 'welcome',
-      body: { name, userId, roleId: role.id as number }
-    })
+      const token = await sendVerifyEmail({
+        to: email,
+        template: 'welcome',
+        body: { name, userId, roleId: role.id as number }
+      })
 
-    const emailToken = {
-      token,
-      user: {
-        id: userId,
-        role: {
-          id: role.id
+      const emailToken = {
+        token,
+        user: {
+          id: userId,
+          role: {
+            id: role.id
+          }
         }
-      }
-    } as EmailVerificationToken
-    await emailVerificationTokenRepository.save(emailToken)
+      } as EmailVerificationToken
+
+      await emailVerificationTokenRepository.save(emailToken)
+    } catch (err) {
+      console.error('Error sending verify email:', err)
+    }
 
     return {}
   }
