@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { ValidationChain, validationResult } from 'express-validator'
 import { RunnableValidationChains } from 'express-validator/lib/middlewares/schema'
-import { BadRequestError, EntityError } from '~/core/error.response'
+import { EntityError } from '~/core/error.response'
 
 // can be reused by many routes
 export const validateSchema = (validation: RunnableValidationChains<ValidationChain>) => {

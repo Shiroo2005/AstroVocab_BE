@@ -1,9 +1,10 @@
 import { Request } from 'express'
 import { checkSchema } from 'express-validator'
+import { now, toNumber } from 'lodash'
+import { env } from 'process'
 import { BadRequestError, NotFoundRequestError } from '~/core/error.response'
-import { tokenRepository } from '~/repositories/token.repository'
-import { userRepository } from '~/repositories/user.repository'
-import { verifyToken } from '~/utils/jwt'
+import { RefreshToken } from '~/entities/refreshToken.entity'
+import { refreshTokenRepository } from '~/repositories/refreshToken.repository'
 import { validateSchema } from '~/utils/validate'
 
 export const refreshTokenValidation = validateSchema(
@@ -13,15 +14,26 @@ export const refreshTokenValidation = validateSchema(
         custom: {
           options: async (value: string, { req }) => {
             // check refresh token valid
-            try {
-              const decodedRefreshToken = await verifyToken({ token: value })
-              ;(req as Request).decodedRefreshToken = decodedRefreshToken
+            //find token
+            const rawToken = await refreshTokenRepository.findOneByTokenAndJoinUserAndRole({
+              refreshToken: value,
+              selectFields: ['refreshToken.createdAt, refreshToken.user, user.roleId', 'refreshToken.token']
+            })
 
-              await Promise.all([isUserIdValid(decodedRefreshToken.userId), isTokenInDb(value)])
-            } catch (error) {
-              if (error === 'jwt expired') throw new BadRequestError('Refresh token expired!')
-              throw error
-            }
+            //check expire time
+            console.log(rawToken, !rawToken, !rawToken?.length)
+
+            if (!rawToken || !rawToken.length || !rawToken[0]) throw new NotFoundRequestError('Token invalid!')
+
+            const foundToken = rawToken[0] as RefreshToken
+            const REFRESH_TOKEN_EXPIRE_TIME = toNumber(env.REFRESH_TOKEN_EXPIRE_TIME)
+            const expiredAt = (foundToken.createdAt as Date).getTime() + REFRESH_TOKEN_EXPIRE_TIME
+
+            if (expiredAt < now())
+              throw new BadRequestError('Token expired!')
+
+              //set user
+            ;(req as Request).user = foundToken.user
 
             return true
           }
@@ -31,25 +43,3 @@ export const refreshTokenValidation = validateSchema(
     ['body']
   )
 )
-
-const isUserIdValid = async (userId: number) => {
-  //check if userId in refresh token is delete or invalid!
-  const user = await userRepository
-    .findUserById({
-      id: userId,
-      selectFields: ['user.id']
-    })
-    .getCount()
-
-  if (!user) throw new NotFoundRequestError('Token invalid')
-}
-
-const isTokenInDb = async (refreshToken: string) => {
-  // can refresh token use ?
-  const foundToken = await tokenRepository
-    .getQueryBuilder('token')
-    .where('refreshToken = :refreshToken', { refreshToken })
-    .getCount()
-
-  if (!foundToken) throw new BadRequestError('Token invalid')
-}

@@ -34,7 +34,7 @@
     "globals": "^15.14.0",
     "nodemon": "^3.1.9",
     "prettier": "^3.4.2",
-    "resend": "^4.3.0",
+    "resend": "^4.4.1",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.10",

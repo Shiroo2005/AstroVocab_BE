@@ -34,7 +34,6 @@ export const loginController = async (req: Request<ParamsDictionary, any, LoginB
     message: 'Login successful!',
     metaData: await authService.login({
       userId: user.id as number,
-      status: user.status as UserStatus,
       role: user.role as Role
     })
   }).send(res)
@@ -50,11 +49,11 @@ export const logoutController = async (req: Request<ParamsDictionary, any, Logou
 }
 
 export const refreshTokenController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
-  const { decodedRefreshToken } = req as Request
+  const { user } = req as Request
 
   return new SuccessResponse({
     message: 'Get new tokens successful!',
-    metaData: await authService.newToken(decodedRefreshToken as TokenPayload)
+    metaData: await authService.newToken({ userId: user?.id as number, roleId: user?.role.id as number })
   }).send(res)
 }
 

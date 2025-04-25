@@ -7,7 +7,7 @@ export class RefreshToken {
   id?: number
 
   @Column({ type: 'varchar', length: 512 })
-  refreshToken!: string
+  token!: string
 
   @ManyToOne(() => User, (user) => user.tokens, { cascade: true })
   user?: User
@@ -15,9 +15,9 @@ export class RefreshToken {
   @CreateDateColumn()
   createdAt?: Date
 
-  static create = ({ refreshToken, user }: RefreshToken) => {
+  static create = ({ token, user }: RefreshToken) => {
     const newToken = new RefreshToken()
-    newToken.refreshToken = refreshToken
+    newToken.token = token
     newToken.user = user
 
     return newToken

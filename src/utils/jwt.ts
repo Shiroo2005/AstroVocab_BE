@@ -31,40 +31,15 @@ export const signToken = ({ payload, optional }: { payload: string | Buffer | ob
   })
 }
 
-export const signAccessToken = async ({
-  userId,
-  status = UserStatus.NOT_VERIFIED,
-  roleId
-}: {
-  userId: number
-  status?: UserStatus
-  roleId: number
-}) => {
+export const signAccessToken = async ({ userId, roleId }: { userId: number; status?: UserStatus; roleId: number }) => {
   return await signToken({
-    payload: { userId, status, roleId, tokenType: TokenType.accessToken },
+    payload: { userId, roleId, tokenType: TokenType.accessToken },
     optional: { expiresIn: toNumber(process.env.ACCESS_TOKEN_EXPIRE_TIME) }
   })
 }
 
-export const signRefreshToken = async ({
-  userId,
-  status = UserStatus.NOT_VERIFIED,
-  exp,
-  roleId
-}: {
-  userId: number
-  status?: UserStatus
-  exp?: number
-  roleId: number
-}) => {
-  if (exp) {
-    return await signToken({ payload: { userId, status, roleId, exp, tokenType: TokenType.refreshToken } })
-  }
-
-  return await signToken({
-    payload: { userId, status, roleId, tokenType: TokenType.refreshToken },
-    optional: { expiresIn: toNumber(process.env.REFRESH_TOKEN_EXPIRE_TIME) }
-  })
+export const signRefreshToken = async () => {
+  return uuidv4()
 }
 
 export const signEmailVerificationToken = async ({ userId }: { userId: number }) => {
