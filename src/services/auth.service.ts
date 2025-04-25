@@ -4,11 +4,10 @@ import { TokenPayload } from '~/dto/common.dto'
 import { LogoutBodyReq } from '~/dto/req/auth/logoutBody.req'
 import { RegisterBodyReq } from '~/dto/req/auth/registerBody.req'
 import { Role } from '~/entities/role.entity'
-import { RefreshToken } from '~/entities/refreshToken.entity'
 import { User } from '~/entities/user.entity'
 import { signAccessToken, signRefreshToken } from '~/utils/jwt'
 import { BadRequestError } from '~/core/error.response'
-import { tokenRepository } from '~/repositories/token.repository'
+import { refreshTokenRepository } from '~/repositories/refreshToken.repository'
 import { roleRepository } from '~/repositories/role.repository'
 import { userRepository } from '~/repositories/user.repository'
 import { sendVerifyEmail } from './email.service'
@@ -21,18 +20,11 @@ import { getAccountRes } from '~/dto/res/auth/getAccount.res'
 import { roleService } from './role.service'
 
 class AuthService {
-  login = async ({ userId, status, role }: { userId: number; status: UserStatus; role: Role }): Promise<LoginRes> => {
-    // create access, refresh token
-    const [accessToken, refreshToken] = await Promise.all([
-      signAccessToken({ userId, status, roleId: role.id as number }),
-      signRefreshToken({ userId, status, roleId: role.id as number })
-    ])
-
-    // save refreshToken
-    const token = new RefreshToken()
-    token.refreshToken = refreshToken
-    token.user = { id: userId } as User
-    await tokenRepository.insert(token)
+  login = async ({ userId, role }: { userId: number; role: Role }): Promise<LoginRes> => {
+    const { accessToken, refreshToken } = await this.createAccessAndRefreshToken({
+      roleId: role.id as number,
+      userId
+    })
 
     return { accessToken, refreshToken }
   }
@@ -61,15 +53,12 @@ class AuthService {
 
     // create access, refresh token
     const userId = createdUser[0].id as number
-    const [accessToken, refreshToken] = await Promise.all([
-      signAccessToken({ userId, roleId: userRole.id as number }),
-      signRefreshToken({ userId, roleId: userRole.id as number })
-    ])
 
-    return {
-      accessToken,
-      refreshToken
-    }
+    const { accessToken, refreshToken } = await this.createAccessAndRefreshToken({
+      userId,
+      roleId: userRole.id as number
+    })
+    return { accessToken, refreshToken }
   }
 
   sendVerifyEmail = async ({ email, userId, name }: { email: string; userId: number; name: string }) => {
@@ -98,22 +87,16 @@ class AuthService {
 
   logout = async ({ refreshToken }: LogoutBodyReq) => {
     // delete refresh token in db
-    const result = await tokenRepository.delete({ refreshToken })
+    const result = await refreshTokenRepository.delete({ token: refreshToken })
 
     return result
   }
 
-  newToken = async ({ userId, exp, status, roleId }: TokenPayload): Promise<NewTokenRes> => {
-    // recreate token
-    const [accessToken, refreshToken] = await Promise.all([
-      signAccessToken({ userId: userId, status: status as UserStatus, roleId: roleId as number }),
-      signRefreshToken({ userId: userId, status: status as UserStatus, exp, roleId: roleId as number })
-    ])
+  newToken = async ({ userId, roleId }: { userId: number; roleId: number }): Promise<NewTokenRes> => {
+    //only create access token
+    const accessToken = await signAccessToken({ userId, roleId })
 
-    // save refreshToken
-    await tokenRepository.insert({ refreshToken, user: { id: userId } })
-
-    return { accessToken, refreshToken }
+    return { accessToken }
   }
 
   getAccount = async ({ user }: { user: User }): Promise<getAccountRes | object> => {
@@ -124,15 +107,20 @@ class AuthService {
     //set status user in db
     await userRepository.update(userId, { status: UserStatus.VERIFIED })
 
+    //only create access token
+    const accessToken = await signAccessToken({ userId, roleId })
+
+    return { accessToken }
+  }
+
+  createAccessAndRefreshToken = async ({ userId, roleId }: { userId: number; roleId: number }) => {
     // create access, refresh token
-    const [accessToken, refreshToken] = await Promise.all([
-      signAccessToken({ userId, status: UserStatus.VERIFIED, roleId }),
-      signRefreshToken({ userId, status: UserStatus.VERIFIED, roleId })
-    ])
-    return {
-      accessToken,
-      refreshToken
-    }
+    const [accessToken, refreshToken] = await Promise.all([signAccessToken({ userId, roleId }), signRefreshToken()])
+
+    // save refreshToken
+    await refreshTokenRepository.insert({ token: refreshToken, user: { id: userId } })
+
+    return { accessToken, refreshToken }
   }
 }
 

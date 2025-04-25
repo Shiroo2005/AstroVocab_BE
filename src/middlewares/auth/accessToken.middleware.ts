@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import { checkSchema } from 'express-validator'
-import { AuthRequestError } from '~/core/error.response'
+import { TokenType } from '~/constants/token'
+import { AuthRequestError, BadRequestError } from '~/core/error.response'
 import { User } from '~/entities/user.entity'
 import { userRepository } from '~/repositories/user.repository'
 import { verifyToken } from '~/utils/jwt'
@@ -22,7 +23,10 @@ export const accessTokenValidation = validateSchema(
               ;(req as Request).decodedAuthorization = decodedAuthorization
 
               // set User
-              const { userId } = decodedAuthorization
+              const { userId, tokenType } = decodedAuthorization
+
+              //check type token
+              if (tokenType != TokenType.accessToken) throw new BadRequestError('Token invalid!')
 
               const foundUser = await userRepository
                 .findUserAndJoinRole()
