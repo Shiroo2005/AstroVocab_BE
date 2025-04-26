@@ -14,3 +14,9 @@ declare module 'express' {
     parseQueryPagination?: { page?: number; limit?: number }
   }
 }
+
+declare global {
+  namespace Express {
+    type User = AppUser
+  }
+}

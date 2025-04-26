@@ -7,14 +7,15 @@ import { DataWithPagination } from '~/dto/res/pagination.res'
 import { Role } from '~/entities/role.entity'
 import { userRepository } from '~/repositories/user.repository'
 import { unGetData } from '~/utils'
+import { User } from '~/entities/user.entity'
 class UserService {
   createUser = async ({ email, username, avatar, fullName, password, roleId }: CreateUserBodyReq) => {
     //save user in db
     const role = { id: roleId } as Role
 
-    const createdUser = await userRepository.save({ email, username, avatar, fullName, password, role })
+    const createdUser = (await userRepository.save({ email, username, avatar, fullName, password, role }))[0]
 
-    return unGetData({ fields: ['password'], object: createdUser })
+    return unGetData({ fields: ['password'], object: createdUser }) as User
   }
 
   updateUser = async (id: number, { email, username, fullName, roleId, avatar, status }: UpdateUserBodyReq) => {

@@ -1,5 +1,6 @@
 import { error } from 'console'
 import _, { toNumber } from 'lodash'
+import { userRepository } from '~/repositories/user.repository'
 
 export const isValidNumber = (num: string) => {
   try {
@@ -41,6 +42,8 @@ export const getResourceValues = <T extends object>(enumType: T) => {
 }
 
 export const isValidEnumValue = <T extends object>(value: string, enumObj: T): boolean => {
+  console.log(Object.values(enumObj))
+
   return Object.values(enumObj).includes(value as T[keyof T])
 }
 
@@ -50,6 +53,19 @@ export const objectToArray = <T>(obj: Record<string, T>): T[] => {
 
 export function getEnumLabels<T extends object>(enumObj: T): (keyof T)[] {
   return Object.keys(enumObj).filter((key) => isNaN(Number(key))) as (keyof T)[]
+}
+
+export async function generateUniqueUsername(baseUsername: string): Promise<string> {
+  const finalUsername = baseUsername.toLowerCase().replace(/[^a-z0-9]/g, '')
+  let counter = 0
+  let usernameToCheck = finalUsername
+
+  while (await userRepository.findOne({ username: usernameToCheck })) {
+    counter++
+    usernameToCheck = `${finalUsername}${counter}`
+  }
+
+  return usernameToCheck
 }
 
 // export const getSelectData = (select = []) => {

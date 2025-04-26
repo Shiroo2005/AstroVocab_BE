@@ -1,6 +1,10 @@
+import { Query } from 'accesscontrol'
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
-import { UserStatus } from '~/constants/userStatus'
+import passport from 'passport'
+import { env } from 'process'
+import { OAUTH_PROVIDER } from '~/constants/oauth'
+import { BadRequestError } from '~/core/error.response'
 import { CREATED, SuccessResponse } from '~/core/success.response'
 import { TokenPayload } from '~/dto/common.dto'
 import { LoginBodyReq } from '~/dto/req/auth/loginBody.req'
@@ -9,6 +13,7 @@ import { RegisterBodyReq } from '~/dto/req/auth/registerBody.req'
 import { Role } from '~/entities/role.entity'
 import { User } from '~/entities/user.entity'
 import { authService } from '~/services/auth.service'
+import { isValidEnumValue } from '~/utils'
 
 export const registerController = async (req: Request<ParamsDictionary, any, RegisterBodyReq>, res: Response) => {
   return new CREATED({ message: 'Register successful!', metaData: await authService.register(req.body) }).send(res)
@@ -34,9 +39,35 @@ export const loginController = async (req: Request<ParamsDictionary, any, LoginB
     message: 'Login successful!',
     metaData: await authService.login({
       userId: user.id as number,
-      role: user.role as Role
+      roleId: user.role.id as number
     })
   }).send(res)
+}
+
+export const oauthLoginController = async (req: Request, res: Response) => {
+  const provider = req.params.provider
+  console.log(provider)
+
+  if (!provider || !isValidEnumValue(provider, OAUTH_PROVIDER)) throw new BadRequestError('Provider invalid!')
+
+  passport.authenticate(provider, { scope: ['profile', 'email'], session: false })(req, res)
+}
+
+export const oauthLoginCallbackController = async (req: Request, res: Response) => {
+  const provider = req.params.provider
+  if (!provider || !isValidEnumValue(provider, OAUTH_PROVIDER)) throw new BadRequestError('Provider invalid!')
+  passport.authenticate(provider, { session: false }, async (err: any, user: User, info: any) => {
+    if (err || !user) {
+      throw new BadRequestError('Login failed!')
+    }
+
+    const { accessToken, refreshToken } = await authService.login({
+      userId: user.id as number,
+      roleId: user.role.id as number
+    })
+    const FE_URL = env.FE_URL as string
+    res.redirect(`${FE_URL}?accessToken=${accessToken}&refreshToken=${refreshToken}`)
+  })(req, res)
 }
 
 export const logoutController = async (req: Request<ParamsDictionary, any, LogoutBodyReq>, res: Response) => {

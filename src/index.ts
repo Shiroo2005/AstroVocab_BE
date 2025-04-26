@@ -15,6 +15,7 @@ import { syncDatabase } from './services/database.service'
 import { seedData } from './core/seeds'
 import './services/redis.service'
 import { redisConnect } from './services/redis.service'
+import './config/passport.config'
 const app = express()
 const port = process.env.PORT || 8081
 
@@ -54,8 +55,12 @@ async function initApp() {
   // Serving static image
   servingStaticConfig(app)
 
+  // //passport initialize
+  // app.use(passport.initialize())
+
   //ROUTES
   app.use(router)
+
   //////////////////////////////
 
   //init swagger

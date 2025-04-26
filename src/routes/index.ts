@@ -9,9 +9,12 @@ import { topicRouter } from './topic.route'
 import { courseRouter } from './course.route'
 import { emailRouter } from './email.route'
 import { userProgressRouter } from './userProgress.route'
+import { oAuthRouter } from './oauth.route'
 const router = express.Router()
 
 router.use('/auth', authRouter)
+
+router.use('/oauth', oAuthRouter)
 
 router.use('/email', emailRouter)
 

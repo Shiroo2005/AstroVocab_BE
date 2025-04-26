@@ -1,4 +1,5 @@
 import express from 'express'
+import passport from 'passport'
 import {
   accountController,
   loginController,
@@ -47,7 +48,12 @@ authRouter.post('/register', registerValidation, wrapRequestHandler(registerCont
  * @path : /login
  * @body : {username: string, password: string}
  */
-authRouter.post('/login', loginValidation, wrapRequestHandler(loginController))
+authRouter.post(
+  '/login',
+  loginValidation,
+  passport.authenticate('local', { session: false }),
+  wrapRequestHandler(loginController)
+)
 
 /**
  * @description : Logout user
