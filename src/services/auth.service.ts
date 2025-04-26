@@ -19,9 +19,9 @@ import { getAccountRes } from '~/dto/res/auth/getAccount.res'
 import { roleService } from './role.service'
 
 class AuthService {
-  login = async ({ userId, role }: { userId: number; role: Role }): Promise<LoginRes> => {
+  login = async ({ userId, roleId }: { userId: number; roleId: number }): Promise<LoginRes> => {
     const { accessToken, refreshToken } = await this.createAccessAndRefreshToken({
-      roleId: role.id as number,
+      roleId,
       userId
     })
 

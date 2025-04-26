@@ -8,8 +8,10 @@ import { compareBcrypt } from '~/utils/jwt'
 import { env } from 'process'
 import { TokenType } from '~/constants/token'
 import { TokenPayload } from '~/dto/common.dto'
+import { OAuthStrategyFactory } from '~/services/passport.service'
+import { OAUTH_PROVIDER } from '~/constants/oauth'
 
-// Đăng nhập username/password
+// Login username/password
 passport.use(
   new LocalStrategy(
     {
@@ -37,7 +39,7 @@ passport.use(
   )
 )
 
-// Xác thực bằng JWT
+// Authenticate by JWT
 passport.use(
   new JwtStrategy(
     {
@@ -63,3 +65,19 @@ passport.use(
     }
   )
 )
+
+//OAuthFactory
+
+// Login google
+OAuthStrategyFactory.create({
+  provider: OAUTH_PROVIDER.GOOGLE,
+  clientID: env.GOOGLE_CLIENT_ID as string,
+  clientSecret: env.GOOGLE_CLIENT_SECRET as string,
+  callbackURL: env.GOOGLE_CALLBACK_URL as string,
+  scope: ['profile', 'email'],
+  getProfile: async (profile) => {
+    const email = profile.emails?.[0]?.value
+    const fullName = profile.displayName
+    return { email, fullName }
+  }
+})
